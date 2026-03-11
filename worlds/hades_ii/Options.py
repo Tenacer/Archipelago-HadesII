@@ -238,24 +238,12 @@ class FillerHelperPercentage(Range):
 class MaxHealthHelperPercentage(Range):
     """
     Choose the percentage of helper items that will boost your max health.
+    The remaning percentage will go towards initial money helpers, which boost initial money by X AMOUNT.
     """
     display_name = "Max Health Helper Percentage"
     range_start = 0
     range_end = 100
-    default = 35
-
-
-class InitialMoneyHelperPercentage(Range):
-    """
-    Choose the percentage of helper items that will boost your initial money by 25 each run.
-    This gets capped by the percentage being left from the MaxHealthHelpers. 
-    What percentage remains from this and the MaxHealthHelpers will give you items that boost the 
-    rarity of the boons obtained in runs.
-    """
-    display_name = "Initial Money Helper Percentage"
-    range_start = 0
-    range_end = 100
-    default = 35
+    default = 50
     
 # -- Traps
 
@@ -311,7 +299,6 @@ class HadesIIOptions(PerGameCommonOptions):
     
     filler_helper_percentage: FillerHelperPercentage
     max_health_helper_percentage: MaxHealthHelperPercentage
-    initial_money_helper_percentage: InitialMoneyHelperPercentage
     
     filler_trap_percentage: FillerTrapPercentage
     
@@ -351,7 +338,6 @@ hades_ii_option_groups = [
     OptionGroup("Helpers and Trap Options", [
         FillerHelperPercentage,
         MaxHealthHelperPercentage,
-        InitialMoneyHelperPercentage,
         FillerTrapPercentage,
     ]),
     OptionGroup("Quality of Life Options", [

@@ -74,8 +74,11 @@ item_name_groups = {
     **group_keepsakes,
 }
 
-# Sorry for the abomination of uppercase and underscore here, but I figured it was more readable
-# than `HadesIIItem`
+def create_trap_pool():
+    return [trap for trap in item_table_traps.keys()]
+
+# Sorry for the abomination of uppercase and underscore here, but I figured it was more 
+# readable than `HadesIIItem`
 class Hades_II_Item(Item):
     game = "Hades"
 
