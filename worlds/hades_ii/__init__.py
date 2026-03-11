@@ -45,19 +45,19 @@ class HadesIIWorld(World):
         
         # Keepsakes
         if self.options.keepsakesanity:
-            for name, data in item_table_keepsakes.items():
+            for name in item_table_keepsakes:
                 item = Hades_II_Item(name, self.player)
                 pool.append(item)
         
         # Weapons
         if self.options.weaponsanity:
-            for name, data in item_table_weapons.items():
+            for name in item_table_weapons:
                 if self.should_ignore_weapon(name):
                     continue
                 item = Hades_II_Item(name, self.player)
                 pool.append(item)
                 
         if self.options.aspectsanity:
-            for name, data in item_table_aspects.items():
+            for name in item_table_aspects:
                 item = Hades_II_Item(name, self.player)
                 pool.append(item)
