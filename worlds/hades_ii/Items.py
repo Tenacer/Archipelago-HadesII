@@ -23,27 +23,33 @@ item_table_filler: Dict[str, ItemData] = {
 }
 
 item_table_keepsakes: Dict[str, ItemData] = {
-    "keepsake1": ItemData(hades_ii_base_item_id +4, ItemClassification.useful)
+    "keepsake1": ItemData(hades_ii_base_item_id +4, ItemClassification.useful),
+    "keepsake33": ItemData(hades_ii_base_item_id +36, ItemClassification.useful)
 }
 
 item_table_weapons: Dict[str, ItemData] = {
-    "X Weapon Unlock Item": ItemData(hades_ii_base_item_id+5, ItemClassification.progression)
+    "Staff Weapon Unlock Item": ItemData(hades_ii_base_item_id+37, ItemClassification.progression),
+    "Daggers Weapon Unlock Item": ItemData(hades_ii_base_item_id+38, ItemClassification.progression),
+    "Torches Weapon Unlock Item": ItemData(hades_ii_base_item_id+39, ItemClassification.progression),
+    "Axe Weapon Unlock Item": ItemData(hades_ii_base_item_id+40, ItemClassification.progression),
+    "Skull Weapon Unlock Item": ItemData(hades_ii_base_item_id+41, ItemClassification.progression),
+    "Coat Weapon Unlock Item": ItemData(hades_ii_base_item_id+42, ItemClassification.progression)
 }
 
 item_table_tools: Dict[str, ItemData] = {
-    "X Tool Unlock Item": ItemData(hades_ii_base_item_id+6, ItemClassification.progression)
+    "X Tool Unlock Item": ItemData(hades_ii_base_item_id+11, ItemClassification.progression)
 }
 
 item_table_aspects: Dict[str, ItemData] = {
-    "X Weapon Y Aspect Unlock Item": ItemData(hades_ii_base_item_id+7, ItemClassification.progression)
+    "X Weapon Y Aspect Unlock Item": ItemData(hades_ii_base_item_id+12, ItemClassification.progression)
 }
 
 item_table_traps: Dict[str, ItemData] = {
-    "trap1": ItemData(hades_ii_base_item_id+8, ItemClassification.trap)
+    "trap1": ItemData(hades_ii_base_item_id+13, ItemClassification.trap)
 }
 
 item_table_helpers: Dict[str, ItemData] = {
-    "helper1": ItemData(hades_ii_base_item_id+9, ItemClassification.progression | ItemClassification.useful)
+    "helper1": ItemData(hades_ii_base_item_id+14, ItemClassification.progression | ItemClassification.useful)
 }
 
 item_table = {

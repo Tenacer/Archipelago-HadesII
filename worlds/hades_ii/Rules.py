@@ -93,7 +93,7 @@ class HadesIILogic(LogicMixin):
     def _has_moros_access(self, player: int) -> bool:
         return self.has("Doomed Beckoning", player)  # type: ignore
 
-def set_rules(world: "HadesIIWorld", player: int, number_items: int, location_table: dict, options) -> None:
+def set_rules(world, player: int, number_items: int, location_table: dict, options) -> None:
     # Locations
     if options.location_system == "room_weapon_based":
         for weapon in weapons:
@@ -118,7 +118,8 @@ def set_rules(world: "HadesIIWorld", player: int, number_items: int, location_ta
         lambda state:
             state._has_enough_weapons(player, options, 6)) # type: ignore
     
-    world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
+    world.completion_condition[player] = \
+        lambda state: state._can_get_victory(player, options)
     
     # Keepsakes
     if options.keepsakesanity:

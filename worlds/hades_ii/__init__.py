@@ -25,11 +25,11 @@ class HadesIISettings(settings.Group):
 class HadesIIWorld(World):
     options: HadesIIOptions
     options_dataclass = HadesIIOptions
-    game = "Hades II"
-    topology_present = False
+    game: str = "Hades II"
+    topology_present: bool = False
     settings: typing.ClassVar[HadesIISettings]
     # TODO: Web world eventually
-    required_client_version = (0, 6, 4)
+    required_client_version: tuple = (0, 6, 4)
     
     item_name_to_id = {name: data.code for name, data in item_table.items() if data.code is not None}
     location_name_to_id = give_all_locations_table()
@@ -43,7 +43,7 @@ class HadesIIWorld(World):
         local_location_table = setup_location_table_with_settings(self.options).copy()
         pool = []
         
-        # Data is included but never used, not sure if it breaks anything to remove it, I'll test later4
+        # Data is included but never used, not sure if it breaks anything to remove it, I'll test later
         # TODO: Fear
         
         # Keepsakes
@@ -67,10 +67,10 @@ class HadesIIWorld(World):
                 pool.append(item)
                 
         # Filler Stuff
-        total_fillers_needed = len(local_location_table)- len(pool)- len(location_table_prophecies_events) 
-        # Not 100% sure why the prophecy events are in here, just copied and pasted, I'll figure it out later
+        total_fillers_needed = len(local_location_table) - len(pool) - len(location_table_prophecies_events) 
         
         # Define the percentages in the pool based off options
+        # ? Add F. Fabric to speed things up for the player?
         percentages = {
             "ash": self.options.ash_pack_percentage,
             "bones": self.options.bones_pack_percentage,
@@ -132,4 +132,7 @@ class HadesIIWorld(World):
     # Rules
     def apply_rules(self):
         local_location_table = setup_location_table_with_settings(self.options).copy()
-        set_rules(self.multiworld, self.player, self.calculate_number_of_pact_items(), local_location_table, self.options)
+        set_rules(
+                self.multiworld, self.player, self.calculate_number_of_pact_items(), 
+                local_location_table, self.options
+        )

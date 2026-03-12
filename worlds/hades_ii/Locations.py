@@ -1,5 +1,6 @@
 from BaseClasses import Location
 
+#TODO: Figure out why it's done this way, why specifically 1700 in H1?
 hades_ii_base_location_id = 1
 max_number_room_checks = 1700 + hades_ii_base_location_id
 
