@@ -23,8 +23,43 @@ item_table_filler: Dict[str, ItemData] = {
 }
 
 item_table_keepsakes: Dict[str, ItemData] = {
-    "keepsake1": ItemData(hades_ii_base_item_id +4, ItemClassification.useful),
-    "keepsake33": ItemData(hades_ii_base_item_id +36, ItemClassification.useful)
+    "Hecate Keepsake": ItemData(hades_ii_base_item_id +4, ItemClassification.useful),
+    "Odysseus Keepsake": ItemData(hades_ii_base_item_id +5, ItemClassification.useful),
+    "Schelemeus Keepsake": ItemData(hades_ii_base_item_id +6, ItemClassification.useful),
+    "Dora Keepsake": ItemData(hades_ii_base_item_id +7, ItemClassification.useful),
+    "Nemisis Keepsake": ItemData(hades_ii_base_item_id +8, ItemClassification.useful),
+    "Moros Keepsake": ItemData(hades_ii_base_item_id +9, ItemClassification.useful),
+    "Eris Keepsake": ItemData(hades_ii_base_item_id +10, ItemClassification.useful),
+    "Charon Keepsake": ItemData(hades_ii_base_item_id +11, ItemClassification.useful),
+    "Hermes Keepsake": ItemData(hades_ii_base_item_id +12, ItemClassification.useful),
+    "Artemis Keepsake": ItemData(hades_ii_base_item_id +13, ItemClassification.useful),
+    "Selene Keepsake": ItemData(hades_ii_base_item_id +14, ItemClassification.useful),
+    
+    "Zeus Keepsake": ItemData(hades_ii_base_item_id +15, ItemClassification.useful),
+    "Hera Keepsake": ItemData(hades_ii_base_item_id +16, ItemClassification.useful),
+    "Poseidon Keepsake": ItemData(hades_ii_base_item_id +17, ItemClassification.useful),
+    "Demeter Keepsake": ItemData(hades_ii_base_item_id +18, ItemClassification.useful),
+    "Apollo Keepsake": ItemData(hades_ii_base_item_id +19, ItemClassification.useful),
+    "Aphrodite Keepsake": ItemData(hades_ii_base_item_id +20, ItemClassification.useful),
+    "Hephaestus Keepsake": ItemData(hades_ii_base_item_id +21, ItemClassification.useful),
+    "Hestia Keepsake": ItemData(hades_ii_base_item_id +22, ItemClassification.useful),
+    "Ares Keepsake": ItemData(hades_ii_base_item_id +23, ItemClassification.useful),
+    "Athena Keepsake": ItemData(hades_ii_base_item_id +24, ItemClassification.useful),
+    "Dionysus Keepsake": ItemData(hades_ii_base_item_id +25, ItemClassification.useful),
+    
+    "Arachne Keepsake": ItemData(hades_ii_base_item_id +26, ItemClassification.useful),
+    "Narcissus Keepsake": ItemData(hades_ii_base_item_id +27, ItemClassification.useful),
+    "Echo Keepsake": ItemData(hades_ii_base_item_id +28, ItemClassification.useful),
+    "Heracles Keepsake": ItemData(hades_ii_base_item_id +29, ItemClassification.useful),
+    "Medea Keepsake": ItemData(hades_ii_base_item_id +30, ItemClassification.useful),
+    "Circe Keepsake": ItemData(hades_ii_base_item_id +31, ItemClassification.useful),
+    "Icarus Keepsake": ItemData(hades_ii_base_item_id +32, ItemClassification.useful),
+    
+    "Hades/Persephone Keepsake": ItemData(hades_ii_base_item_id +33, ItemClassification.useful),
+    "Zagreus Keepsake": ItemData(hades_ii_base_item_id +34, ItemClassification.useful),
+    "Chronos Keepsake": ItemData(hades_ii_base_item_id +35, ItemClassification.useful),
+    
+    "Chaos Keepsake": ItemData(hades_ii_base_item_id +36, ItemClassification.useful),
 }
 
 item_table_weapons: Dict[str, ItemData] = {
