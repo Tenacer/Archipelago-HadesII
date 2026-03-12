@@ -3,12 +3,13 @@ import settings
 
 from ..AutoWorld import World
 from .Options import hades_ii_option_groups, HadesIIOptions
+from BaseClasses import Entrance, Item, MultiWorld, Region, Tutorial
 
-from .Items import item_table, item_name_groups, Hades_II_Item, create_trap_pool
-from .Items import item_table_keepsakes, item_table_weapons, item_table_aspects
-
-from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings
-from .Locations import location_table_prophecies_events
+from .Items import item_table, item_name_groups, Hades_II_Item, create_trap_pool, \
+    item_table_keepsakes, item_table_weapons, item_table_aspects
+                
+from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings, \
+    location_table_prophecies_events, HadesIILocation
 
 from .Rules import set_rules
 
@@ -24,7 +25,7 @@ class HadesIISettings(settings.Group):
 
 class HadesIIWorld(World):
     options: HadesIIOptions
-    options_dataclass = HadesIIOptions
+    # options_dataclass = HadesIIOptions
     game: str = "Hades II"
     topology_present: bool = False
     settings: typing.ClassVar[HadesIISettings]
@@ -102,8 +103,6 @@ class HadesIIWorld(World):
         # Helpers
         health_helpers = int(counts["helpers"] * self.options.max_health_helper_percentage / 100)
         money_helpers = counts["helpers"] - health_helpers
-        
-        trap_pool = create_trap_pool()
 
         # Populate the pool with fillers
         items = {
@@ -122,9 +121,13 @@ class HadesIIWorld(World):
                 pool.append(Hades_II_Item(name, self.player))
         
         # Fill traps
+        trap_pool = create_trap_pool()
         for i in range(counts["traps"]):
             item_name = trap_pool[i % len(trap_pool)]
             pool.append(Hades_II_Item(item_name, self.player))
+            
+        # Place in boss events
+        place_boss_events(self.world, self.player)
             
         # Add items to pool
         self.multiworld.itempool += pool
@@ -136,3 +139,35 @@ class HadesIIWorld(World):
                 self.multiworld, self.player, self.calculate_number_of_pact_items(), 
                 local_location_table, self.options
         )
+        
+# Regions
+def create_region(multiworld: MultiWorld, player: int, location_database: dict, name: str, locations=None, exits=None) -> Region:
+    temp_region = Region(name, player, multiworld)
+    if locations:
+        for location in locations:
+            loc_id = location_database.get(location, 0)
+            location = HadesIILocation(player, location, loc_id, temp_region)
+            temp_region.locations.append(location)
+    if exits:
+        for exit in exits:
+            temp_region.exits.append(Entrance(player, exit, temp_region))
+
+    return temp_region
+
+# Places boss event pseudo-items at each location
+def place_boss_events(world, player):
+    bosses = [
+        "Hecate Victory",
+        "Scylla Victory",
+        "Cerberus Victory",
+        "Chronos Victory",
+        "Polyphemus Victory",
+        "Eris Victory",
+        "Prometheus Victory",
+        "Typhon Victory",
+    ]
+
+    for boss in bosses:
+        location = world.get_location(boss, player)
+        item = world.create_event(boss)
+        location.place_locked_item(item)

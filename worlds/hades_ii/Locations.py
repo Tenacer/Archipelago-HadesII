@@ -4,6 +4,40 @@ from BaseClasses import Location
 hades_ii_base_location_id = 1
 max_number_room_checks = 1700 + hades_ii_base_location_id
 
+location_table_crossroads = {}
+
+location_table_erebus = {
+    "Hecate Victory": None
+}
+
+location_table_oceanus = {
+    "Scylla Victory": None
+}
+
+location_table_fields = {
+    "Cerberus Victory": None
+}
+
+location_table_tartarus = {
+    "Chronos Victory": None
+}
+
+location_table_ephyra = {
+    "Polyphemus Victory": None
+}
+
+location_table_thessaly = {
+    "Eris Victory": None
+}
+
+location_table_olympus = {
+    "Prometheus Victory": None
+}
+
+location_table_summit = {
+    "Typhon Victory": None
+}
+
 location_keepsakes = {    
     "Hecate Keepsake": max_number_room_checks + 1,
     "Odysseus Keepsake": max_number_room_checks + 2,
@@ -117,3 +151,13 @@ def should_ignore_weapon_location(weaponLocation : str, options):
     if options.initial_weapon.value == 5 and weaponLocation == "Coat Weapon Unlock Location":
         return True
     return False
+
+
+class HadesIILocation(Location):
+    game: str = "Hades II"
+
+    def __init__(self, player: int, name: str, address=None, parent=None):
+        super(HadesIILocation, self).__init__(player, name, address, parent)
+        if address is None:
+            self.event = True
+            self.locked = True
