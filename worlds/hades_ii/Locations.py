@@ -1,8 +1,8 @@
 from BaseClasses import Location
 
-#TODO: Figure out why it's done this way, why specifically 1700 in H1?
+# 2500 is arbitrary here, we'll find a more accurate amount later
 hades_ii_base_location_id = 1
-max_number_room_checks = 1700 + hades_ii_base_location_id
+max_number_room_checks = 2500 + hades_ii_base_location_id
 
 location_table_crossroads = {}
 
@@ -38,59 +38,69 @@ location_table_summit = {
     "Typhon Victory": None
 }
 
+keepsake_checks = max_number_room_checks
 location_keepsakes = {    
-    "Hecate Keepsake": max_number_room_checks + 1,
-    "Odysseus Keepsake": max_number_room_checks + 2,
-    "Schelemeus Keepsake": max_number_room_checks + 3,
-    "Dora Keepsake": max_number_room_checks + 4,
-    "Nemisis Keepsake": max_number_room_checks + 5,
-    "Moros Keepsake": max_number_room_checks + 6,
-    "Eris Keepsake": max_number_room_checks + 7,
-    "Charon Keepsake": max_number_room_checks + 8,
-    "Hermes Keepsake": max_number_room_checks + 9,
-    "Artemis Keepsake": max_number_room_checks + 10,
-    "Selene Keepsake": max_number_room_checks + 11,
+    "Hecate Keepsake": keepsake_checks + 1,
+    "Odysseus Keepsake": keepsake_checks + 2,
+    "Schelemeus Keepsake": keepsake_checks + 3,
+    "Dora Keepsake": keepsake_checks + 4,
+    "Nemisis Keepsake": keepsake_checks + 5,
+    "Moros Keepsake": keepsake_checks + 6,
+    "Eris Keepsake": keepsake_checks + 7,
+    "Charon Keepsake": keepsake_checks + 8,
+    "Hermes Keepsake": keepsake_checks + 9,
+    "Artemis Keepsake": keepsake_checks + 10,
+    "Selene Keepsake": keepsake_checks + 11,
     
-    "Zeus Keepsake": max_number_room_checks + 12,
-    "Hera Keepsake": max_number_room_checks + 13,
-    "Poseidon Keepsake": max_number_room_checks + 14,
-    "Demeter Keepsake": max_number_room_checks + 15,
-    "Apollo Keepsake": max_number_room_checks +16,
-    "Aphrodite Keepsake": max_number_room_checks + 17,
-    "Hephaestus Keepsake": max_number_room_checks + 18,
-    "Hestia Keepsake": max_number_room_checks + 19,
-    "Ares Keepsake": max_number_room_checks + 20,
-    "Athena Keepsake": max_number_room_checks + 21,
-    "Dionysus Keepsake": max_number_room_checks + 22,
+    "Zeus Keepsake": keepsake_checks + 12,
+    "Hera Keepsake": keepsake_checks + 13,
+    "Poseidon Keepsake": keepsake_checks + 14,
+    "Demeter Keepsake": keepsake_checks + 15,
+    "Apollo Keepsake": keepsake_checks +16,
+    "Aphrodite Keepsake": keepsake_checks + 17,
+    "Hephaestus Keepsake": keepsake_checks + 18,
+    "Hestia Keepsake": keepsake_checks + 19,
+    "Ares Keepsake": keepsake_checks + 20,
+    "Athena Keepsake": keepsake_checks + 21,
+    "Dionysus Keepsake": keepsake_checks + 22,
     
-    "Arachne Keepsake": max_number_room_checks + 23,
-    "Narcissus Keepsake": max_number_room_checks + 24,
-    "Echo Keepsake": max_number_room_checks + 25,
-    "Heracles Keepsake": max_number_room_checks + 26,
-    "Medea Keepsake": max_number_room_checks + 27,
-    "Circe Keepsake": max_number_room_checks + 28,
-    "Icarus Keepsake": max_number_room_checks + 29,
+    "Arachne Keepsake": keepsake_checks + 23,
+    "Narcissus Keepsake": keepsake_checks + 24,
+    "Echo Keepsake": keepsake_checks + 25,
+    "Heracles Keepsake": keepsake_checks + 26,
+    "Medea Keepsake": keepsake_checks + 27,
+    "Circe Keepsake": keepsake_checks + 28,
+    "Icarus Keepsake": keepsake_checks + 29,
     
-    "Hades/Persephone Keepsake": max_number_room_checks + 30,
-    "Zagreus Keepsake": max_number_room_checks + 31,
-    "Chronos Keepsake": max_number_room_checks + 32,
+    "Hades/Persephone Keepsake": keepsake_checks + 30,
+    "Zagreus Keepsake": keepsake_checks + 31,
+    "Chronos Keepsake": keepsake_checks + 32,
     
-    "Chaos Keepsake": max_number_room_checks + 33,
+    "Chaos Keepsake": keepsake_checks + 33,
 }
 
+weapon_checks = keepsake_checks + 33
 location_weapons = {
-    "Staff Weapon Unlock Location": max_number_room_checks + 34,
-    "Coat weapon Unlock Location": max_number_room_checks + 39
+    "Staff Weapon Unlock Location": weapon_checks + 1,
+    "Daggers Weapon Unlock Location": weapon_checks + 2,
+    "Torches Weapon Unlock Location": weapon_checks + 3,
+    "Axe Weapon Unlock Location": weapon_checks + 4,
+    "Skull Weapon Unlock Location": weapon_checks + 5,
+    "Coat weapon Unlock Location": weapon_checks +6
 }
 
+tool_checks = weapon_checks + 6
 location_tools = {
-    "Shovel Tool Unlock Location": max_number_room_checks + 40,
-    "Last Tool Unlock Location": max_number_room_checks + 44
+    "Crescent Pickaxe Tool Unlock Location": tool_checks + 1,
+    "Silver Spade Tool Unlock Location": tool_checks + 2,
+    "Tablet of Peace Tool Unlock Location": tool_checks + 3,
+    "Rod of Fishing Tool Unlock Location": tool_checks + 4,
 }
 
+prophecies_checks = tool_checks + 4
 location_table_prophecies = {
-    "Witch of the Crossroads Prophecy":  max_number_room_checks + 45,
-    "Last prophecy": max_number_room_checks + 133
+    "Witch of the Crossroads Prophecy":  prophecies_checks + 1,
+    "Last prophecy": prophecies_checks + 133
 }
 
 location_table_prophecies_events = {

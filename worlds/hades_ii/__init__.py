@@ -42,6 +42,6 @@ class HadesIIWorld(World):
         create_items(self)
        
     # Rules
-    def apply_rules(self):
+    def set_rules(self):
         local_location_table = setup_location_table_with_settings(self.options).copy()
         set_rules( self.multiworld, self.player, local_location_table, self.options)
