@@ -1,12 +1,23 @@
 from typing import Dict, NamedTuple, Optional
-
 from BaseClasses import Item, ItemClassification
+from .Locations import setup_location_table_with_settings, location_table_prophecies_events
 
 class ItemData(NamedTuple):
     code: Optional[int]
     item_classification: ItemClassification
     event: bool = False
     
+# Sorry for the abomination of uppercase and underscore here, but I figured it was more 
+# readable than `HadesIIItem`
+class Hades_II_Item(Item):
+    game = "Hades"
+
+    def __init__(self, name, player: int):
+        item_data = item_table[name]
+        itemClass = item_data.item_classification
+            
+        super(Hades_II_Item, self).__init__(name, itemClass, item_data.code, player)
+
 hades_ii_base_item_id = 1
 
 item_table_fears: Dict[str, ItemData] = {
@@ -115,23 +126,115 @@ item_name_groups = {
     **group_keepsakes,
 }
 
+def create_items(self) -> None:
+        local_location_table = setup_location_table_with_settings(self.options).copy()
+        pool = []
+        
+        # Data is included but never used, not sure if it breaks anything to remove it, I'll test later
+        # TODO: Fear
+        
+        # Keepsakes
+        if self.options.keepsakesanity:
+            for name in item_table_keepsakes:
+                item = Hades_II_Item(name, self.player)
+                pool.append(item)
+        
+        # Weapons
+        if self.options.weaponsanity:
+            for name in item_table_weapons:
+                if self.should_ignore_weapon(name):
+                    continue
+                item = Hades_II_Item(name, self.player)
+                pool.append(item)
+                
+        # Aspects
+        if self.options.aspectsanity:
+            for name in item_table_aspects:
+                item = Hades_II_Item(name, self.player)
+                pool.append(item)
+                
+        # Filler Stuff
+        total_fillers_needed = len(local_location_table) - len(pool) - len(location_table_prophecies_events) 
+        
+        # Define the percentages in the pool based off options
+        # ? Add F. Fabric to speed things up for the player?
+        percentages = {
+            "ash": self.options.ash_pack_percentage,
+            "bones": self.options.bones_pack_percentage,
+            "psyche": self.options.psyche_pack_percentage,
+            "nectar": self.options.nectar_pack_percentage,
+            "ambrosia": self.options.ambrosia_pack_percentage,
+            "nightmare": self.options.nightmare_pack_percentage,
+            "helpers": self.options.filler_helper_percentage,
+            "traps": self.options.filler_trap_percentage,
+        }
+
+        total_percentage = sum(percentages.values())
+
+        if total_percentage == 0:
+            percentages["bones"] = 100
+            total_percentage = 100
+            
+        correction = 100/total_percentage
+        
+        # Calculate the needed amounts
+        counts = {
+            name: int(total_fillers_needed * pct * correction / 100)
+            for name, pct in percentages.items()
+        }
+
+        # Populate the rest with bones for remainder safety
+        counts["bones"] += total_fillers_needed - sum(counts.values())
+        
+        # Helpers
+        health_helpers = int(counts["helpers"] * self.options.max_health_helper_percentage / 100)
+        money_helpers = counts["helpers"] - health_helpers
+
+        # Populate the pool with fillers
+        items = {
+            "Ash": counts["ash"],
+            "Bones": counts["bones"],
+            "Psyche": counts["psyche"],
+            "Nectar": counts["nectar"],
+            "Ambrosia": counts["ambrosia"],
+            "Nightmare": counts["nightmare"],
+            "Max Health Helper": health_helpers,
+            "Initial Money Helper": money_helpers,
+        }
+
+        for name, count in items.items():
+            for _ in range(count):
+                pool.append(Hades_II_Item(name, self.player))
+        
+        # Fill traps
+        trap_pool = create_trap_pool()
+        for i in range(counts["traps"]):
+            item_name = trap_pool[i % len(trap_pool)]
+            pool.append(Hades_II_Item(item_name, self.player))
+            
+        # Place in boss events
+        place_boss_events(self.world, self.player)
+            
+        # Add items to pool
+        self.multiworld.itempool += pool
+
 def create_trap_pool():
     return [trap for trap in item_table_traps.keys()]
 
-# Sorry for the abomination of uppercase and underscore here, but I figured it was more 
-# readable than `HadesIIItem`
-class Hades_II_Item(Item):
-    game = "Hades"
+# Places boss event pseudo-items at each location
+def place_boss_events(world, player):
+    bosses = [
+        "Hecate Victory",
+        "Scylla Victory",
+        "Cerberus Victory",
+        "Chronos Victory",
+        "Polyphemus Victory",
+        "Eris Victory",
+        "Prometheus Victory",
+        "Typhon Victory",
+    ]
 
-    def __init__(self, name, player: int):
-        item_data = item_table[name]
-        itemClass = item_data.item_classification
-            
-        super(Hades_II_Item, self).__init__(
-            name,
-            itemClass,
-            item_data.code, player
-        )
-        
-        def is_progression(self): # idk if this is needed, copied/pasted
-            return self.classification == ItemClassification.progression
+    for boss in bosses:
+        location = world.get_location(boss, player)
+        item = world.create_event(boss)
+        location.place_locked_item(item)

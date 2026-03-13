@@ -17,8 +17,8 @@ weapons = [
     "Coat Weapon",
 ]
 
-# Used for keepsakes
-olympians = {
+# Used for keepsake logic
+olympians = [
     "Zeus",
     "Hera",
     "Poseidon",
@@ -29,7 +29,7 @@ olympians = {
     "Hestia",
     "Ares",
     "Athena",
-}
+]
 
 class HadesIILogic(LogicMixin):
     # Checks if the player has enough of a given item 
@@ -111,18 +111,18 @@ class HadesIILogic(LogicMixin):
     def _has_moros_access(self, player: int) -> bool:
         return self.has("Doomed Beckoning", player)  # type: ignore
 
-def set_rules(world, player: int, number_items: int, location_table: dict, options) -> None:    
+def set_rules(world, player: int, location_table: dict, options) -> None:    
     if options.location_system == "room_weapon_based":
-        for weapon in weapons:
-            set_weapon_region_rules(world, player, number_items, location_table, options, weapon) # type: ignore
+        pass
+        # for weapon in weapons:
+            # set_weapon_region_rules(world, player, number_items, location_table, options, weapon)
     else:
         handle_area_logic(world, player)
     
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
     
     # Keepsakes
-    if options.keepsakesanity:
-        handle_keepsakes(world, player, options)
+    handle_keepsakes(world, player, options)
         
     # if options.weaponsanity:
     #     add_rule(world.get_entrance("Weapon Cache", player), lambda state: True)
@@ -153,39 +153,45 @@ def handle_area_logic(world, player):
 
 # Defines logic for keepsakes, the logic doc lists NPCs in more detail
 def handle_keepsakes(world, player, options):
-    add_rule(world.get_entrance("NPCS"), lambda state: True)
-    keepsake_rules = [ # ("Name Keepsake", "Boss Victory" {OR NONE}, Surface Needed [bool])
-        ("Narcissus Keepsake", "Hecate Victory", False),
-        ("Hermes Keepsake", "Hecate Victory", False),
-        ("Echo Keepsake", "Scylla Victory", False),
-        ("Medea Keepsake", None, True),
-        ("Heracles Keepsake", None, True),
-        ("Icarus Keepsake", "Polyphemus Victory", True),
-        ("Circe Keepsake", "Polyphemus Victory", True),
-        ("Eris Keepsake", "Eris Victory", True), # ! Eris is probably accessible earlier, here right now for safety.
-        ("Dionysus Keepsake", "Eris Victory", True),        
-    ]
+    if options.keepsakesanity: # If randomized
+        add_rule(world.get_entrance("NPCS"), lambda state: True)
+        keepsake_rules = [ # ("Name Keepsake", "Boss Victory" {OR NONE}, Surface Needed [bool])
+            ("Narcissus Keepsake", "Hecate Victory", False),
+            ("Hermes Keepsake", "Hecate Victory", False),
+            ("Echo Keepsake", "Scylla Victory", False),
+            ("Medea Keepsake", None, True),
+            ("Heracles Keepsake", None, True),
+            ("Icarus Keepsake", "Polyphemus Victory", True),
+            ("Circe Keepsake", "Polyphemus Victory", True),
+            ("Eris Keepsake", "Eris Victory", True), # ! Eris is probably accessible earlier, here right now for safety.
+            ("Dionysus Keepsake", "Eris Victory", True),        
+        ]
 
-    # Apply logic to each keepsake check
-    # Location-based
-    for person, boss, surface in keepsake_rules:
+        # Apply logic to each keepsake check
+        # Location-based
+        for person, boss, surface in keepsake_rules:
+            add_rule(
+                world.get_location(person),
+                lambda state, boss=boss, surface=surface:
+                    (boss is None or state._has_defeated_boss(boss, player, options)) # type: ignore
+                    and (not surface or state._has_surface_access(player)) # type: ignore
+            )
+        
+        # Olympians require their own keepsake to be logically checked
+        for person in olympians:
+            add_rule(
+                world.get_location(f"{person} Keepsake"),
+                lambda state, person=person:
+                    state.has(f"{person} Keepsake", player)
+            )
+        
+        # Specifically Moros
         add_rule(
-            world.get_location(person),
-            lambda state, boss=boss, surface=surface:
-                (boss is None or state._has_defeated_boss(boss, player, options)) # type: ignore
-                and (not surface or state._has_surface_access(player)) # type: ignore
-        )
-    
-    # Olympians require their own keepsake to be logically checked
-    for person in olympians:
-        add_rule(
-            world.get_location(f"{person} Keepsake"),
-            lambda state, person=person:
-                state.has(f"{person} Keepsake", player)
-        )
-    
-    # Specifically Moros
-    add_rule(
-        world.get_location("Moros Keepsake"),
-        lambda state: state._has_moros_access(player) # type: ignore
-        )
+            world.get_location("Moros Keepsake"),
+            lambda state: state._has_moros_access(player) # type: ignore
+            )
+        
+    else: # If not randomized
+        for keepsake in item_table_keepsakes.keys():
+            location = world.get_location(f"{keepsake} Keepsake", player)
+            location.place_locked_item(world.create_item(f"{keepsake} Keepsake"))
