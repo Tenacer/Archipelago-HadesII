@@ -73,42 +73,134 @@ item_table_keepsakes: Dict[str, ItemData] = {
 
 weapons_base_item_id = keepsakes_base_item_id + 33
 item_table_weapons: Dict[str, ItemData] = {
-    "Staff Weapon Unlock Item": ItemData(weapons_base_item_id+1, ItemClassification.progression),
-    "Daggers Weapon Unlock Item": ItemData(weapons_base_item_id+2, ItemClassification.progression),
-    "Torches Weapon Unlock Item": ItemData(weapons_base_item_id+3, ItemClassification.progression),
-    "Axe Weapon Unlock Item": ItemData(weapons_base_item_id+4, ItemClassification.progression),
-    "Skull Weapon Unlock Item": ItemData(weapons_base_item_id+5, ItemClassification.progression),
-    "Coat Weapon Unlock Item": ItemData(weapons_base_item_id+6, ItemClassification.progression)
+    "Staff Weapon Unlock Item": ItemData(weapons_base_item_id +1, ItemClassification.progression),
+    "Daggers Weapon Unlock Item": ItemData(weapons_base_item_id + 2, ItemClassification.progression),
+    "Torches Weapon Unlock Item": ItemData(weapons_base_item_id + 3, ItemClassification.progression),
+    "Axe Weapon Unlock Item": ItemData(weapons_base_item_id + 4, ItemClassification.progression),
+    "Skull Weapon Unlock Item": ItemData(weapons_base_item_id + 5, ItemClassification.progression),
+    "Coat Weapon Unlock Item": ItemData(weapons_base_item_id + 6, ItemClassification.progression)
 }
 
 tools_base_item_id = weapons_base_item_id +6
 item_table_tools: Dict[str, ItemData] = {
-    "Crescent Pickaxe Tool Unlock Item": ItemData(tools_base_item_id+1, ItemClassification.progression),
-    "Crescent Pickaxe Tool Unlock Item": ItemData(tools_base_item_id+1, ItemClassification.progression),
-    "Crescent Pickaxe Tool Unlock Item": ItemData(tools_base_item_id+1, ItemClassification.progression),
-    "Crescent Pickaxe Tool Unlock Item": ItemData(tools_base_item_id+1, ItemClassification.progression)
+    "Crescent Pickaxe Tool Unlock Item": ItemData(tools_base_item_id + 1, ItemClassification.progression),
+    "Tablet of Peace Tool Unlock Item": ItemData(tools_base_item_id + 1, ItemClassification.progression),
+    "Silver Spade Tool Unlock Item": ItemData(tools_base_item_id+  1, ItemClassification.progression),
+    "Rod of Fishing Tool Unlock Item": ItemData(tools_base_item_id + 1, ItemClassification.progression)
 
 }
 
+aspects_base_item_id = tools_base_item_id +4
 item_table_aspects: Dict[str, ItemData] = {
-    "X Weapon Y Aspect Unlock Item": ItemData(hades_ii_base_item_id+12, ItemClassification.progression)
+    "X Weapon Y Aspect Unlock Item": ItemData(aspects_base_item_id+ 1 , ItemClassification.progression)
 }
 
+traps_base_item_id = aspects_base_item_id + 24
 item_table_traps: Dict[str, ItemData] = {
     "trap1": ItemData(hades_ii_base_item_id+13, ItemClassification.trap)
 }
 
+helpers_base_item_id = traps_base_item_id + 1
 item_table_helpers: Dict[str, ItemData] = {
     "helper1": ItemData(hades_ii_base_item_id+14, ItemClassification.progression | ItemClassification.useful)
 }
 
-item_table_prophecies_completion = {
-    
-}
+# prophecies_base_item_id = helpers_base_item_id + 1
+# item_table_prophecies_completion = {
+#     "Melinoë, Help Us Reward": ItemData(prophecies_base_item_id+1, ItemClassification.progression, False),
+#     "Melinoë, Remember Us Event": ItemData(prophecies_base_item_id+2, ItemClassification.progression, False),
+#     "Melinoë, Seek Us Event": ItemData(prophecies_base_item_id+3, ItemClassification.progression, True),
+#     "Melinoë, Find Us Event": ItemData(prophecies_base_item_id+4, ItemClassification.progression, True),
+#     "Storm in the Heavens Event": ItemData(prophecies_base_item_id+5, ItemClassification.progression, True),
+#     "Temporary Setback Event": ItemData(prophecies_base_item_id+6, ItemClassification.progression, True),
+#     "Harbinger of Doom Event": ItemData(prophecies_base_item_id+7, ItemClassification.progression, True),
+#     "Witch of the Crossroads Event": ItemData(prophecies_base_item_id+8, ItemClassification.progression, True),
+#     "Natural Talent Event": ItemData(prophecies_base_item_id+9, ItemClassification.progression, True),
+#     "Sword of the Night Event": ItemData(prophecies_base_item_id+10, ItemClassification.progression, True),
+#     "Arcana of the Ages Event": ItemData(prophecies_base_item_id+11, ItemClassification.progression, True),
+#     "Unrivaled Prowess Event": ItemData(prophecies_base_item_id+12, ItemClassification.progression, True),
+#     "Bearing Dark Gifts Event": ItemData(prophecies_base_item_id+13, ItemClassification.progression, True),
+#     "Den Mother Event": ItemData(prophecies_base_item_id+14, ItemClassification.progression, True),
+#     "Family in Need Event": ItemData(prophecies_base_item_id+15, ItemClassification.progression, True),
+#     "Visions of Victory Event": ItemData(prophecies_base_item_id+16, ItemClassification.progression, True),
+#     "Unfinished Business Event": ItemData(prophecies_base_item_id+17, ItemClassification.progression, True),
+#     "Haunted by the Past Event": ItemData(prophecies_base_item_id+18, ItemClassification.progression, True),
+#     "Silk and Spitefulness Event": ItemData(prophecies_base_item_id+19, ItemClassification.progression, True),
+#     "Voice and Vanity Event": ItemData(prophecies_base_item_id+20, ItemClassification.progression, True),
+#     "Bitter Tears Event": ItemData(prophecies_base_item_id+21, ItemClassification.progression, True),
+#     "Drowned Ambitions Event": ItemData(prophecies_base_item_id+22, ItemClassification.progression, True),
+#     "The Jackal's Aspect Event": ItemData(prophecies_base_item_id+23, ItemClassification.progression, True),
+#     "The Crow's Aspect Event": ItemData(prophecies_base_item_id+24, ItemClassification.progression, True),
+#     "The Shadow's Aspect Event": ItemData(prophecies_base_item_id+25, ItemClassification.progression, True),
+#     "The Warrior's Aspect Event": ItemData(prophecies_base_item_id+26, ItemClassification.progression, True),
+#     "The Grave's Aspect Event": ItemData(prophecies_base_item_id+27, ItemClassification.progression, True),
+#     "The Destroyer's Aspect Event": ItemData(prophecies_base_item_id+28, ItemClassification.progression, True),
+#     "Nobody but Nobody Event": ItemData(prophecies_base_item_id+29, ItemClassification.progression, True),
+#     "Born to Win Event": ItemData(prophecies_base_item_id+30, ItemClassification.progression, True),
+#     "Improbable Outcomes Event": ItemData(prophecies_base_item_id+31, ItemClassification.progression, True),
+#     "Soundest of Slumbers Event": ItemData(prophecies_base_item_id+32, ItemClassification.progression, True),
+#     "Customary Gift Event": ItemData(prophecies_base_item_id+33, ItemClassification.progression, True),
+#     "Mindful Craft Event": ItemData(prophecies_base_item_id+34, ItemClassification.progression, True),
+#     "Blades of Pure Silver Event": ItemData(prophecies_base_item_id+35, ItemClassification.progression, True),
+#     "The Arms of Night Event": ItemData(prophecies_base_item_id+36, ItemClassification.progression, True),
+#     "The Unseen Sentinel Event": ItemData(prophecies_base_item_id+37, ItemClassification.progression, True),
+#     "Awakened Aspect Event": ItemData(prophecies_base_item_id+38, ItemClassification.progression, True),
+#     "Major Arcana Event": ItemData(prophecies_base_item_id+39, ItemClassification.progression, True),
+#     "Familiar Confidant Event": ItemData(prophecies_base_item_id+40, ItemClassification.progression, True),
+#     "Note to Self Event": ItemData(prophecies_base_item_id+41, ItemClassification.progression, True),
+#     "The Invoker Event": ItemData(prophecies_base_item_id+42, ItemClassification.progression, True),
+#     "Whims of Chaos Event": ItemData(prophecies_base_item_id+43, ItemClassification.progression, True),
+#     "Breadth of Knowledge Event": ItemData(prophecies_base_item_id+44, ItemClassification.progression, True),
+#     "Weight in Gold Event": ItemData(prophecies_base_item_id+45, ItemClassification.progression, True),
+#     "Valued Customer Event": ItemData(prophecies_base_item_id+46, ItemClassification.progression, True),
+#     "Close Companions Event": ItemData(prophecies_base_item_id+47, ItemClassification.progression, True),
+#     "Beyond Familiar Event": ItemData(prophecies_base_item_id+48, ItemClassification.progression, True),
+#     "Denizen of the Depths Event": ItemData(prophecies_base_item_id+49, ItemClassification.progression, True),
+#     "Keeper of Shadows Event": ItemData(prophecies_base_item_id+50, ItemClassification.progression, True),
+#     "Tools of the Unseen Event": ItemData(prophecies_base_item_id+51, ItemClassification.progression, True),
+#     "Precision Instrument Event": ItemData(prophecies_base_item_id+52, ItemClassification.progression, True),
+#     "Home in the Crossroads Event": ItemData(prophecies_base_item_id+53, ItemClassification.progression, True),
+#     "Spectral Forms Event": ItemData(prophecies_base_item_id+54, ItemClassification.progression, True),
+#     "Shadow of Death Event": ItemData(prophecies_base_item_id+55, ItemClassification.progression, True),
+#     "Shadow of Doom Event": ItemData(prophecies_base_item_id+56, ItemClassification.progression, True),
+#     "Gifts of the Moon Event": ItemData(prophecies_base_item_id+57, ItemClassification.progression, True),
+#     "Godsent Favor Event": ItemData(prophecies_base_item_id+58, ItemClassification.progression, True),
+#     "Master of the Dead Event": ItemData(prophecies_base_item_id+59, ItemClassification.progression, True),
+#     "Master of the Heavens Event": ItemData(prophecies_base_item_id+60, ItemClassification.progression, True),
+#     "Mistress of Wedlock Event": ItemData(prophecies_base_item_id+61, ItemClassification.progression, True),
+#     "Master of the Sea Event": ItemData(prophecies_base_item_id+62, ItemClassification.progression, True),
+#     "Mistress of Seasons Event": ItemData(prophecies_base_item_id+63, ItemClassification.progression, True),
+#     "Master of Light Event": ItemData(prophecies_base_item_id+64, ItemClassification.progression, True),
+#     "Mistress of Beauty Event": ItemData(prophecies_base_item_id+65, ItemClassification.progression, True),
+#     "Master of the Forge Event": ItemData(prophecies_base_item_id+66, ItemClassification.progression, True),
+#     "Mistress of the Hearth Event": ItemData(prophecies_base_item_id+67, ItemClassification.progression, True),
+#     "Master of War Event": ItemData(prophecies_base_item_id+68, ItemClassification.progression, True),
+#     "Mistress of the Hunt Event": ItemData(prophecies_base_item_id+69, ItemClassification.progression, True),
+#     "Master of Swiftness Event": ItemData(prophecies_base_item_id+70, ItemClassification.progression, True),
+#     "Mistress of Battle Event": ItemData(prophecies_base_item_id+71, ItemClassification.progression, True),
+#     "Master of Revelry Event": ItemData(prophecies_base_item_id+72, ItemClassification.progression, True),
+#     "Original Sins Event": ItemData(prophecies_base_item_id+73, ItemClassification.progression, True),
+#     "Original Virtues Event": ItemData(prophecies_base_item_id+74, ItemClassification.progression, True),
+#     "Power Beyond Legend Event": ItemData(prophecies_base_item_id+75, ItemClassification.progression, True),
+#     "Combined Might Event": ItemData(prophecies_base_item_id+76, ItemClassification.progression, True),
+#     "Weaver of Fineries Event": ItemData(prophecies_base_item_id+77, ItemClassification.progression, True),
+#     "Denier of Suitors Event": ItemData(prophecies_base_item_id+78, ItemClassification.progression, True),
+#     "Voice of Truth Event": ItemData(prophecies_base_item_id+79, ItemClassification.progression, True),
+#     "Witch of Shadows Event": ItemData(prophecies_base_item_id+80, ItemClassification.progression, True),
+#     "Witch of Changing Event": ItemData(prophecies_base_item_id+81, ItemClassification.progression, True),
+#     "Wings of Freedom Event": ItemData(prophecies_base_item_id+82, ItemClassification.progression, True),
+#     "Bared Fangs Event": ItemData(prophecies_base_item_id+83, ItemClassification.progression, True),
+#     "The Witch's Staff Event": ItemData(prophecies_base_item_id+84, ItemClassification.progression, True),
+#     "The Sister Blades Event": ItemData(prophecies_base_item_id+85, ItemClassification.progression, True),
+#     "The Umbral Flames Event": ItemData(prophecies_base_item_id+86, ItemClassification.progression, True),
+#     "The Moonstone Axe Event": ItemData(prophecies_base_item_id+87, ItemClassification.progression, True),
+#     "The Argent Skull Event": ItemData(prophecies_base_item_id+88, ItemClassification.progression, True),
+#     "The Black Coat Event": ItemData(prophecies_base_item_id+89, ItemClassification.progression, True)
+# }
 
 item_table = {
     **item_table_fears,
-    **item_table_prophecies_completion,
+    # **item_table_prophecies_completion,
     **item_table_filler,
     **item_table_keepsakes,
     **item_table_weapons,
@@ -161,9 +253,9 @@ def create_items(self) -> None:
     if self.options.toolsanity:
         pool.extend(self.create_item(name) for name in item_table_tools)
 
-    # Prophecies
-    if self.options.fatesanity:
-        pool.extend(self.create_item(name) for name in item_table_prophecies_completion)
+    # # Prophecies
+    # if self.options.fatesanity:
+    #     pool.extend(self.create_item(name) for name in item_table_prophecies_completion)
             
     # Handle fillers and traps
     handle_fillers(self, pool, local_location_table)
