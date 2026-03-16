@@ -194,99 +194,6 @@ location_table_prophecies = {
     "The Black Coat Check": prophecies_checks + 89
 }
 
-# Finished
-location_table_prophecies_events = {
-    "Melinoë, Help Us Event": None,
-    "Melinoë, Remember Us Event": None,
-    "Melinoë, Seek Us Event": None,
-    "Melinoë, Find Us Event": None,
-    "Storm in the Heavens Event": None,
-    "Temporary Setback Event": None,
-    "Harbinger of Doom Event": None,
-    "Witch of the Crossroads Event": None,
-    "Natural Talent Event": None,
-    "Sword of the Night Event": None,
-    "Arcana of the Ages Event": None,
-    "Unrivaled Prowess Event": None,
-    "Bearing Dark Gifts Event": None,
-    "Den Mother Event": None,
-    "Family in Need Event": None,
-    "Visions of Victory Event": None,
-    "Unfinished Business Event": None,
-    "Haunted by the Past Event": None,
-    "Silk and Spitefulness Event": None,
-    "Voice and Vanity Event": None,
-    "Bitter Tears Event": None,
-    "Drowned Ambitions Event": None,
-    "The Jackal's Aspect Event": None,
-    "The Crow's Aspect Event": None,
-    "The Shadow's Aspect Event": None,
-    "The Warrior's Aspect Event": None,
-    "The Grave's Aspect Event": None,
-    "The Destroyer's Aspect Event": None,
-    "Nobody but Nobody Event": None,
-    "Born to Win Event": None,
-    "Improbable Outcomes Event": None,
-    "Soundest of Slumbers Event": None,
-    "Customary Gift Event": None,
-    "Mindful Craft Event": None,
-    "Blades of Pure Silver Event": None,
-    "The Arms of Night Event": None,
-    "The Unseen Sentinel Event": None,
-    "Awakened Aspect Event": None,
-    "Major Arcana Event": None,
-    "Familiar Confidant Event": None,
-    "Note to Self Event": None,
-    "The Invoker Event": None,
-    "Whims of Chaos Event": None,
-    "Breadth of Knowledge Event": None,
-    "Weight in Gold Event": None,
-    "Valued Customer Event": None,
-    "Close Companions Event": None,
-    "Beyond Familiar Event": None,
-    "Denizen of the Depths Event": None,
-    "Keeper of Shadows Event": None,
-    "Tools of the Unseen Event": None,
-    "Precision Instrument Event": None,
-    "Home in the Crossroads Event": None,
-    "Spectral Forms Event": None,
-    "Shadow of Death Event": None,
-    "Shadow of Doom Event": None,
-    "Gifts of the Moon Event": None,
-    "Godsent Favor Event": None,
-    "Master of the Dead Event": None,
-    "Master of the Heavens Event": None,
-    "Mistress of Wedlock Event": None,
-    "Master of the Sea Event": None,
-    "Mistress of Seasons Event": None,
-    "Master of Light Event": None,
-    "Mistress of Beauty Event": None,
-    "Master of the Forge Event": None,
-    "Mistress of the Hearth Event": None,
-    "Master of War Event": None,
-    "Mistress of the Hunt Event": None,
-    "Master of Swiftness Event": None,
-    "Mistress of Battle Event": None,
-    "Master of Revelry Event": None,
-    "Original Sins Event": None,
-    "Original Virtues Event": None,
-    "Power Beyond Legend Event": None,
-    "Combined Might Event": None,
-    "Weaver of Fineries Event": None,
-    "Denier of Suitors Event": None,
-    "Voice of Truth Event": None,
-    "Witch of Shadows Event": None,
-    "Witch of Changing Event": None,
-    "Wings of Freedom Event": None,
-    "Bared Fangs Event": None,
-    "The Witch's Staff Event": None,
-    "The Sister Blades Event": None,
-    "The Umbral Flames Event": None,
-    "The Moonstone Axe Event": None,
-    "The Argent Skull Event": None,
-    "The Black Coat Event": None
-}
-
 group_keepsakes = {"keepsakes": location_keepsakes.keys()}
 group_weapons = {"weapons": location_weapons.keys()}
 group_tools = {"tools": location_tools.keys()}
@@ -305,13 +212,10 @@ def give_all_locations_table() -> dict:
         **location_weapons,
         **location_tools,
         **location_table_prophecies,
-        **location_table_prophecies_events,
     }
 
 def setup_location_table_with_settings(options):
     total_table = {}
- 
-    total_table.update(location_table_prophecies_events)
     
     if options.keepsakesanity.value == 1:
         total_table.update(location_keepsakes)
