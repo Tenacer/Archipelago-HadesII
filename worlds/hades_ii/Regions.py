@@ -1,63 +1,92 @@
-from BaseClasses import Region, Entrance, Location
-from .Locations import location_table_crossroads, location_table_erebus, location_table_oceanus, \
-    location_table_fields, location_table_tartarus, location_table_ephyra, location_table_thessaly, \
-    location_table_olympus, location_table_summit
-from .Options import HadesIIOptions
+from BaseClasses import Region, Entrance
+from .Locations import (
+    HadesIILocation,
+    location_table_score_checks,
+    location_table_boss_rewards,
+    location_keepsakes,
+    location_weapons,
+    location_tools,
+    location_table_prophecies,
+    location_table_erebus,
+    location_table_oceanus,
+    location_table_fields,
+    location_table_tartarus,
+    location_table_ephyra,
+    location_table_thessaly,
+    location_table_olympus,
+    location_table_summit,
+    should_ignore_weapon_location,
+)
 
-options: HadesIIOptions
+# Biome → (event location table, boss reward location name or None)
+_biome_data = {
+    "Erebus":    (location_table_erebus,   None),
+    "Oceanus":   (location_table_oceanus,  None),
+    "Fields":    (location_table_fields,   None),
+    "Tartarus":  (location_table_tartarus, "Chronos Kill Reward"),
+    "Ephyra":    (location_table_ephyra,   None),
+    "Thessaly":  (location_table_thessaly, None),
+    "Olympus":   (location_table_olympus,  None),
+    "Summit":    (location_table_summit,   "Typhon Kill Reward"),
+}
 
-from BaseClasses import Region, Entrance, Location
-
-region_connections = {
+_region_connections = {
+    "Menu":       ["Crossroads"],
     "Crossroads": ["Erebus", "Ephyra"],
-
-    "Erebus": ["Oceanus"],
-    "Oceanus": ["Fields"],
-    "Fields": ["Tartarus"],
-
-    "Ephyra": ["Thessaly"],
-    "Thessaly": ["Olympus"],
-    "Olympus": ["Summit"]
+    "Erebus":     ["Oceanus"],
+    "Oceanus":    ["Fields"],
+    "Fields":     ["Tartarus"],
+    "Tartarus":   [],
+    "Ephyra":     ["Thessaly"],
+    "Thessaly":   ["Olympus"],
+    "Olympus":    ["Summit"],
+    "Summit":     [],
 }
 
-region_locations = {
-    "Erebus": location_table_erebus,
-    "Oceanus": location_table_oceanus,
-    "Fields": location_table_fields,
-    "Tartarus": location_table_tartarus,
 
-    "Ephyra": location_table_ephyra,
-    "Thessaly": location_table_thessaly,
-    "Olympus": location_table_olympus,
-    "Summit": location_table_summit,
+def _add_location(region: Region, name: str, address):
+    region.locations.append(HadesIILocation(region.player, name, address, region))
 
-    "Crossroads": location_table_crossroads,
-}
 
-def create_regions(player, multiworld, location_database):
+def create_regions(player, multiworld, location_database, options):
+    regions = {name: Region(name, player, multiworld) for name in _region_connections}
 
-    regions = {}
+    # Score checks — always accessible, live in Menu
+    for name, loc_id in location_table_score_checks.items():
+        _add_location(regions["Menu"], name, loc_id)
 
-    # Create region objects
-    for region_name in region_locations.keys():
-        regions[region_name] = Region(region_name, player, multiworld)
-
-    # Add locations
-    for region_name, location_table in region_locations.items():
+    # Biome victory events + boss reward checks
+    for region_name, (event_table, boss_reward_name) in _biome_data.items():
         region = regions[region_name]
+        for event_name in event_table:
+            _add_location(region, event_name, None)  # event — address is None
+        if boss_reward_name:
+            _add_location(region, boss_reward_name, location_table_boss_rewards[boss_reward_name])
 
-        for loc_name in location_table:
-            region.locations.append(
-                Location(player, loc_name, location_database[loc_name], region)
-            )
+    # Option-gated locations
+    if options.keepsakesanity:
+        for name, loc_id in location_keepsakes.items():
+            _add_location(regions["Crossroads"], name, loc_id)
 
-    # Create connections
-    for source, targets in region_connections.items():
+    if options.weaponsanity:
+        for name, loc_id in location_weapons.items():
+            if not should_ignore_weapon_location(name, options):
+                _add_location(regions["Crossroads"], name, loc_id)
+
+    if options.fatesanity:
+        for name, loc_id in location_table_prophecies.items():
+            _add_location(regions["Crossroads"], name, loc_id)
+
+    # Tools are always available at the shop
+    for name, loc_id in location_tools.items():
+        _add_location(regions["Crossroads"], name, loc_id)
+
+    # Wire up connections
+    for source, targets in _region_connections.items():
         for target in targets:
             entrance = Entrance(player, f"{source} -> {target}", regions[source])
             entrance.connect(regions[target])
             regions[source].exits.append(entrance)
 
     multiworld.regions += list(regions.values())
-
     return regions

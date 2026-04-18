@@ -15,12 +15,13 @@ class InitialWeapon(Choice):
     
 class LocationSystem(Choice):
     """
-    Chooses how the game gives you items. RoomBased gives items on every new room completed. 
+    Chooses how the game gives you items. RoomBased gives items on every new room completed.
     """
     display_name = "Location System"
-    room_based = 0
-    room_weapon_based = 1
-    score_based = 2
+    option_room_based = 0
+    option_room_weapon_based = 1
+    option_score_based = 2
+    default = 2
     
 class KeepsakeSanity(DefaultOnToggle):
     """
@@ -93,158 +94,117 @@ class FatesNeeded(Range):
     
 # -- Fear NOT IMPLEMENTED YET
 
-# -- Filler
+# -- Filler config: single place to tune all filler defaults
+#    value      = how much of the resource each pack grants
+#    percentage = share of the filler pool (treated as proportions if they don't sum to 100)
+FILLER_CONFIG = {
+    "ash":         {"value": 10,  "percentage": 10},
+    "bones":       {"value": 50, "percentage": 10},
+    "psyche":      {"value": 30,  "percentage": 10},
+    "nectar":      {"value": 1,    "percentage": 10},
+    "ambrosia":    {"value": 1,    "percentage": 10},
+    "nightmare":   {"value": 1,   "percentage": 10},
+    "fate_fabric": {"value": 1,    "percentage": 3},
+}
+
 class AshPackValue(Range):
-    """
-    Choose the value (amount of ash) of each ash pack in the pool. 
-    If set to 0, ash will not appear in the pool.
-    693 ash is needed to unlock all arcana cards.
-    """
+    """Choose the value (amount of ash) of each ash pack. 693 ash unlocks all arcana cards."""
     display_name = "Ash Pack Value"
     range_start = 0
     range_end = 2000
-    default = 200
-    
+    default = FILLER_CONFIG["ash"]["value"]
+
 class AshPackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be ash packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be ash packs."""
     display_name = "Ash Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
-    
+    default = FILLER_CONFIG["ash"]["percentage"]
 
 class BonesPackValue(Range):
-    """
-    Choose the value (amount of bones) of each bones pack in the pool. 
-    If set to 0, bones will not appear in the pool.
-    """
+    """Choose the value (amount of bones) of each bones pack."""
     display_name = "Bones Pack Value"
     range_start = 0
     range_end = 10000
-    default = 1000
-    
+    default = FILLER_CONFIG["bones"]["value"]
+
 class BonesPackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be bone packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be bones packs."""
     display_name = "Bones Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
-    
+    default = FILLER_CONFIG["bones"]["percentage"]
 
 class PsychePackValue(Range):
-    """
-    Choose the value (amount of psyche) of each psyche pack in the pool. 
-    If set to 0, psyche will not appear in the pool.
-    2595 Psyche is needed to max all arcana levels
-    """
+    """Choose the value (amount of psyche) of each psyche pack. 2595 psyche maxes all arcana levels."""
     display_name = "Psyche Pack Value"
     range_start = 0
     range_end = 3200
-    default = 650
-    
+    default = FILLER_CONFIG["psyche"]["value"]
+
 class PsychePackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be psyche packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be psyche packs."""
     display_name = "Psyche Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
-
+    default = FILLER_CONFIG["psyche"]["percentage"]
 
 class NectarPackValue(Range):
-    """
-    Choose the value (amount of nectar) of each nectar pack in the pool. 
-    If set to 0, nectar will not appear in the pool.
-    32 nectar is needed to unlock all keepsake checks
-    """
+    """Choose the value (amount of nectar) of each nectar pack. 32 nectar unlocks all keepsake checks."""
     display_name = "Nectar Pack Value"
     range_start = 0
     range_end = 50
-    default = 4
-    
+    default = FILLER_CONFIG["nectar"]["value"]
+
 class NectarPackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be nectar packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be nectar packs."""
     display_name = "Nectar Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
-    
+    default = FILLER_CONFIG["nectar"]["percentage"]
 
 class AmbrosiaPackValue(Range):
-    """
-    Choose the value (amount of Ambrosia) of each Ambrosia pack in the pool. 
-    If set to 0, Ambrosia will not appear in the pool.
-    """
+    """Choose the value (amount of ambrosia) of each ambrosia pack."""
     display_name = "Ambrosia Pack Value"
     range_start = 0
     range_end = 50
-    default = 4
-    
+    default = FILLER_CONFIG["ambrosia"]["value"]
+
 class AmbrosiaPackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be Ambrosia packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be ambrosia packs."""
     display_name = "Ambrosia Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
+    default = FILLER_CONFIG["ambrosia"]["percentage"]
 
 class NightmarePackValue(Range):
-    """
-    Choose the value (amount of Nightmare) of each Nightmare pack in the pool. 
-    If set to 0, Nightmare will not appear in the pool.
-    118 Nightmare is needed to upgrade all aspects.
-    """
+    """Choose the value (amount of nightmare) of each nightmare pack. 118 nightmare upgrades all aspects."""
     display_name = "Nightmare Pack Value"
     range_start = 0
     range_end = 50
-    default = 15
-    
+    default = FILLER_CONFIG["nightmare"]["value"]
+
 class NightmarePackPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be Nightmare packs.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
+    """Percentage of filler slots that will be nightmare packs."""
     display_name = "Nightmare Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
-    
-# -- Helpers
+    default = FILLER_CONFIG["nightmare"]["percentage"]
 
-class FillerHelperPercentage(Range):
-    """
-    Choose the percentage of filler items in the pool that will be helpers instead. 
-    Helpers give a boost to your max Health or starting money.
-    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-    """
-    display_name = "Filler Helper Percentage"
+class FateFabricPackValue(Range):
+    """Choose the value (amount of Fate Fabric) of each Fate Fabric pack. A rare meta resource."""
+    display_name = "Fate Fabric Pack Value"
+    range_start = 0
+    range_end = 10
+    default = FILLER_CONFIG["fate_fabric"]["value"]
+
+class FateFabricPackPercentage(Range):
+    """Percentage of filler slots that will be Fate Fabric packs. Recommended to keep low."""
+    display_name = "Fate Fabric Pack Percentage"
     range_start = 0
     range_end = 100
-    default = 10
+    default = FILLER_CONFIG["fate_fabric"]["percentage"]
 
-class MaxHealthHelperPercentage(Range):
-    """
-    Choose the percentage of helper items that will boost your max health.
-    The remaning percentage will go towards initial money helpers, which boost initial money by X AMOUNT.
-    """
-    display_name = "Max Health Helper Percentage"
-    range_start = 0
-    range_end = 100
-    default = 50
-    
 # -- Traps
 
 class FillerTrapPercentage(Range):
@@ -273,6 +233,7 @@ class IgnoreWinDeaths(Toggle):
 class HadesIIOptions(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     initial_weapon: InitialWeapon
+    location_system: LocationSystem
     
     keepsakesanity: KeepsakeSanity
     weaponsanity: WeaponSanity
@@ -296,10 +257,9 @@ class HadesIIOptions(PerGameCommonOptions):
     ambrosia_pack_percentage: AmbrosiaPackPercentage
     nightmare_pack_value: NightmarePackValue
     nightmare_pack_percentage: NightmarePackPercentage
-    
-    filler_helper_percentage: FillerHelperPercentage
-    max_health_helper_percentage: MaxHealthHelperPercentage
-    
+    fate_fabric_pack_value: FateFabricPackValue
+    fate_fabric_pack_percentage: FateFabricPackPercentage
+
     filler_trap_percentage: FillerTrapPercentage
     
     ignore_win_deaths: IgnoreWinDeaths
@@ -307,8 +267,7 @@ class HadesIIOptions(PerGameCommonOptions):
 
 hades_ii_option_groups = [
     OptionGroup("Game Options", [
-        InitialWeapon,
-        LocationSystem,
+        InitialWeapon, LocationSystem,
         KeepsakeSanity,
         WeaponSanity,
         AspectSanity,
@@ -333,11 +292,11 @@ hades_ii_option_groups = [
         AmbrosiaPackValue,
         AmbrosiaPackPercentage,
         NightmarePackValue,
-        NightmarePackPercentage
+        NightmarePackPercentage,
+        FateFabricPackValue,
+        FateFabricPackPercentage,
     ]),
-    OptionGroup("Helpers and Trap Options", [
-        FillerHelperPercentage,
-        MaxHealthHelperPercentage,
+    OptionGroup("Trap Options", [
         FillerTrapPercentage,
     ]),
     OptionGroup("Quality of Life Options", [

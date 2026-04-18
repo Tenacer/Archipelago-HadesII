@@ -68,7 +68,7 @@ class HadesIILogic(LogicMixin):
     
     # Checks if the player has defeated the boss with enough (depending on options):
     def _can_get_victory(self, player: int, options) -> bool:
-        can_win = self._has_defeated_boss("Boss Victory", player, options)
+        can_win = self._can_reach_endgame(player, options)
         # Weapons cleared
         if options.weaponsanity:
             weapons_temp = options.weapons_clears_needed.value
@@ -86,30 +86,31 @@ class HadesIILogic(LogicMixin):
             
         return can_win
     
-    # Checks if the player has defeated bosses 
-    def _has_defeated_boss(self, bossVictory : str, player: int, options) -> bool:
+    # Checks if a specific biome boss has been defeated (used for region/keepsake logic)
+    def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
+        return self.has(boss_event, player)  # type: ignore
+
+    # Checks if the player has reached the end-game (Chronos or Typhon cleared)
+    def _can_reach_endgame(self, player: int, options) -> bool:
         if options.location_system == "room_weapon_based":
-            return sum(self.count(f"{bossVictory} {w}", player) for w in weapons) > 0 # type: ignore
+            return sum(self.count(f"Boss Victory {w}", player) for w in weapons) > 0  # type: ignore
         else:
-            return self.has(bossVictory, player) # type: ignore
-    
+            return self.has("Chronos Victory", player) or self.has("Typhon Victory", player)  # type: ignore
+
     # Checks if the player has enough weapon wins for goal
     def _enough_weapons_victories(self, player: int, options, amount: int) -> bool:
         if options.location_system == "room_weapon_based":
-            counter = sum(self.count("Boss Victory " + w, player) for w in weapons) # type: ignore
+            counter = sum(self.count("Boss Victory " + w, player) for w in weapons)  # type: ignore
             return counter >= amount
         else:
-            return self.has("Boss Victory", player) and self._has_enough_weapons(player, options, amount) # type: ignore
+            return self._can_reach_endgame(player, options) and self._has_enough_weapons(player, options, amount)
     
-    # Checks if the player has the 2 incantations needed to permanently access the surface
+    # Incantations not yet implemented — surface/moros always accessible for now
     def _has_surface_access(self, player: int) -> bool:
-        return (
-            self.has("Permeation of Witching-Wards", player) and # type: ignore
-            self.has("Unraveling of a Fateful Bond", player) # type: ignore
-        )  
-        
+        return True
+
     def _has_moros_access(self, player: int) -> bool:
-        return self.has("Doomed Beckoning", player)  # type: ignore
+        return True
 
 def set_rules(world, player: int, location_table: dict, options) -> None:    
     if options.location_system == "room_weapon_based":
@@ -169,7 +170,7 @@ def handle_keepsakes(world, player, options):
             add_rule(
                 world.get_location(person_keepsake, player),
                 lambda state, boss=boss, surface=surface:
-                    (boss is None or state._has_defeated_boss(boss, player, options)) # type: ignore
+                    (boss is None or state._has_defeated_final_boss(boss, player, options)) # type: ignore
                     and (not surface or state._has_surface_access(player)) # type: ignore
             )
         
@@ -187,7 +188,4 @@ def handle_keepsakes(world, player, options):
             lambda state: state._has_moros_access(player) # type: ignore
             )
         
-    else: # If not randomized
-        for keepsake in item_table_keepsakes.keys():
-            location = world.get_location(f"{keepsake} Keepsake", player)
-            location.place_locked_item(world.create_item(f"{keepsake} Keepsake"))
+    # When keepsakesanity is off there are no keepsake locations, nothing to do.

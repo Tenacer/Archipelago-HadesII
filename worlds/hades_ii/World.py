@@ -2,12 +2,11 @@ from ..AutoWorld import World
 from .Options import HadesIIOptions
 from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings
 from .Regions import create_regions
-from .Items import item_table, item_name_groups, create_items
+from .Items import item_table, item_name_groups, create_items, Hades_II_Item
 from .Rules import set_rules
 
 class HadesIIWorld(World):
-    options: HadesIIOptions
-    # options_dataclass = HadesIIOptions
+    options_dataclass = HadesIIOptions
     game: str = "Hades II"
     topology_present: bool = False
     # settings: typing.ClassVar[HadesIISettings]
@@ -22,9 +21,12 @@ class HadesIIWorld(World):
     
     # Regions
     def create_regions(self):
-        create_regions(self.player, self.multiworld, self.location_name_to_id)
+        create_regions(self.player, self.multiworld, self.location_name_to_id, self.options)
         
     # Items
+    def create_item(self, name: str):
+        return Hades_II_Item(name, self.player)
+
     def create_items(self):
         create_items(self)
        

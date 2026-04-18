@@ -4,6 +4,14 @@ from BaseClasses import Location
 hades_ii_base_location_id = 1
 max_number_room_checks = 2500 + hades_ii_base_location_id
 
+# Score-based AP locations: one check per threshold crossed.
+# IDs sit within the reserved 1..2500 range.
+SCORE_LOCATION_COUNT = 30
+location_table_score_checks: dict[str, int] = {
+    f"Score Check {i + 1}": hades_ii_base_location_id + i
+    for i in range(SCORE_LOCATION_COUNT)
+}
+
 location_table_crossroads = {}
 
 location_table_erebus = {
@@ -196,6 +204,23 @@ location_table_prophecies = {
     "The Black Coat Check": prophecies_checks + 89
 }
 
+# Boss kill reward locations — separate from the victory EVENTS above.
+# These are proper locations (with IDs) that the client sends LocationChecks for
+# when the player defeats the final boss of each path.
+_boss_reward_base = prophecies_checks + 89 + 1   # = 2634
+
+location_table_boss_rewards: dict[str, int] = {
+    "Chronos Kill Reward": _boss_reward_base,
+    "Typhon Kill Reward":  _boss_reward_base + 1,
+}
+
+# Maps in-game room name → AP location ID (used by HadesIIClient)
+BOSS_ROOM_TO_LOCATION_ID: dict[str, int] = {
+    "I_Boss01": location_table_boss_rewards["Chronos Kill Reward"],
+    "Q_Boss01": location_table_boss_rewards["Typhon Kill Reward"],
+    "Q_Boss02": location_table_boss_rewards["Typhon Kill Reward"],
+}
+
 group_keepsakes = {"keepsakes": location_keepsakes.keys()}
 group_weapons = {"weapons": location_weapons.keys()}
 group_tools = {"tools": location_tools.keys()}
@@ -210,6 +235,8 @@ location_name_groups = {
 
 def give_all_locations_table() -> dict:
     return {
+        **location_table_score_checks,
+        **location_table_boss_rewards,
         **location_keepsakes,
         **location_weapons,
         **location_tools,
@@ -218,18 +245,25 @@ def give_all_locations_table() -> dict:
 
 def setup_location_table_with_settings(options):
     total_table = {}
-    
+
+    # Score checks and boss rewards are always included
+    total_table.update(location_table_score_checks)
+    total_table.update(location_table_boss_rewards)
+
+    # Tools are always available at the shop
+    total_table.update(location_tools)
+
     if options.keepsakesanity.value == 1:
         total_table.update(location_keepsakes)
-     
+
     if options.weaponsanity.value == 1:
         for weaponLocation, weaponData in location_weapons.items():
             if not should_ignore_weapon_location(weaponLocation, options):
                 total_table.update({weaponLocation: weaponData})
-    
+
     if options.fatesanity == 1:
         total_table.update(location_table_prophecies)
-    
+
     return total_table
 
 def should_ignore_weapon_location(weaponLocation : str, options):

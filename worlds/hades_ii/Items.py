@@ -1,11 +1,19 @@
 from typing import Dict, NamedTuple, Optional
 from BaseClasses import Item, ItemClassification
-from .Locations import setup_location_table_with_settings, location_table_prophecies
+from .Locations import setup_location_table_with_settings, location_table_prophecies, should_ignore_weapon_location
+
+_BOSS_VICTORY_NAMES = {
+    "Hecate Victory", "Scylla Victory", "Cerberus Victory", "Chronos Victory",
+    "Polyphemus Victory", "Eris Victory", "Prometheus Victory", "Typhon Victory",
+}
 
 class ItemData(NamedTuple):
     code: Optional[int]
     item_classification: ItemClassification
     event: bool = False
+    # resource_id and amount are used by HadesIIClient to grant items via the mod
+    resource_id: Optional[str] = None
+    amount: int = 0
     
 # Sorry for the abomination of uppercase and underscore here, but I figured it was more 
 # readable than `HadesIIItem`
@@ -26,11 +34,16 @@ item_table_fears: Dict[str, ItemData] = {
 
 filler_base_item_id = fears_base_item_id + 2
 item_table_filler: Dict[str, ItemData] = {
-    "filler1": ItemData(filler_base_item_id+1, ItemClassification.filler),
-    "filler2": ItemData(filler_base_item_id+2, ItemClassification.filler)
+    "Ash":                  ItemData(filler_base_item_id + 1, ItemClassification.filler, False, "Ashes",          100),
+    "Psyche":               ItemData(filler_base_item_id + 2, ItemClassification.useful, False, "Psyche",           1),
+    "Nectar":               ItemData(filler_base_item_id + 3, ItemClassification.useful, False, "Nectar",           1),
+    "Ambrosia":             ItemData(filler_base_item_id + 4, ItemClassification.useful, False, "Ambrosia",         1),
+    "Nightmare":            ItemData(filler_base_item_id + 5, ItemClassification.useful, False, "Nightmare",        1),
+    "Bones":                ItemData(filler_base_item_id + 6, ItemClassification.filler, False, "Bones",          100),
+    "Fate Fabric":          ItemData(filler_base_item_id + 7, ItemClassification.useful, False, "FabricOfMemory",   1),
 }
 
-keepsakes_base_item_id  = filler_base_item_id + 2
+keepsakes_base_item_id  = filler_base_item_id + 7
 item_table_keepsakes: Dict[str, ItemData] = {
     "Hecate Keepsake": ItemData(keepsakes_base_item_id + 1, ItemClassification.progression),
     "Odysseus Keepsake": ItemData(keepsakes_base_item_id + 2, ItemClassification.progression),
@@ -269,7 +282,9 @@ def create_items(self) -> None:
     # Weapons
     if self.options.weaponsanity:
         for name in item_table_weapons:
-            if self.should_ignore_weapon(name):
+            # item name is e.g. "Staff Weapon Unlock Item"; location is "Staff Weapon Unlock Location"
+            location_name = name.replace(" Item", " Location")
+            if should_ignore_weapon_location(location_name, self.options):
                 continue
             item = Hades_II_Item(name, self.player)
             pool.append(item)
@@ -280,9 +295,8 @@ def create_items(self) -> None:
             item = Hades_II_Item(name, self.player)
             pool.append(item)
             
-    # Tools
-    if self.options.toolsanity:
-        pool.extend(self.create_item(name) for name in item_table_tools)
+    # Tools — always available (no toolsanity option yet)
+    pool.extend(self.create_item(name) for name in item_table_tools)
 
     # # Prophecies
     # if self.options.fatesanity:
@@ -291,8 +305,8 @@ def create_items(self) -> None:
     # Handle fillers and traps
     handle_fillers(self, pool, local_location_table)
 
-    # Place in boss event psuedo-items
-    place_boss_events(self.world, self.player)
+    # Place in boss event pseudo-items
+    place_boss_events(self.multiworld, self.player)
         
     # Add items to pool
     self.multiworld.itempool += pool
@@ -303,37 +317,26 @@ def create_item(self, name: str) -> Item:
 
 # Places boss event pseudo-items at each location
 def place_boss_events(world, player) -> None:
-    bosses = [
-        "Hecate Victory",
-        "Scylla Victory",
-        "Cerberus Victory",
-        "Chronos Victory",
-        "Polyphemus Victory",
-        "Eris Victory",
-        "Prometheus Victory",
-        "Typhon Victory",
-    ]
-
-    for boss in bosses:
+    for boss in _BOSS_VICTORY_NAMES:
         location = world.get_location(boss, player)
-        item = world.create_event(boss)
-        location.place_locked_item(item)
+        event_item = Item(boss, ItemClassification.progression, None, player)
+        location.place_locked_item(event_item)
 
 # Calculates percentages of filler materials and traps    
 def handle_fillers(self, pool, local_location_table):
-    total_fillers_needed = len(local_location_table) - len(pool) - len(location_table_prophecies) 
+    total_fillers_needed = len(local_location_table) - len(pool)
     
     # Define the percentages in the pool based off options
     # ? Add F. Fabric to speed things up for the player?
     percentages = {
-        "ash": self.options.ash_pack_percentage,
-        "bones": self.options.bones_pack_percentage,
-        "psyche": self.options.psyche_pack_percentage,
-        "nectar": self.options.nectar_pack_percentage,
-        "ambrosia": self.options.ambrosia_pack_percentage,
-        "nightmare": self.options.nightmare_pack_percentage,
-        "helpers": self.options.filler_helper_percentage,
-        "traps": self.options.filler_trap_percentage,
+        "ash":         self.options.ash_pack_percentage,
+        "bones":       self.options.bones_pack_percentage,
+        "psyche":      self.options.psyche_pack_percentage,
+        "nectar":      self.options.nectar_pack_percentage,
+        "ambrosia":    self.options.ambrosia_pack_percentage,
+        "nightmare":   self.options.nightmare_pack_percentage,
+        "fate_fabric": self.options.fate_fabric_pack_percentage,
+        "traps":       self.options.filler_trap_percentage,
     }
 
     total_percentage = sum(percentages.values())
@@ -356,27 +359,31 @@ def handle_fillers(self, pool, local_location_table):
     # For 100% safety to make sure negative numbers don't happen
     counts["bones"] = max(counts["bones"], 0)
     
-    # Helpers
-    health_helpers = int(counts["helpers"] * self.options.max_health_helper_percentage / 100)
-    money_helpers = counts["helpers"] - health_helpers
-
     # Populate the pool with fillers
-    items = {
-        "Ash": counts["ash"],
-        "Bones": counts["bones"],
-        "Psyche": counts["psyche"],
-        "Nectar": counts["nectar"],
-        "Ambrosia": counts["ambrosia"],
-        "Nightmare": counts["nightmare"],
-        "Max Health Helper": health_helpers,
-        "Initial Money Helper": money_helpers,
+    filler_counts = {
+        "Ash":         counts["ash"],
+        "Bones":       counts["bones"],
+        "Psyche":      counts["psyche"],
+        "Nectar":      counts["nectar"],
+        "Ambrosia":    counts["ambrosia"],
+        "Nightmare":   counts["nightmare"],
+        "Fate Fabric": counts["fate_fabric"],
     }
 
-    for name, count in items.items():
+    for name, count in filler_counts.items():
         pool.extend(self.create_item(name) for _ in range(count))
-            
+
     # Fill traps
     trap_pool = list(item_table_traps.keys())
     for i in range(counts["traps"]):
         item_name = trap_pool[i % len(trap_pool)]
         pool.append(Hades_II_Item(item_name, self.player))
+
+
+# Maps item code → (resource_id, amount) for HadesIIClient to write to ap_in.json.
+# Only includes items the Lua mod can grant via AddResource.
+ITEM_CODE_TO_RESOURCE: Dict[int, tuple] = {
+    data.code: (data.resource_id, data.amount)
+    for data in item_table.values()
+    if data.code is not None and data.resource_id is not None
+}
