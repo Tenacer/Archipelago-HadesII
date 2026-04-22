@@ -68,23 +68,39 @@ class HadesIILogic(LogicMixin):
     
     # Checks if the player has defeated the boss with enough (depending on options):
     def _can_get_victory(self, player: int, options) -> bool:
-        can_win = self._can_reach_endgame(player, options)
+        if options.true_ending:
+            can_win = self._has_true_ending_requirements(player, options)
+        else:
+            can_win = self._can_reach_endgame(player, options)
+
         # Weapons cleared
         if options.weaponsanity:
             weapons_temp = options.weapons_clears_needed.value
             can_win = (can_win) and (self._enough_weapons_victories(player, options, weapons_temp))
-        
+
         # Keepsakes owned
         if options.keepsakesanity:
             keepsakes = options.keepsakes_needed.value
             can_win = (can_win) and (self._has_enough_keepsakes(player, keepsakes))
-        
+
         # Prophecies cleared
         if options.fatesanity:
             fates = options.fates_needed.value
             can_win = (can_win) and (self._has_enough_prophecies_done(player, fates))
-            
+
         return can_win
+
+    # True Ending: both final bosses, ingredient counts, Gigaros, both goal incantations.
+    def _has_true_ending_requirements(self, player: int, options) -> bool:
+        return (
+            self.has("Chronos Victory", player)  # type: ignore
+            and self.has("Typhon Victory", player)  # type: ignore
+            and self.has("Gigaros", player)  # type: ignore
+            and self.has("Dissolution of Time", player)  # type: ignore
+            and self.has("Disintegration of Monstrosity", player)  # type: ignore
+            and self.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value  # type: ignore
+            and self.count("Void Lens", player) >= options.void_lens_needed.value  # type: ignore
+        )
     
     # Checks if a specific biome boss has been defeated (used for region/keepsake logic)
     def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
@@ -92,18 +108,11 @@ class HadesIILogic(LogicMixin):
 
     # Checks if the player has reached the end-game (Chronos or Typhon cleared)
     def _can_reach_endgame(self, player: int, options) -> bool:
-        if options.location_system == "room_weapon_based":
-            return sum(self.count(f"Boss Victory {w}", player) for w in weapons) > 0  # type: ignore
-        else:
-            return self.has("Chronos Victory", player) or self.has("Typhon Victory", player)  # type: ignore
+        return self.has("Chronos Victory", player) or self.has("Typhon Victory", player)  # type: ignore
 
     # Checks if the player has enough weapon wins for goal
     def _enough_weapons_victories(self, player: int, options, amount: int) -> bool:
-        if options.location_system == "room_weapon_based":
-            counter = sum(self.count("Boss Victory " + w, player) for w in weapons)  # type: ignore
-            return counter >= amount
-        else:
-            return self._can_reach_endgame(player, options) and self._has_enough_weapons(player, options, amount)
+        return self._can_reach_endgame(player, options) and self._has_enough_weapons(player, options, amount)
     
     # Incantations not yet implemented — surface/moros always accessible for now
     def _has_surface_access(self, player: int) -> bool:
@@ -124,6 +133,9 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     
     # Keepsakes
     handle_keepsakes(world, player, options)
+
+    # Hidden aspects: require the weapon to be in logic before the chant can happen.
+    handle_hidden_aspects(world, player, options)
         
     # if options.weaponsanity:
     #     add_rule(world.get_entrance("Weapon Cache", player), lambda state: True)
@@ -148,6 +160,25 @@ def handle_area_logic(world, player):
     
     for entrance_name, victory_item in area_rules:
         add_rule(world.get_entrance(entrance_name, player), lambda state, v=victory_item: state.has(v, player))
+
+# Each hidden aspect can only be unlocked once the player has the corresponding weapon.
+def handle_hidden_aspects(world, player, options):
+    if not options.hidden_aspectsanity:
+        return
+    hidden_aspect_rules = [
+        ("Staff Weapon Anubis Aspect Unlock Location",    "Staff Weapon"),
+        ("Daggers Weapon Morrigan Aspect Unlock Location","Daggers Weapon"),
+        ("Torches Weapon Supay Aspect Unlock Location",   "Torches Weapon"),
+        ("Axe Weapon Nergal Aspect Unlock Location",      "Axe Weapon"),
+        ("Skull Weapon Hel Aspect Unlock Location",       "Skull Weapon"),
+        ("Coat Weapon Shiva Aspect Unlock Location",      "Coat Weapon"),
+    ]
+    for location_name, weapon_name in hidden_aspect_rules:
+        add_rule(
+            world.get_location(location_name, player),
+            lambda state, w=weapon_name: state._has_weapon(w, player, options),
+        )
+
 
 # Defines logic for keepsakes, the logic doc lists NPCs in more detail
 def handle_keepsakes(world, player, options):

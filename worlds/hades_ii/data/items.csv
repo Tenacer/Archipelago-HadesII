@@ -1,0 +1,277 @@
+id,name,classification,groups
+1,Vow of Pain Rank 1,useful,fears
+2,Vow of Pain Rank 2,useful,fears
+3,Vow of Pain Rank 3,useful,fears
+4,Vow of Grit Rank 1,useful,fears
+5,Vow of Grit Rank 2,useful,fears
+6,Vow of Grit Rank 3,useful,fears
+7,Vow of Wards Rank 1,useful,fears
+8,Vow of Wards Rank 2,useful,fears
+9,Vow of Frenzy Rank 1,useful,fears
+10,Vow of Frenzy Rank 2,useful,fears
+11,Vow of Hordes Rank 1,useful,fears
+12,Vow of Hordes Rank 2,useful,fears
+13,Vow of Hordes Rank 3,useful,fears
+14,Vow of Menace Rank 1,useful,fears
+15,Vow of Menace Rank 2,useful,fears
+16,Vow of Return Rank 1,useful,fears
+17,Vow of Return Rank 2,useful,fears
+18,Vow of Fangs Rank 1,useful,fears
+19,Vow of Fangs Rank 2,useful,fears
+20,Vow of Scars Rank 1,useful,fears
+21,Vow of Scars Rank 2,useful,fears
+22,Vow of Scars Rank 3,useful,fears
+23,Vow of Debt Rank 1,useful,fears
+24,Vow of Debt Rank 2,useful,fears
+25,Vow of Shadow,useful,fears
+26,Vow of Forfeit,useful,fears
+27,Vow of Time Rank 1,useful,fears
+28,Vow of Time Rank 2,useful,fears
+29,Vow of Time Rank 3,useful,fears
+30,Vow of Void Rank 1,useful,fears
+31,Vow of Void Rank 2,useful,fears
+32,Vow of Void Rank 3,useful,fears
+33,Vow of Void Rank 4,useful,fears
+34,Vow of Hubris Rank 1,useful,fears
+35,Vow of Hubris Rank 2,useful,fears
+36,Vow of Denial,useful,fears
+37,Vow of Rivals Rank 1,useful,fears
+38,Vow of Rivals Rank 2,useful,fears
+39,Vow of Rivals Rank 3,useful,fears
+40,Vow of Rivals Rank 4,useful,fears
+41,Ash,filler,fillers
+42,Psyche,filler,fillers
+43,Nectar,filler,fillers
+44,Ambrosia,filler,fillers
+45,Nightmare,useful,fillers
+46,Bones,filler,fillers
+47,Fate Fabric,useful,fillers
+48,Hecate Keepsake,useful,keepsakes
+49,Odysseus Keepsake,useful,keepsakes
+50,Schelemeus Keepsake,useful,keepsakes
+51,Dora Keepsake,useful,keepsakes
+52,Nemesis Keepsake,useful,keepsakes
+53,Moros Keepsake,useful,keepsakes
+54,Eris Keepsake,useful,keepsakes
+55,Charon Keepsake,useful,keepsakes
+56,Hermes Keepsake,useful,keepsakes
+57,Artemis Keepsake,useful,keepsakes
+58,Selene Keepsake,useful,keepsakes
+59,Zeus Keepsake,useful,"keepsakes,olympian"
+60,Hera Keepsake,useful,"keepsakes,olympian"
+61,Poseidon Keepsake,useful,"keepsakes,olympian"
+62,Demeter Keepsake,useful,"keepsakes,olympian"
+63,Apollo Keepsake,useful,"keepsakes,olympian"
+64,Aphrodite Keepsake,useful,"keepsakes,olympian"
+65,Hephaestus Keepsake,useful,"keepsakes,olympian"
+66,Hestia Keepsake,useful,"keepsakes,olympian"
+67,Ares Keepsake,useful,"keepsakes,olympian"
+68,Athena Keepsake,useful,"keepsakes,olympian"
+69,Dionysus Keepsake,useful,keepsakes
+70,Arachne Keepsake,useful,keepsakes
+71,Narcissus Keepsake,useful,keepsakes
+72,Echo Keepsake,useful,keepsakes
+73,Heracles Keepsake,useful,keepsakes
+74,Medea Keepsake,useful,keepsakes
+75,Circe Keepsake,useful,keepsakes
+76,Icarus Keepsake,useful,keepsakes
+77,Hades/Persephone Keepsake,useful,post_ending_keepsakes
+78,Zagreus Keepsake,useful,post_ending_keepsakes
+79,Chronos Keepsake,useful,post_ending_keepsakes
+80,Chaos Keepsake,useful,keepsakes
+81,Staff Weapon Unlock Item,progression,weapons
+82,Daggers Weapon Unlock Item,progression,weapons
+83,Torches Weapon Unlock Item,progression,weapons
+84,Axe Weapon Unlock Item,progression,weapons
+85,Skull Weapon Unlock Item,progression,weapons
+86,Coat Weapon Unlock Item,progression,weapons
+87,Crescent Pickaxe Tool Unlock Item,progression,tools
+88,Tablet of Peace Tool Unlock Item,progression,tools
+89,Silver Spade Tool Unlock Item,progression,tools
+90,Rod of Fishing Tool Unlock Item,progression,tools
+91,Staff Weapon Anubis Aspect Unlock Item,useful,hidden_aspects
+92,Daggers Weapon Morrigan Aspect Unlock Item,useful,hidden_aspects
+93,Torches Weapon Supay Aspect Unlock Item,useful,hidden_aspects
+94,Axe Weapon Nergal Aspect Unlock Item,useful,hidden_aspects
+95,Skull Weapon Hel Aspect Unlock Item,useful,hidden_aspects
+96,Coat Weapon Shiva Aspect Unlock Item,useful,hidden_aspects
+97,"Melinoë, Help Us Reward",useful,prophecies
+98,"Melinoë, Remember Us Reward",useful,prophecies
+99,"Melinoë, Seek Us Reward",useful,prophecies
+100,"Melinoë, Find Us Reward",useful,prophecies
+101,Storm in the Heavens Reward,useful,prophecies
+102,Temporary Setback Reward,useful,prophecies
+103,Harbinger of Doom Reward,useful,prophecies
+104,Witch of the Crossroads Reward,useful,prophecies
+105,Natural Talent Reward,useful,prophecies
+106,Sword of the Night Reward,useful,prophecies
+107,Arcana of the Ages Reward,useful,prophecies
+108,Unrivaled Prowess Reward,useful,prophecies
+109,Bearing Dark Gifts Reward,useful,prophecies
+110,Den Mother Reward,useful,prophecies
+111,Family in Need Reward,useful,prophecies
+112,Visions of Victory Reward,useful,prophecies
+113,Unfinished Business Reward,useful,prophecies
+114,Haunted by the Past Reward,useful,prophecies
+115,Silk and Spitefulness Reward,useful,prophecies
+116,Voice and Vanity Reward,useful,prophecies
+117,Bitter Tears Reward,useful,prophecies
+118,Drowned Ambitions Reward,useful,prophecies
+119,The Jackal's Aspect Reward,useful,prophecies
+120,The Crow's Aspect Reward,useful,prophecies
+121,The Shadow's Aspect Reward,useful,prophecies
+122,The Warrior's Aspect Reward,useful,prophecies
+123,The Grave's Aspect Reward,useful,prophecies
+124,The Destroyer's Aspect Reward,useful,prophecies
+125,Nobody but Nobody Reward,useful,prophecies
+126,Born to Win Reward,useful,prophecies
+127,Improbable Outcomes Reward,useful,prophecies
+128,Soundest of Slumbers Reward,useful,prophecies
+129,Customary Gift Reward,useful,prophecies
+130,Mindful Craft Reward,useful,prophecies
+131,Blades of Pure Silver Reward,useful,prophecies
+132,The Arms of Night Reward,useful,prophecies
+133,The Unseen Sentinel Reward,useful,prophecies
+134,Awakened Aspect Reward,useful,prophecies
+135,Major Arcana Reward,useful,prophecies
+136,Familiar Confidant Reward,useful,prophecies
+137,Note to Self Reward,useful,prophecies
+138,The Invoker Reward,useful,prophecies
+139,Whims of Chaos Reward,useful,prophecies
+140,Breadth of Knowledge Reward,useful,prophecies
+141,Weight in Gold Reward,useful,prophecies
+142,Valued Customer Reward,useful,prophecies
+143,Close Companions Reward,useful,prophecies
+144,Beyond Familiar Reward,useful,prophecies
+145,Denizen of the Depths Reward,useful,prophecies
+146,Keeper of Shadows Reward,useful,prophecies
+147,Tools of the Unseen Reward,useful,prophecies
+148,Precision Instrument Reward,useful,prophecies
+149,Home in the Crossroads Reward,useful,prophecies
+150,Spectral Forms Reward,useful,prophecies
+151,Shadow of Death Reward,useful,prophecies
+152,Shadow of Doom Reward,useful,prophecies
+153,Gifts of the Moon Reward,useful,prophecies
+154,Godsent Favor Reward,useful,prophecies
+155,Master of the Dead Reward,useful,prophecies
+156,Master of the Heavens Reward,useful,prophecies
+157,Mistress of Wedlock Reward,useful,prophecies
+158,Master of the Sea Reward,useful,prophecies
+159,Mistress of Seasons Reward,useful,prophecies
+160,Master of Light Reward,useful,prophecies
+161,Mistress of Beauty Reward,useful,prophecies
+162,Master of the Forge Reward,useful,prophecies
+163,Mistress of the Hearth Reward,useful,prophecies
+164,Master of War Reward,useful,prophecies
+165,Mistress of the Hunt Reward,useful,prophecies
+166,Master of Swiftness Reward,useful,prophecies
+167,Mistress of Battle Reward,useful,prophecies
+168,Master of Revelry Reward,useful,prophecies
+169,Original Sins Reward,useful,prophecies
+170,Original Virtues Reward,useful,prophecies
+171,Power Beyond Legend Reward,useful,prophecies
+172,Combined Might Reward,useful,prophecies
+173,Weaver of Fineries Reward,useful,prophecies
+174,Denier of Suitors Reward,useful,prophecies
+175,Voice of Truth Reward,useful,prophecies
+176,Witch of Shadows Reward,useful,prophecies
+177,Witch of Changing Reward,useful,prophecies
+178,Wings of Freedom Reward,useful,prophecies
+179,Bared Fangs Reward,useful,prophecies
+180,The Witch's Staff Reward,useful,prophecies
+181,The Sister Blades Reward,useful,prophecies
+182,The Umbral Flames Reward,useful,prophecies
+183,The Moonstone Axe Reward,useful,prophecies
+184,The Argent Skull Reward,useful,prophecies
+185,The Black Coat Reward,useful,prophecies
+186,Unraveling a Fateful Bond,useful,incantations
+187,Permeation of Witching-Wards,useful,incantations
+188,Fated Intervention,useful,incantations
+189,Doomed Beckoning,useful,incantations
+190,Purification of Crystal Clarity,useful,incantations
+191,Return of Latent Memories,useful,incantations
+192,Essence of Sorrow,useful,incantations
+193,Augmentation of Bone Density,useful,incantations
+194,End to Deepest Slumber,useful,incantations
+195,End to Dearest Slumber,useful,incantations
+196,End to Dumbest Slumber,useful,incantations
+197,Aspects of Night and Darkness,useful,incantations
+198,Consecration of Ashes,useful,incantations
+199,Abyssal Insight,useful,incantations
+200,Abyssal Reflection,useful,incantations
+201,Faith of Familiar Spirits,useful,incantations
+202,Bravery of Familiar Spirits,useful,incantations
+203,Alteration of Familiar Forms,useful,incantations
+204,Greater Favor of Gaia,useful,incantations
+205,Long Arm of the Unseen,useful,incantations
+206,Acceptance of Another Fate,useful,incantations
+207,Night's Craftwork,useful,incantations
+208,Divination of the Elements,useful,incantations
+209,Forget-Me-Not,useful,incantations
+210,Path to Desired Blessings,useful,incantations
+211,Spreading of Ashes,useful,incantations
+212,Favored of All Keepsakes,useful,incantations
+213,Reagent Sensing,useful,incantations
+214,Insight into Offerings,useful,incantations
+215,Summoning of Mercantile Fortune,useful,incantations
+216,Deathly Fortune,useful,incantations
+217,Kinship Fortune,useful,incantations
+218,Earthly Fortune,useful,incantations
+219,Rivals of Depth and Sea,useful,incantations
+220,Rivals of Plain and Peak,useful,incantations
+221,Rivals of Old and Rot,useful,incantations
+222,Cleansing of Fountain-Waters,useful,incantations
+223,Purification of Fountain-Waters,useful,incantations
+224,Rise of Stygian Wells,useful,incantations
+225,Surge of Stygian Wells,useful,incantations
+226,Rush of Fresh Air,useful,incantations
+227,Surge of Fresh Air,useful,incantations
+228,Revival of a Desecrating Pool,useful,incantations
+229,Surge of Desecrating Pools,useful,incantations
+230,Woodsy Lifespring,useful,incantations
+231,Briny Lifespring,useful,incantations
+232,Golden Lifespring,useful,incantations
+233,Sandy Lifespring,useful,incantations
+234,Frozen Lifespring,useful,incantations
+235,Propensity Toward Gold,useful,incantations
+236,Summoning a Colony of Bats,useful,incantations
+237,Reviving a Mournful Husk,useful,incantations
+238,Temporal Fluctuation,useful,incantations
+239,Power to Pause and Reflect,useful,incantations
+240,Gathering of Ancient Bones,useful,incantations
+241,Gathering of Subterranean Riches,useful,incantations
+242,Kindred Keepsakes,useful,incantations
+243,Quickening of Sentimental Value,useful,incantations
+244,Rage of the Elements,useful,incantations
+245,Circles of Protection,useful,incantations
+246,Circles of the Moon,useful,incantations
+247,Necromantic Influence,useful,incantations
+248,Exhumed Troves,useful,incantations
+249,Eyes of Night and Darkness,useful,incantations
+250,Arisen Troves,useful,incantations
+251,Bounties of the Infinite Abyss,useful,incantations
+252,Ashen Memories of Life,useful,incantations
+253,Bones of Arcane Wisdom,useful,incantations
+254,Nectar of Godly Savor,useful,incantations
+255,Rite of Social Solidarity,useful,incantations
+256,Rite of Vapor-Cleansing,useful,incantations
+257,Rite of River-Fording,useful,incantations
+258,Observance of Gaia's Secrets,useful,incantations
+259,Flourishing Soil,useful,incantations
+260,Rich Soil,useful,incantations
+261,Verdant Soil,useful,incantations
+262,Green Hand of Gaia,useful,incantations
+263,Greater Sowing of Gardens,useful,incantations
+264,Greatest Gift of Gaia,useful,incantations
+265,Empath's Intuition,useful,incantations
+266,Summoning of Musical Rhapsody,useful,incantations
+267,Shuffling of Noted Ballads,useful,incantations
+268,Summoning of Historic Travails,useful,incantations
+269,Summoning of Personal Insights,useful,incantations
+270,Returning to a Real Possibility,useful,incantations
+271,Greater Removal of Rubbish,useful,incantations
+272,Zodiac Sand,progression,true_ending_ingredients
+273,Void Lens,progression,true_ending_ingredients
+274,Gigaros,progression,true_ending_ingredients
+275,Dissolution of Time,progression,true_ending_incantations
+276,Disintegration of Monstrosity,progression,true_ending_incantations

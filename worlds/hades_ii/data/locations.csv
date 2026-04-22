@@ -1,0 +1,732 @@
+id,name,region,category
+1,Score Check 1,Menu,score
+2,Score Check 2,Menu,score
+3,Score Check 3,Menu,score
+4,Score Check 4,Menu,score
+5,Score Check 5,Menu,score
+6,Score Check 6,Menu,score
+7,Score Check 7,Menu,score
+8,Score Check 8,Menu,score
+9,Score Check 9,Menu,score
+10,Score Check 10,Menu,score
+11,Score Check 11,Menu,score
+12,Score Check 12,Menu,score
+13,Score Check 13,Menu,score
+14,Score Check 14,Menu,score
+15,Score Check 15,Menu,score
+16,Score Check 16,Menu,score
+17,Score Check 17,Menu,score
+18,Score Check 18,Menu,score
+19,Score Check 19,Menu,score
+20,Score Check 20,Menu,score
+21,Score Check 21,Menu,score
+22,Score Check 22,Menu,score
+23,Score Check 23,Menu,score
+24,Score Check 24,Menu,score
+25,Score Check 25,Menu,score
+26,Score Check 26,Menu,score
+27,Score Check 27,Menu,score
+28,Score Check 28,Menu,score
+29,Score Check 29,Menu,score
+30,Score Check 30,Menu,score
+31,Score Check 31,Menu,score
+32,Score Check 32,Menu,score
+33,Score Check 33,Menu,score
+34,Score Check 34,Menu,score
+35,Score Check 35,Menu,score
+36,Score Check 36,Menu,score
+37,Score Check 37,Menu,score
+38,Score Check 38,Menu,score
+39,Score Check 39,Menu,score
+40,Score Check 40,Menu,score
+41,Score Check 41,Menu,score
+42,Score Check 42,Menu,score
+43,Score Check 43,Menu,score
+44,Score Check 44,Menu,score
+45,Score Check 45,Menu,score
+46,Score Check 46,Menu,score
+47,Score Check 47,Menu,score
+48,Score Check 48,Menu,score
+49,Score Check 49,Menu,score
+50,Score Check 50,Menu,score
+51,Score Check 51,Menu,score
+52,Score Check 52,Menu,score
+53,Score Check 53,Menu,score
+54,Score Check 54,Menu,score
+55,Score Check 55,Menu,score
+56,Score Check 56,Menu,score
+57,Score Check 57,Menu,score
+58,Score Check 58,Menu,score
+59,Score Check 59,Menu,score
+60,Score Check 60,Menu,score
+61,Score Check 61,Menu,score
+62,Score Check 62,Menu,score
+63,Score Check 63,Menu,score
+64,Score Check 64,Menu,score
+65,Score Check 65,Menu,score
+66,Score Check 66,Menu,score
+67,Score Check 67,Menu,score
+68,Score Check 68,Menu,score
+69,Score Check 69,Menu,score
+70,Score Check 70,Menu,score
+71,Score Check 71,Menu,score
+72,Score Check 72,Menu,score
+73,Score Check 73,Menu,score
+74,Score Check 74,Menu,score
+75,Score Check 75,Menu,score
+76,Score Check 76,Menu,score
+77,Score Check 77,Menu,score
+78,Score Check 78,Menu,score
+79,Score Check 79,Menu,score
+80,Score Check 80,Menu,score
+81,Score Check 81,Menu,score
+82,Score Check 82,Menu,score
+83,Score Check 83,Menu,score
+84,Score Check 84,Menu,score
+85,Score Check 85,Menu,score
+86,Score Check 86,Menu,score
+87,Score Check 87,Menu,score
+88,Score Check 88,Menu,score
+89,Score Check 89,Menu,score
+90,Score Check 90,Menu,score
+91,Score Check 91,Menu,score
+92,Score Check 92,Menu,score
+93,Score Check 93,Menu,score
+94,Score Check 94,Menu,score
+95,Score Check 95,Menu,score
+96,Score Check 96,Menu,score
+97,Score Check 97,Menu,score
+98,Score Check 98,Menu,score
+99,Score Check 99,Menu,score
+100,Score Check 100,Menu,score
+101,Score Check 101,Menu,score
+102,Score Check 102,Menu,score
+103,Score Check 103,Menu,score
+104,Score Check 104,Menu,score
+105,Score Check 105,Menu,score
+106,Score Check 106,Menu,score
+107,Score Check 107,Menu,score
+108,Score Check 108,Menu,score
+109,Score Check 109,Menu,score
+110,Score Check 110,Menu,score
+111,Score Check 111,Menu,score
+112,Score Check 112,Menu,score
+113,Score Check 113,Menu,score
+114,Score Check 114,Menu,score
+115,Score Check 115,Menu,score
+116,Score Check 116,Menu,score
+117,Score Check 117,Menu,score
+118,Score Check 118,Menu,score
+119,Score Check 119,Menu,score
+120,Score Check 120,Menu,score
+121,Score Check 121,Menu,score
+122,Score Check 122,Menu,score
+123,Score Check 123,Menu,score
+124,Score Check 124,Menu,score
+125,Score Check 125,Menu,score
+126,Score Check 126,Menu,score
+127,Score Check 127,Menu,score
+128,Score Check 128,Menu,score
+129,Score Check 129,Menu,score
+130,Score Check 130,Menu,score
+131,Score Check 131,Menu,score
+132,Score Check 132,Menu,score
+133,Score Check 133,Menu,score
+134,Score Check 134,Menu,score
+135,Score Check 135,Menu,score
+136,Score Check 136,Menu,score
+137,Score Check 137,Menu,score
+138,Score Check 138,Menu,score
+139,Score Check 139,Menu,score
+140,Score Check 140,Menu,score
+141,Score Check 141,Menu,score
+142,Score Check 142,Menu,score
+143,Score Check 143,Menu,score
+144,Score Check 144,Menu,score
+145,Score Check 145,Menu,score
+146,Score Check 146,Menu,score
+147,Score Check 147,Menu,score
+148,Score Check 148,Menu,score
+149,Score Check 149,Menu,score
+150,Score Check 150,Menu,score
+151,Score Check 151,Menu,score
+152,Score Check 152,Menu,score
+153,Score Check 153,Menu,score
+154,Score Check 154,Menu,score
+155,Score Check 155,Menu,score
+156,Score Check 156,Menu,score
+157,Score Check 157,Menu,score
+158,Score Check 158,Menu,score
+159,Score Check 159,Menu,score
+160,Score Check 160,Menu,score
+161,Score Check 161,Menu,score
+162,Score Check 162,Menu,score
+163,Score Check 163,Menu,score
+164,Score Check 164,Menu,score
+165,Score Check 165,Menu,score
+166,Score Check 166,Menu,score
+167,Score Check 167,Menu,score
+168,Score Check 168,Menu,score
+169,Score Check 169,Menu,score
+170,Score Check 170,Menu,score
+171,Score Check 171,Menu,score
+172,Score Check 172,Menu,score
+173,Score Check 173,Menu,score
+174,Score Check 174,Menu,score
+175,Score Check 175,Menu,score
+176,Score Check 176,Menu,score
+177,Score Check 177,Menu,score
+178,Score Check 178,Menu,score
+179,Score Check 179,Menu,score
+180,Score Check 180,Menu,score
+181,Score Check 181,Menu,score
+182,Score Check 182,Menu,score
+183,Score Check 183,Menu,score
+184,Score Check 184,Menu,score
+185,Score Check 185,Menu,score
+186,Score Check 186,Menu,score
+187,Score Check 187,Menu,score
+188,Score Check 188,Menu,score
+189,Score Check 189,Menu,score
+190,Score Check 190,Menu,score
+191,Score Check 191,Menu,score
+192,Score Check 192,Menu,score
+193,Score Check 193,Menu,score
+194,Score Check 194,Menu,score
+195,Score Check 195,Menu,score
+196,Score Check 196,Menu,score
+197,Score Check 197,Menu,score
+198,Score Check 198,Menu,score
+199,Score Check 199,Menu,score
+200,Score Check 200,Menu,score
+201,Score Check 201,Menu,score
+202,Score Check 202,Menu,score
+203,Score Check 203,Menu,score
+204,Score Check 204,Menu,score
+205,Score Check 205,Menu,score
+206,Score Check 206,Menu,score
+207,Score Check 207,Menu,score
+208,Score Check 208,Menu,score
+209,Score Check 209,Menu,score
+210,Score Check 210,Menu,score
+211,Score Check 211,Menu,score
+212,Score Check 212,Menu,score
+213,Score Check 213,Menu,score
+214,Score Check 214,Menu,score
+215,Score Check 215,Menu,score
+216,Score Check 216,Menu,score
+217,Score Check 217,Menu,score
+218,Score Check 218,Menu,score
+219,Score Check 219,Menu,score
+220,Score Check 220,Menu,score
+221,Score Check 221,Menu,score
+222,Score Check 222,Menu,score
+223,Score Check 223,Menu,score
+224,Score Check 224,Menu,score
+225,Score Check 225,Menu,score
+226,Score Check 226,Menu,score
+227,Score Check 227,Menu,score
+228,Score Check 228,Menu,score
+229,Score Check 229,Menu,score
+230,Score Check 230,Menu,score
+231,Score Check 231,Menu,score
+232,Score Check 232,Menu,score
+233,Score Check 233,Menu,score
+234,Score Check 234,Menu,score
+235,Score Check 235,Menu,score
+236,Score Check 236,Menu,score
+237,Score Check 237,Menu,score
+238,Score Check 238,Menu,score
+239,Score Check 239,Menu,score
+240,Score Check 240,Menu,score
+241,Score Check 241,Menu,score
+242,Score Check 242,Menu,score
+243,Score Check 243,Menu,score
+244,Score Check 244,Menu,score
+245,Score Check 245,Menu,score
+246,Score Check 246,Menu,score
+247,Score Check 247,Menu,score
+248,Score Check 248,Menu,score
+249,Score Check 249,Menu,score
+250,Score Check 250,Menu,score
+251,Score Check 251,Menu,score
+252,Score Check 252,Menu,score
+253,Score Check 253,Menu,score
+254,Score Check 254,Menu,score
+255,Score Check 255,Menu,score
+256,Score Check 256,Menu,score
+257,Score Check 257,Menu,score
+258,Score Check 258,Menu,score
+259,Score Check 259,Menu,score
+260,Score Check 260,Menu,score
+261,Score Check 261,Menu,score
+262,Score Check 262,Menu,score
+263,Score Check 263,Menu,score
+264,Score Check 264,Menu,score
+265,Score Check 265,Menu,score
+266,Score Check 266,Menu,score
+267,Score Check 267,Menu,score
+268,Score Check 268,Menu,score
+269,Score Check 269,Menu,score
+270,Score Check 270,Menu,score
+271,Score Check 271,Menu,score
+272,Score Check 272,Menu,score
+273,Score Check 273,Menu,score
+274,Score Check 274,Menu,score
+275,Score Check 275,Menu,score
+276,Score Check 276,Menu,score
+277,Score Check 277,Menu,score
+278,Score Check 278,Menu,score
+279,Score Check 279,Menu,score
+280,Score Check 280,Menu,score
+281,Score Check 281,Menu,score
+282,Score Check 282,Menu,score
+283,Score Check 283,Menu,score
+284,Score Check 284,Menu,score
+285,Score Check 285,Menu,score
+286,Score Check 286,Menu,score
+287,Score Check 287,Menu,score
+288,Score Check 288,Menu,score
+289,Score Check 289,Menu,score
+290,Score Check 290,Menu,score
+291,Score Check 291,Menu,score
+292,Score Check 292,Menu,score
+293,Score Check 293,Menu,score
+294,Score Check 294,Menu,score
+295,Score Check 295,Menu,score
+296,Score Check 296,Menu,score
+297,Score Check 297,Menu,score
+298,Score Check 298,Menu,score
+299,Score Check 299,Menu,score
+300,Score Check 300,Menu,score
+301,Score Check 301,Menu,score
+302,Score Check 302,Menu,score
+303,Score Check 303,Menu,score
+304,Score Check 304,Menu,score
+305,Score Check 305,Menu,score
+306,Score Check 306,Menu,score
+307,Score Check 307,Menu,score
+308,Score Check 308,Menu,score
+309,Score Check 309,Menu,score
+310,Score Check 310,Menu,score
+311,Score Check 311,Menu,score
+312,Score Check 312,Menu,score
+313,Score Check 313,Menu,score
+314,Score Check 314,Menu,score
+315,Score Check 315,Menu,score
+316,Score Check 316,Menu,score
+317,Score Check 317,Menu,score
+318,Score Check 318,Menu,score
+319,Score Check 319,Menu,score
+320,Score Check 320,Menu,score
+321,Score Check 321,Menu,score
+322,Score Check 322,Menu,score
+323,Score Check 323,Menu,score
+324,Score Check 324,Menu,score
+325,Score Check 325,Menu,score
+326,Score Check 326,Menu,score
+327,Score Check 327,Menu,score
+328,Score Check 328,Menu,score
+329,Score Check 329,Menu,score
+330,Score Check 330,Menu,score
+331,Score Check 331,Menu,score
+332,Score Check 332,Menu,score
+333,Score Check 333,Menu,score
+334,Score Check 334,Menu,score
+335,Score Check 335,Menu,score
+336,Score Check 336,Menu,score
+337,Score Check 337,Menu,score
+338,Score Check 338,Menu,score
+339,Score Check 339,Menu,score
+340,Score Check 340,Menu,score
+341,Score Check 341,Menu,score
+342,Score Check 342,Menu,score
+343,Score Check 343,Menu,score
+344,Score Check 344,Menu,score
+345,Score Check 345,Menu,score
+346,Score Check 346,Menu,score
+347,Score Check 347,Menu,score
+348,Score Check 348,Menu,score
+349,Score Check 349,Menu,score
+350,Score Check 350,Menu,score
+351,Score Check 351,Menu,score
+352,Score Check 352,Menu,score
+353,Score Check 353,Menu,score
+354,Score Check 354,Menu,score
+355,Score Check 355,Menu,score
+356,Score Check 356,Menu,score
+357,Score Check 357,Menu,score
+358,Score Check 358,Menu,score
+359,Score Check 359,Menu,score
+360,Score Check 360,Menu,score
+361,Score Check 361,Menu,score
+362,Score Check 362,Menu,score
+363,Score Check 363,Menu,score
+364,Score Check 364,Menu,score
+365,Score Check 365,Menu,score
+366,Score Check 366,Menu,score
+367,Score Check 367,Menu,score
+368,Score Check 368,Menu,score
+369,Score Check 369,Menu,score
+370,Score Check 370,Menu,score
+371,Score Check 371,Menu,score
+372,Score Check 372,Menu,score
+373,Score Check 373,Menu,score
+374,Score Check 374,Menu,score
+375,Score Check 375,Menu,score
+376,Score Check 376,Menu,score
+377,Score Check 377,Menu,score
+378,Score Check 378,Menu,score
+379,Score Check 379,Menu,score
+380,Score Check 380,Menu,score
+381,Score Check 381,Menu,score
+382,Score Check 382,Menu,score
+383,Score Check 383,Menu,score
+384,Score Check 384,Menu,score
+385,Score Check 385,Menu,score
+386,Score Check 386,Menu,score
+387,Score Check 387,Menu,score
+388,Score Check 388,Menu,score
+389,Score Check 389,Menu,score
+390,Score Check 390,Menu,score
+391,Score Check 391,Menu,score
+392,Score Check 392,Menu,score
+393,Score Check 393,Menu,score
+394,Score Check 394,Menu,score
+395,Score Check 395,Menu,score
+396,Score Check 396,Menu,score
+397,Score Check 397,Menu,score
+398,Score Check 398,Menu,score
+399,Score Check 399,Menu,score
+400,Score Check 400,Menu,score
+401,Score Check 401,Menu,score
+402,Score Check 402,Menu,score
+403,Score Check 403,Menu,score
+404,Score Check 404,Menu,score
+405,Score Check 405,Menu,score
+406,Score Check 406,Menu,score
+407,Score Check 407,Menu,score
+408,Score Check 408,Menu,score
+409,Score Check 409,Menu,score
+410,Score Check 410,Menu,score
+411,Score Check 411,Menu,score
+412,Score Check 412,Menu,score
+413,Score Check 413,Menu,score
+414,Score Check 414,Menu,score
+415,Score Check 415,Menu,score
+416,Score Check 416,Menu,score
+417,Score Check 417,Menu,score
+418,Score Check 418,Menu,score
+419,Score Check 419,Menu,score
+420,Score Check 420,Menu,score
+421,Score Check 421,Menu,score
+422,Score Check 422,Menu,score
+423,Score Check 423,Menu,score
+424,Score Check 424,Menu,score
+425,Score Check 425,Menu,score
+426,Score Check 426,Menu,score
+427,Score Check 427,Menu,score
+428,Score Check 428,Menu,score
+429,Score Check 429,Menu,score
+430,Score Check 430,Menu,score
+431,Score Check 431,Menu,score
+432,Score Check 432,Menu,score
+433,Score Check 433,Menu,score
+434,Score Check 434,Menu,score
+435,Score Check 435,Menu,score
+436,Score Check 436,Menu,score
+437,Score Check 437,Menu,score
+438,Score Check 438,Menu,score
+439,Score Check 439,Menu,score
+440,Score Check 440,Menu,score
+441,Score Check 441,Menu,score
+442,Score Check 442,Menu,score
+443,Score Check 443,Menu,score
+444,Score Check 444,Menu,score
+445,Score Check 445,Menu,score
+446,Score Check 446,Menu,score
+447,Score Check 447,Menu,score
+448,Score Check 448,Menu,score
+449,Score Check 449,Menu,score
+450,Score Check 450,Menu,score
+451,Score Check 451,Menu,score
+452,Score Check 452,Menu,score
+453,Score Check 453,Menu,score
+454,Score Check 454,Menu,score
+455,Score Check 455,Menu,score
+456,Score Check 456,Menu,score
+457,Score Check 457,Menu,score
+458,Score Check 458,Menu,score
+459,Score Check 459,Menu,score
+460,Score Check 460,Menu,score
+461,Score Check 461,Menu,score
+462,Score Check 462,Menu,score
+463,Score Check 463,Menu,score
+464,Score Check 464,Menu,score
+465,Score Check 465,Menu,score
+466,Score Check 466,Menu,score
+467,Score Check 467,Menu,score
+468,Score Check 468,Menu,score
+469,Score Check 469,Menu,score
+470,Score Check 470,Menu,score
+471,Score Check 471,Menu,score
+472,Score Check 472,Menu,score
+473,Score Check 473,Menu,score
+474,Score Check 474,Menu,score
+475,Score Check 475,Menu,score
+476,Score Check 476,Menu,score
+477,Score Check 477,Menu,score
+478,Score Check 478,Menu,score
+479,Score Check 479,Menu,score
+480,Score Check 480,Menu,score
+481,Score Check 481,Menu,score
+482,Score Check 482,Menu,score
+483,Score Check 483,Menu,score
+484,Score Check 484,Menu,score
+485,Score Check 485,Menu,score
+486,Score Check 486,Menu,score
+487,Score Check 487,Menu,score
+488,Score Check 488,Menu,score
+489,Score Check 489,Menu,score
+490,Score Check 490,Menu,score
+491,Score Check 491,Menu,score
+492,Score Check 492,Menu,score
+493,Score Check 493,Menu,score
+494,Score Check 494,Menu,score
+495,Score Check 495,Menu,score
+496,Score Check 496,Menu,score
+497,Score Check 497,Menu,score
+498,Score Check 498,Menu,score
+499,Score Check 499,Menu,score
+500,Score Check 500,Menu,score
+2717,Chronos Kill Reward,Tartarus,boss_reward
+2718,Typhon Kill Reward,Summit,boss_reward
+,Hecate Victory,Erebus,biome_victory
+,Scylla Victory,Oceanus,biome_victory
+,Cerberus Victory,Fields,biome_victory
+,Chronos Victory,Tartarus,biome_victory
+,Polyphemus Victory,Ephyra,biome_victory
+,Eris Victory,Thessaly,biome_victory
+,Prometheus Victory,Olympus,biome_victory
+,Typhon Victory,Summit,biome_victory
+2502,Hecate Keepsake,Crossroads,keepsake
+2503,Odysseus Keepsake,Crossroads,keepsake
+2504,Schelemeus Keepsake,Crossroads,keepsake
+2505,Dora Keepsake,Crossroads,keepsake
+2506,Nemesis Keepsake,Crossroads,keepsake
+2507,Moros Keepsake,Crossroads,keepsake
+2508,Eris Keepsake,Crossroads,keepsake
+2509,Charon Keepsake,Crossroads,keepsake
+2510,Hermes Keepsake,Crossroads,keepsake
+2511,Artemis Keepsake,Crossroads,keepsake
+2512,Selene Keepsake,Crossroads,keepsake
+2513,Zeus Keepsake,Crossroads,keepsake
+2514,Hera Keepsake,Crossroads,keepsake
+2515,Poseidon Keepsake,Crossroads,keepsake
+2516,Demeter Keepsake,Crossroads,keepsake
+2517,Apollo Keepsake,Crossroads,keepsake
+2518,Aphrodite Keepsake,Crossroads,keepsake
+2519,Hephaestus Keepsake,Crossroads,keepsake
+2520,Hestia Keepsake,Crossroads,keepsake
+2521,Ares Keepsake,Crossroads,keepsake
+2522,Athena Keepsake,Crossroads,keepsake
+2523,Dionysus Keepsake,Crossroads,keepsake
+2524,Arachne Keepsake,Crossroads,keepsake
+2525,Narcissus Keepsake,Crossroads,keepsake
+2526,Echo Keepsake,Crossroads,keepsake
+2527,Heracles Keepsake,Crossroads,keepsake
+2528,Medea Keepsake,Crossroads,keepsake
+2529,Circe Keepsake,Crossroads,keepsake
+2530,Icarus Keepsake,Crossroads,keepsake
+2531,Chaos Keepsake,Crossroads,keepsake
+2532,Staff Weapon Unlock Location,Crossroads,weapon
+2533,Daggers Weapon Unlock Location,Crossroads,weapon
+2534,Torches Weapon Unlock Location,Crossroads,weapon
+2535,Axe Weapon Unlock Location,Crossroads,weapon
+2536,Skull Weapon Unlock Location,Crossroads,weapon
+2537,Coat weapon Unlock Location,Crossroads,weapon
+2538,Crescent Pickaxe Tool Unlock Location,Crossroads,tool
+2539,Silver Spade Tool Unlock Location,Crossroads,tool
+2540,Tablet of Peace Tool Unlock Location,Crossroads,tool
+2541,Rod of Fishing Tool Unlock Location,Crossroads,tool
+2542,Unraveling a Fateful Bond,Crossroads,incantation
+2543,Permeation of Witching-Wards,Crossroads,incantation
+2544,Fated Intervention,Crossroads,incantation
+2545,Doomed Beckoning,Crossroads,incantation
+2546,Purification of Crystal Clarity,Crossroads,incantation
+2547,Return of Latent Memories,Crossroads,incantation
+2548,Essence of Sorrow,Crossroads,incantation
+2549,Augmentation of Bone Density,Crossroads,incantation
+2550,End to Deepest Slumber,Crossroads,incantation
+2551,End to Dearest Slumber,Crossroads,incantation
+2552,End to Dumbest Slumber,Crossroads,incantation
+2553,Aspects of Night and Darkness,Crossroads,incantation
+2554,Consecration of Ashes,Crossroads,incantation
+2555,Abyssal Insight,Crossroads,incantation
+2556,Abyssal Reflection,Crossroads,incantation
+2557,Faith of Familiar Spirits,Crossroads,incantation
+2558,Bravery of Familiar Spirits,Crossroads,incantation
+2559,Alteration of Familiar Forms,Crossroads,incantation
+2560,Greater Favor of Gaia,Crossroads,incantation
+2561,Long Arm of the Unseen,Crossroads,incantation
+2562,Acceptance of Another Fate,Crossroads,incantation
+2563,Night's Craftwork,Crossroads,incantation
+2564,Divination of the Elements,Crossroads,incantation
+2565,Forget-Me-Not,Crossroads,incantation
+2566,Path to Desired Blessings,Crossroads,incantation
+2567,Spreading of Ashes,Crossroads,incantation
+2568,Favored of All Keepsakes,Crossroads,incantation
+2569,Reagent Sensing,Crossroads,incantation
+2570,Insight into Offerings,Crossroads,incantation
+2571,Summoning of Mercantile Fortune,Crossroads,incantation
+2572,Deathly Fortune,Crossroads,incantation
+2573,Kinship Fortune,Crossroads,incantation
+2574,Earthly Fortune,Crossroads,incantation
+2575,Rivals of Depth and Sea,Crossroads,incantation
+2576,Rivals of Plain and Peak,Crossroads,incantation
+2577,Rivals of Old and Rot,Crossroads,incantation
+2578,Cleansing of Fountain-Waters,Crossroads,incantation
+2579,Purification of Fountain-Waters,Crossroads,incantation
+2580,Rise of Stygian Wells,Crossroads,incantation
+2581,Surge of Stygian Wells,Crossroads,incantation
+2582,Rush of Fresh Air,Crossroads,incantation
+2583,Surge of Fresh Air,Crossroads,incantation
+2584,Revival of a Desecrating Pool,Crossroads,incantation
+2585,Surge of Desecrating Pools,Crossroads,incantation
+2586,Woodsy Lifespring,Crossroads,incantation
+2587,Briny Lifespring,Crossroads,incantation
+2588,Golden Lifespring,Crossroads,incantation
+2589,Sandy Lifespring,Crossroads,incantation
+2590,Frozen Lifespring,Crossroads,incantation
+2591,Propensity Toward Gold,Crossroads,incantation
+2592,Summoning a Colony of Bats,Crossroads,incantation
+2593,Reviving a Mournful Husk,Crossroads,incantation
+2594,Temporal Fluctuation,Crossroads,incantation
+2595,Power to Pause and Reflect,Crossroads,incantation
+2596,Gathering of Ancient Bones,Crossroads,incantation
+2597,Gathering of Subterranean Riches,Crossroads,incantation
+2598,Kindred Keepsakes,Crossroads,incantation
+2599,Quickening of Sentimental Value,Crossroads,incantation
+2600,Rage of the Elements,Crossroads,incantation
+2601,Circles of Protection,Crossroads,incantation
+2602,Circles of the Moon,Crossroads,incantation
+2603,Necromantic Influence,Crossroads,incantation
+2604,Exhumed Troves,Crossroads,incantation
+2605,Eyes of Night and Darkness,Crossroads,incantation
+2606,Arisen Troves,Crossroads,incantation
+2607,Bounties of the Infinite Abyss,Crossroads,incantation
+2608,Ashen Memories of Life,Crossroads,incantation
+2609,Bones of Arcane Wisdom,Crossroads,incantation
+2610,Nectar of Godly Savor,Crossroads,incantation
+2611,Rite of Social Solidarity,Crossroads,incantation
+2612,Rite of Vapor-Cleansing,Crossroads,incantation
+2613,Rite of River-Fording,Crossroads,incantation
+2614,Observance of Gaia's Secrets,Crossroads,incantation
+2615,Flourishing Soil,Crossroads,incantation
+2616,Rich Soil,Crossroads,incantation
+2617,Verdant Soil,Crossroads,incantation
+2618,Green Hand of Gaia,Crossroads,incantation
+2619,Greater Sowing of Gardens,Crossroads,incantation
+2620,Greatest Gift of Gaia,Crossroads,incantation
+2621,Empath's Intuition,Crossroads,incantation
+2622,Summoning of Musical Rhapsody,Crossroads,incantation
+2623,Shuffling of Noted Ballads,Crossroads,incantation
+2624,Summoning of Historic Travails,Crossroads,incantation
+2625,Summoning of Personal Insights,Crossroads,incantation
+2626,Returning to a Real Possibility,Crossroads,incantation
+2627,Greater Removal of Rubbish,Crossroads,incantation
+2628,"Melinoë, Help Us Check",Crossroads,prophecy
+2629,"Melinoë, Remember Us Check",Crossroads,prophecy
+2630,"Melinoë, Seek Us Check",Crossroads,prophecy
+2631,"Melinoë, Find Us Check",Crossroads,prophecy
+2632,Storm in the Heavens Check,Crossroads,prophecy
+2633,Temporary Setback Check,Crossroads,prophecy
+2634,Harbinger of Doom Check,Crossroads,prophecy
+2635,Witch of the Crossroads Check,Crossroads,prophecy
+2636,Natural Talent Check,Crossroads,prophecy
+2637,Sword of the Night Check,Crossroads,prophecy
+2638,Arcana of the Ages Check,Crossroads,prophecy
+2639,Unrivaled Prowess Check,Crossroads,prophecy
+2640,Bearing Dark Gifts Check,Crossroads,prophecy
+2641,Den Mother Check,Crossroads,prophecy
+2642,Family in Need Check,Crossroads,prophecy
+2643,Visions of Victory Check,Crossroads,prophecy
+2644,Unfinished Business Check,Crossroads,prophecy
+2645,Haunted by the Past Check,Crossroads,prophecy
+2646,Silk and Spitefulness Check,Crossroads,prophecy
+2647,Voice and Vanity Check,Crossroads,prophecy
+2648,Bitter Tears Check,Crossroads,prophecy
+2649,Drowned Ambitions Check,Crossroads,prophecy
+2650,The Jackal's Aspect Check,Crossroads,prophecy
+2651,The Crow's Aspect Check,Crossroads,prophecy
+2652,The Shadow's Aspect Check,Crossroads,prophecy
+2653,The Warrior's Aspect Check,Crossroads,prophecy
+2654,The Grave's Aspect Check,Crossroads,prophecy
+2655,The Destroyer's Aspect Check,Crossroads,prophecy
+2656,Nobody but Nobody Check,Crossroads,prophecy
+2657,Born to Win Check,Crossroads,prophecy
+2658,Improbable Outcomes Check,Crossroads,prophecy
+2659,Soundest of Slumbers Check,Crossroads,prophecy
+2660,Customary Gift Check,Crossroads,prophecy
+2661,Mindful Craft Check,Crossroads,prophecy
+2662,Blades of Pure Silver Check,Crossroads,prophecy
+2663,The Arms of Night Check,Crossroads,prophecy
+2664,The Unseen Sentinel Check,Crossroads,prophecy
+2665,Awakened Aspect Check,Crossroads,prophecy
+2666,Major Arcana Check,Crossroads,prophecy
+2667,Familiar Confidant Check,Crossroads,prophecy
+2668,Note to Self Check,Crossroads,prophecy
+2669,The Invoker Check,Crossroads,prophecy
+2670,Whims of Chaos Check,Crossroads,prophecy
+2671,Breadth of Knowledge Check,Crossroads,prophecy
+2672,Weight in Gold Check,Crossroads,prophecy
+2673,Valued Customer Check,Crossroads,prophecy
+2674,Close Companions Check,Crossroads,prophecy
+2675,Beyond Familiar Check,Crossroads,prophecy
+2676,Denizen of the Depths Check,Crossroads,prophecy
+2677,Keeper of Shadows Check,Crossroads,prophecy
+2678,Tools of the Unseen Check,Crossroads,prophecy
+2679,Precision Instrument Check,Crossroads,prophecy
+2680,Home in the Crossroads Check,Crossroads,prophecy
+2681,Spectral Forms Check,Crossroads,prophecy
+2682,Shadow of Death Check,Crossroads,prophecy
+2683,Shadow of Doom Check,Crossroads,prophecy
+2684,Gifts of the Moon Check,Crossroads,prophecy
+2685,Godsent Favor Check,Crossroads,prophecy
+2686,Master of the Dead Check,Crossroads,prophecy
+2687,Master of the Heavens Check,Crossroads,prophecy
+2688,Mistress of Wedlock Check,Crossroads,prophecy
+2689,Master of the Sea Check,Crossroads,prophecy
+2690,Mistress of Seasons Check,Crossroads,prophecy
+2691,Master of Light Check,Crossroads,prophecy
+2692,Mistress of Beauty Check,Crossroads,prophecy
+2693,Master of the Forge Check,Crossroads,prophecy
+2694,Mistress of the Hearth Check,Crossroads,prophecy
+2695,Master of War Check,Crossroads,prophecy
+2696,Mistress of the Hunt Check,Crossroads,prophecy
+2697,Master of Swiftness Check,Crossroads,prophecy
+2698,Mistress of Battle Check,Crossroads,prophecy
+2699,Master of Revelry Check,Crossroads,prophecy
+2700,Original Sins Check,Crossroads,prophecy
+2701,Original Virtues Check,Crossroads,prophecy
+2702,Power Beyond Legend Check,Crossroads,prophecy
+2703,Combined Might Check,Crossroads,prophecy
+2704,Weaver of Fineries Check,Crossroads,prophecy
+2705,Denier of Suitors Check,Crossroads,prophecy
+2706,Voice of Truth Check,Crossroads,prophecy
+2707,Witch of Shadows Check,Crossroads,prophecy
+2708,Witch of Changing Check,Crossroads,prophecy
+2709,Wings of Freedom Check,Crossroads,prophecy
+2710,Bared Fangs Check,Crossroads,prophecy
+2711,The Witch's Staff Check,Crossroads,prophecy
+2712,The Sister Blades Check,Crossroads,prophecy
+2713,The Umbral Flames Check,Crossroads,prophecy
+2714,The Moonstone Axe Check,Crossroads,prophecy
+2715,The Argent Skull Check,Crossroads,prophecy
+2716,The Black Coat Check,Crossroads,prophecy
+2719,Staff Weapon Anubis Aspect Unlock Location,Crossroads,hidden_aspect
+2720,Daggers Weapon Morrigan Aspect Unlock Location,Crossroads,hidden_aspect
+2721,Torches Weapon Supay Aspect Unlock Location,Crossroads,hidden_aspect
+2722,Axe Weapon Nergal Aspect Unlock Location,Crossroads,hidden_aspect
+2723,Skull Weapon Hel Aspect Unlock Location,Crossroads,hidden_aspect
+2724,Coat Weapon Shiva Aspect Unlock Location,Crossroads,hidden_aspect

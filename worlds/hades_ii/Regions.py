@@ -5,7 +5,9 @@ from .Locations import (
     location_table_boss_rewards,
     location_keepsakes,
     location_weapons,
+    location_hidden_aspects,
     location_tools,
+    location_incantations,
     location_table_prophecies,
     location_table_erebus,
     location_table_oceanus,
@@ -51,9 +53,12 @@ def _add_location(region: Region, name: str, address):
 def create_regions(player, multiworld, location_database, options):
     regions = {name: Region(name, player, multiworld) for name in _region_connections}
 
-    # Score checks — always accessible, live in Menu
-    for name, loc_id in location_table_score_checks.items():
-        _add_location(regions["Menu"], name, loc_id)
+    # Score checks — live in Menu, only populated under score_based location
+    # system and limited to the first N per ScoreRewardsAmount.
+    if options.location_system == "score_based":
+        for i in range(1, options.score_rewards_amount.value + 1):
+            name = f"Score Check {i}"
+            _add_location(regions["Menu"], name, location_table_score_checks[name])
 
     # Biome victory events + boss reward checks
     for region_name, (event_table, boss_reward_name) in _biome_data.items():
@@ -72,6 +77,14 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_weapons.items():
             if not should_ignore_weapon_location(name, options):
                 _add_location(regions["Crossroads"], name, loc_id)
+
+    if options.hidden_aspectsanity:
+        for name, loc_id in location_hidden_aspects.items():
+            _add_location(regions["Crossroads"], name, loc_id)
+
+    if options.cauldronsanity:
+        for name, loc_id in location_incantations.items():
+            _add_location(regions["Crossroads"], name, loc_id)
 
     if options.fatesanity:
         for name, loc_id in location_table_prophecies.items():

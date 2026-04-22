@@ -19,7 +19,6 @@ from CommonClient import (
 )
 
 from .Locations import BOSS_ROOM_TO_LOCATION_ID, SCORE_LOCATION_COUNT, hades_ii_base_location_id
-from .Items import ITEM_CODE_TO_RESOURCE
 
 POLL_INTERVAL = 1.0
 
@@ -28,7 +27,7 @@ def get_ipc_dir() -> Path:
     return Path.home() / "hadesii_ap"
 
 
-class HadesIICommandProcessor(ClientCommandProcessor):
+class HadesIIClientCommandProcessor(ClientCommandProcessor):
     def _cmd_score(self):
         """Show current score and checks sent from the game."""
         outbox = get_ipc_dir() / "ap_out.json"
@@ -46,10 +45,27 @@ class HadesIICommandProcessor(ClientCommandProcessor):
         except (json.JSONDecodeError, OSError) as e:
             logger.warning(f"Could not read outbox: {e}")
 
+    def _cmd_resync(self):
+        """Manually trigger a resync."""
+        #This is a really stupid solution, but it works so idk
+        Utils.async_start(self.ctx.check_connection_and_send_items_and_request_starting_info(""))
+
+    def _cmd_deathlink(self) -> bool:
+        """Toggle deathlink tag of client."""
+        if isinstance(self.ctx, HadesIIContext):
+            # Toggle the deathlink enabled state and set the override flag to prevent automatic enabling from server packages
+            self.ctx.deathlink_enabled = not self.ctx.deathlink_enabled
+            self.ctx.deathlink_client_override = True
+
+            # Send the update to the context which changes the tags for the player
+            Utils.async_start(self.ctx.update_death_link(self.ctx.deathlink_enabled))
+
+        return True
+
 
 class HadesIIContext(CommonContext):
     game = "Hades II"
-    command_processor = HadesIICommandProcessor
+    command_processor = HadesIIClientCommandProcessor
     items_handling = 0b111  # receive all items
 
     def __init__(self, server_address: str, password: Optional[str]):
@@ -77,12 +93,8 @@ class HadesIIContext(CommonContext):
     def _write_inbox(self):
         items = []
         for i, net_item in enumerate(self.items_received):
-            result = ITEM_CODE_TO_RESOURCE.get(net_item.item)
-            if result:
-                resource_id, amount = result
-                items.append({"index": i, "resource_id": resource_id, "amount": amount})
-            else:
-                logger.debug(f"Item code {net_item.item} has no resource mapping (keepsake/weapon/etc.) — skipped")
+            item_name = self.item_names.lookup_in_slot(net_item.item, self.slot)
+            items.append({"index": i, "item_code": net_item.item, "item_name": item_name})
 
         inbox = {
             "connected":           True,
@@ -95,7 +107,7 @@ class HadesIIContext(CommonContext):
         with open(self.ipc_dir / "ap_in.json", "w") as f:
             json.dump(inbox, f)
 
-        logger.info(f"Inbox updated — {len(items)} grantable item(s)")
+        logger.info(f"Inbox updated — {len(items)} item(s)")
 
     # ── Outbox polling (game mod → client) ────────────────────────────────────
 

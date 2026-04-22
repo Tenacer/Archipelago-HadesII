@@ -2,11 +2,11 @@ import dataclasses
 from typing import TYPE_CHECKING, override
 from BaseClasses import CollectionState
 from rule_builder.rules import Has, HasAll, HasAny, Rule, True_
-from worlds.hades_ii.World import HadesIIWorld
+from worlds.hades_ii import HadesIIWorld
 from .Options import WeaponSanity, KeepsakeSanity, FateSanity
 
 if TYPE_CHECKING:
-    from .World import HadesIIWorld
+    from . import HadesIIWorld
 
 surface_access = (
     Has("Permeation of Witching-Wards"),
