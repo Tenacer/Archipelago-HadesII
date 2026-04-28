@@ -100,7 +100,7 @@ def init_generator(config: dict[str, Any]) -> None:
     db.generate_mapping()
 
 
-def cleanup(config: dict):
+def cleanup(config: dict[str, Any]):
     """delete unowned or old user-content"""
     auto_delete = config.get("ROOM_AUTO_DELETE", 0)
     with db_session:
