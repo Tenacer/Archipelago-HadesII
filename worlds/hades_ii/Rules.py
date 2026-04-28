@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from .Items import item_table_fears, item_table_keepsakes, item_table_prophecies
 from worlds.AutoWorld import LogicMixin
 from worlds.generic.Rules import add_rule
+from BaseClasses import LocationProgressType
 
 # NOTE: All the `# type: ignore` blocks are to clear the unknown property error sometimes caused by state stuff
 
@@ -15,20 +16,6 @@ weapons = [
     "Axe Weapon",
     "Skull Weapon",
     "Coat Weapon",
-]
-
-# Used for keepsake logic
-olympians = [
-    "Zeus",
-    "Hera",
-    "Poseidon",
-    "Demeter",
-    "Apollo",
-    "Aphrodite",
-    "Hephaestus",
-    "Hestia",
-    "Ares",
-    "Athena",
 ]
 
 class HadesIILogic(LogicMixin):
@@ -90,10 +77,12 @@ class HadesIILogic(LogicMixin):
 
         return can_win
 
-    # True Ending: both final bosses, ingredient counts, Gigaros, both goal incantations.
+    # True Ending: both final bosses, ingredient counts, Gigaros, both goal
+    # incantations, and a *final* Chronos kill performed after Dissolution of
+    # Time has been cast (represented by the `Chronos True Victory` event).
     def _has_true_ending_requirements(self, player: int, options) -> bool:
         return (
-            self.has("Chronos Victory", player)  # type: ignore
+            self.has("Chronos True Victory", player)  # type: ignore
             and self.has("Typhon Victory", player)  # type: ignore
             and self.has("Gigaros", player)  # type: ignore
             and self.has("Dissolution of Time", player)  # type: ignore
@@ -121,21 +110,55 @@ class HadesIILogic(LogicMixin):
     def _has_moros_access(self, player: int) -> bool:
         return True
 
-def set_rules(world, player: int, location_table: dict, options) -> None:    
-    if options.location_system == "room_weapon_based":
-        pass
-        # for weapon in weapons:
-            # set_weapon_region_rules(world, player, number_items, location_table, options, weapon)
-    else:
-        handle_area_logic(world, player)
-    
+def _mark_score_check_exclusions(world, player: int, options) -> None:
+    """Mark score check locations as EXCLUDED up to the number of pure filler items available.
+
+    AP's fill algorithm requires pure-filler item count >= EXCLUDED location count.
+    Items classified as useful (e.g. Nightmare, Fate Fabric) cannot fill EXCLUDED locations,
+    so we only exclude as many score checks as we have pure filler items to cover them.
+    Any overflow score checks stay DEFAULT, keeping them from starving the fill.
+    """
+    if options.location_system.value != 0:  # only score_based
+        return
+
+    pure_filler_count = sum(
+        1 for item in world.itempool
+        if item.player == player and not item.advancement and not item.useful
+    )
+
+    score_checks = sorted(
+        (loc for loc in world.get_locations(player) if loc.name.startswith("Score Check ")),
+        key=lambda loc: int(loc.name.split()[-1]),
+    )
+
+    for i, loc in enumerate(score_checks):
+        if i < pure_filler_count:
+            loc.progress_type = LocationProgressType.EXCLUDED
+
+
+def set_rules(world, player: int, location_table: dict, options) -> None:
+    handle_area_logic(world, player)
+    _mark_score_check_exclusions(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
-    
+
     # Keepsakes
     handle_keepsakes(world, player, options)
 
     # Hidden aspects: require the weapon to be in logic before the chant can happen.
     handle_hidden_aspects(world, player, options)
+
+    # True Ending: the final Chronos kill can only happen after the first
+    # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Gigaros).
+    if options.true_ending:
+        add_rule(
+            world.get_location("Chronos True Victory", player),
+            lambda state: (
+                state.has("Chronos Victory", player)
+                and state.has("Dissolution of Time", player)
+                and state.has("Gigaros", player)
+                and state.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value
+            ),
+        )
         
     # if options.weaponsanity:
     #     add_rule(world.get_entrance("Weapon Cache", player), lambda state: True)
@@ -203,14 +226,6 @@ def handle_keepsakes(world, player, options):
                 lambda state, boss=boss, surface=surface:
                     (boss is None or state._has_defeated_final_boss(boss, player, options)) # type: ignore
                     and (not surface or state._has_surface_access(player)) # type: ignore
-            )
-        
-        # Olympians require their own keepsake to be logically checked
-        for person in olympians:
-            add_rule(
-                world.get_location(f"{person} Keepsake", player),
-                lambda state, person=person:
-                    state.has(f"{person} Keepsake", player)
             )
         
         # Specifically Moros

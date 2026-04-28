@@ -1,5 +1,6 @@
 {
     "game": "Hades II",
     "world-version": "0.0.1",
-    "authors": ["Jay_Playz2019"]
+    "minimum_ap_version": "0.6.7",
+    "authors": ["Tenacer","Jay_Playz2019"]
   }

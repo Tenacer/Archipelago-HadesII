@@ -505,6 +505,7 @@ id,name,region,category
 ,Scylla Victory,Oceanus,biome_victory
 ,Cerberus Victory,Fields,biome_victory
 ,Chronos Victory,Tartarus,biome_victory
+,Chronos True Victory,Tartarus,biome_victory
 ,Polyphemus Victory,Ephyra,biome_victory
 ,Eris Victory,Thessaly,biome_victory
 ,Prometheus Victory,Olympus,biome_victory
@@ -730,3 +731,5 @@ id,name,region,category
 2722,Axe Weapon Nergal Aspect Unlock Location,Crossroads,hidden_aspect
 2723,Skull Weapon Hel Aspect Unlock Location,Crossroads,hidden_aspect
 2724,Coat Weapon Shiva Aspect Unlock Location,Crossroads,hidden_aspect
+2725,Dissolution of Time,Crossroads,incantation
+2726,Disintegration of Monstrosity,Crossroads,incantation

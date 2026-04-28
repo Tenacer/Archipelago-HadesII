@@ -21,13 +21,12 @@ class InitialWeapon(Choice):
     
 class LocationSystem(Choice):
     """
-    Chooses how the game gives you items. RoomBased gives items on every new room completed.
+    Chooses how the game gives you items. Currently only score_based is supported.
+    Room-based modes are reserved for a future update.
     """
     display_name = "Location System"
-    option_room_based = 0
-    option_room_weapon_based = 1
-    option_score_based = 2
-    default = 2
+    option_score_based = 0
+    default = 0
     
 
 class ScoreRewardsAmount(Range):
@@ -156,11 +155,14 @@ class FatesNeeded(Range):
 
 class FearSystem(Choice):
     """
-    Choose either ReverseFear (1), MinimalFear (2) or VanillaFear(3) for the game.
-    In ReverseFear you start with Fear vows that cannot be disabled until you get the corresponding vow item.
-    In Minimal the settings for the VowAmounts below set your minimal Fear to be set, and cannot go below that level.
-    If not wanting to have one of this Fear systems on, chose Vanilla Fear
-    (then the following options related to vows do nothing).
+    Choose either ReverseFear (1), MinimalFear (2) or VanillaFear (3) for the game.
+    In ReverseFear you start with randomly distributed Fear vows that are locked on until
+    you receive the corresponding vow items from the AP world.
+    In MinimalFear the game starts with randomly distributed vows that act as a permanent
+    floor — the shrine is hidden and levels never change.
+    VanillaFear leaves all vow control to the player (shrine works normally).
+    The total shrine points distributed is set by InitialFearLevel / MinimalFearLevel.
+    Maximum possible fear level is 67 (all vows at max rank).
     """
     display_name = "Fear System"
     option_reverse_Fear = 1
@@ -169,192 +171,28 @@ class FearSystem(Choice):
     default = 1
 
 
-class PainVowAmount(Range):
+class InitialFearLevel(Range):
     """
-    Choose the amount of Vow of Pain ranks in the pool.
-    Enemies deal more damage (3 ranks).
+    Total shrine points to randomly distribute across vows at game start (reverse_Fear only).
+    The points are spread randomly — individual vow ranks are not configurable.
+    Maximum is 67 (all vows at max rank). Unused points if no affordable rank remains.
     """
-    display_name = "Vow of Pain Amount"
+    display_name = "Initial Fear Level"
     range_start = 0
-    range_end = 3
-    default = 1
+    range_end = 67
+    default = 11
 
 
-class GritVowAmount(Range):
+class MinimalFearLevel(Range):
     """
-    Choose the amount of Vow of Grit ranks in the pool.
-    Enemies have more health (3 ranks).
+    Total shrine points to randomly distribute as the permanent vow floor (minimal_Fear only).
+    The shrine is hidden; these levels never change during the run.
+    Maximum is 67 (all vows at max rank). Unused points if no affordable rank remains.
     """
-    display_name = "Vow of Grit Amount"
+    display_name = "Minimal Fear Level"
     range_start = 0
-    range_end = 3
-    default = 1
-
-
-class WardsVowAmount(Range):
-    """
-    Choose the amount of Vow of Wards ranks in the pool.
-    Enemies have barrier defenses (2 ranks).
-    """
-    display_name = "Vow of Wards Amount"
-    range_start = 0
-    range_end = 2
-    default = 1
-
-
-class FrenzyVowAmount(Range):
-    """
-    Choose the amount of Vow of Frenzy ranks in the pool.
-    Enemies move and attack faster (3 ranks).
-    """
-    display_name = "Vow of Frenzy Amount"
-    range_start = 0
-    range_end = 2
-    default = 1
-
-
-class HordesVowAmount(Range):
-    """
-    Choose the amount of Vow of Hordes ranks in the pool.
-    Encounters have more enemies (3 ranks).
-    """
-    display_name = "Vow of Hordes Amount"
-    range_start = 0
-    range_end = 3
-    default = 1
-
-
-class MenaceVowAmount(Range):
-    """
-    Choose the amount of Vow of Menace ranks in the pool.
-    Foes have a chance to be from the next region (2 ranks).
-    """
-    display_name = "Vow of Menace Amount"
-    range_start = 0
-    range_end = 2
-    default = 1
-
-
-class ReturnVowAmount(Range):
-    """
-    Choose the amount of Vow of Return ranks in the pool.
-    Slain foes have a chance to become revenants (2 ranks).
-    """
-    display_name = "Vow of Return Amount"
-    range_start = 0
-    range_end = 2
-    default = 1
-
-
-class FangsVowAmount(Range):
-    """
-    Choose the amount of Vow of Fangs ranks in the pool.
-    Armored enemies gain additional perks (2 ranks).
-    """
-    display_name = "Vow of Fangs Amount"
-    range_start = 0
-    range_end = 2
-    default = 0
-
-
-class ScarsVowAmount(Range):
-    """
-    Choose the amount of Vow of Scars ranks in the pool.
-    Healing items are less effective (3 ranks).
-    """
-    display_name = "Vow of Scars Amount"
-    range_start = 0
-    range_end = 3
-    default = 1
-
-
-class DebtVowAmount(Range):
-    """
-    Choose the amount of Vow of Debt ranks in the pool.
-    Items in the shops are more expensive (2 ranks).
-    """
-    display_name = "Vow of Debt Amount"
-    range_start = 0
-    range_end = 2
-    default = 1
-
-
-class ShadowVowAmount(Range):
-    """
-    Choose the amount of Vow of Shadow ranks in the pool.
-    Shadow Servants appear in mini-boss encounters (1 rank).
-    """
-    display_name = "Vow of Shadow Amount"
-    range_start = 0
-    range_end = 1
-    default = 0
-
-
-class ForfeitVowAmount(Range):
-    """
-    Choose the amount of Vow of Forfeit ranks in the pool.
-    First boon in each region becomes an onion (1 rank).
-    """
-    display_name = "Vow of Forfeit Amount"
-    range_start = 0
-    range_end = 1
-    default = 0
-
-
-class TimeVowAmount(Range):
-    """
-    Choose the amount of Vow of Time ranks in the pool.
-    Limits the time you can use to clear each region before
-     starting to take damage (3 ranks).
-    """
-    display_name = "Vow of Time Amount"
-    range_start = 0
-    range_end = 3
-    default = 0
-
-
-class VoidVowAmount(Range):
-    """
-    Choose the amount of Vow of Void ranks in the pool.
-    Arcana Grasp is reduced (4 ranks).
-    """
-    display_name = "Vow of Void Amount"
-    range_start = 0
-    range_end = 4
-    default = 0
-
-
-class HubrisVowAmount(Range):
-    """
-    Choose the amount of Vow of Hubris ranks in the pool.
-    Prime magick after choosing boons above common (2 ranks).
-    """
-    display_name = "Vow of Hubris Amount"
-    range_start = 0
-    range_end = 2
-    default = 0
-
-
-class DenialVowAmount(Range):
-    """
-    Choose the amount of Vow of Denial ranks in the pool.
-    After choosing a boon, the unpicked choices will no longer be available (1 rank).
-    """
-    display_name = "Vow of Denial Amount"
-    range_start = 0
-    range_end = 1
-    default = 0
-
-
-class RivalsVowAmount(Range):
-    """
-    Choose the amount of Vow of Rivals ranks in the pool.
-    Boss encounters are enhanced (4 ranks).
-    """
-    display_name = "Vow of Rivals Amount"
-    range_start = 0
-    range_end = 4
-    default = 0
+    range_end = 67
+    default = 11
 
 
 # -- Filler config: single place to tune all filler defaults
@@ -601,23 +439,8 @@ class HadesIIOptions(PerGameCommonOptions):
     fates_needed: FatesNeeded
 
     fear_system: FearSystem
-    pain_vow_amount: PainVowAmount
-    grit_vow_amount: GritVowAmount
-    wards_vow_amount: WardsVowAmount
-    frenzy_vow_amount: FrenzyVowAmount
-    hordes_vow_amount: HordesVowAmount
-    menace_vow_amount: MenaceVowAmount
-    return_vow_amount: ReturnVowAmount
-    fangs_vow_amount: FangsVowAmount
-    scars_vow_amount: ScarsVowAmount
-    debt_vow_amount: DebtVowAmount
-    shadow_vow_amount: ShadowVowAmount
-    forfeit_vow_amount: ForfeitVowAmount
-    time_vow_amount: TimeVowAmount
-    void_vow_amount: VoidVowAmount
-    hubris_vow_amount: HubrisVowAmount
-    denial_vow_amount: DenialVowAmount
-    rivals_vow_amount: RivalsVowAmount
+    initial_fear_level: InitialFearLevel
+    minimal_fear_level: MinimalFearLevel
 
     ash_pack_value: AshPackValue
     ash_pack_percentage: AshPackPercentage
@@ -668,23 +491,8 @@ hades_ii_option_groups = [
     ]),
     OptionGroup("Fear Options", [
         FearSystem,
-        PainVowAmount,
-        GritVowAmount,
-        WardsVowAmount,
-        FrenzyVowAmount,
-        HordesVowAmount,
-        MenaceVowAmount,
-        ReturnVowAmount,
-        FangsVowAmount,
-        ScarsVowAmount,
-        DebtVowAmount,
-        ShadowVowAmount,
-        ForfeitVowAmount,
-        TimeVowAmount,
-        VoidVowAmount,
-        HubrisVowAmount,
-        DenialVowAmount,
-        RivalsVowAmount,
+        InitialFearLevel,
+        MinimalFearLevel,
     ]),
     OptionGroup("Filler Options", [
         AshPackValue,
@@ -722,23 +530,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "hidden_aspectsanity": False,
         "fatesanity": False,
         "fear_system": "reverse_Fear",
-        "pain_vow_amount": 1,
-        "grit_vow_amount": 1,
-        "wards_vow_amount": 1,
-        "frenzy_vow_amount": 1,
-        "hordes_vow_amount": 1,
-        "menace_vow_amount": 1,
-        "return_vow_amount": 1,
-        "fangs_vow_amount": 0,
-        "scars_vow_amount": 1,
-        "debt_vow_amount": 1,
-        "shadow_vow_amount": 0,
-        "forfeit_vow_amount": 0,
-        "time_vow_amount": 0,
-        "void_vow_amount": 0,
-        "hubris_vow_amount": 0,
-        "denial_vow_amount": 0,
-        "rivals_vow_amount": 0,
+        "initial_fear_level": 11,
         "ash_pack_value": 20,
         "bones_pack_value": 100,
         "psyche_pack_value": 50,
@@ -754,23 +546,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "hidden_aspectsanity": True,
         "fatesanity": False,
         "fear_system": "reverse_Fear",
-        "pain_vow_amount": 2,
-        "grit_vow_amount": 2,
-        "wards_vow_amount": 1,
-        "frenzy_vow_amount": 2,
-        "hordes_vow_amount": 2,
-        "menace_vow_amount": 1,
-        "return_vow_amount": 1,
-        "fangs_vow_amount": 1,
-        "scars_vow_amount": 2,
-        "debt_vow_amount": 1,
-        "shadow_vow_amount": 1,
-        "forfeit_vow_amount": 0,
-        "time_vow_amount": 1,
-        "void_vow_amount": 1,
-        "hubris_vow_amount": 1,
-        "denial_vow_amount": 0,
-        "rivals_vow_amount": 1,
+        "initial_fear_level": 28,
         "ash_pack_value": 10,
         "bones_pack_value": 50,
         "psyche_pack_value": 30,
@@ -786,23 +562,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "hidden_aspectsanity": True,
         "fatesanity": True,
         "fear_system": "reverse_Fear",
-        "pain_vow_amount": 3,
-        "grit_vow_amount": 3,
-        "wards_vow_amount": 2,
-        "frenzy_vow_amount": 3,
-        "hordes_vow_amount": 3,
-        "menace_vow_amount": 2,
-        "return_vow_amount": 2,
-        "fangs_vow_amount": 2,
-        "scars_vow_amount": 3,
-        "debt_vow_amount": 2,
-        "shadow_vow_amount": 1,
-        "forfeit_vow_amount": 1,
-        "time_vow_amount": 2,
-        "void_vow_amount": 2,
-        "hubris_vow_amount": 2,
-        "denial_vow_amount": 1,
-        "rivals_vow_amount": 3,
+        "initial_fear_level": 57,
         "ash_pack_value": 5,
         "bones_pack_value": 25,
         "psyche_pack_value": 15,

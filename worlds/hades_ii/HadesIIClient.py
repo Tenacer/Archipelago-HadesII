@@ -5,6 +5,7 @@ Bridges the Hades II game mod (via JSON files in ~/hadesii_ap/) with the AP serv
 
 import asyncio
 import json
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -17,10 +18,18 @@ from CommonClient import (
     logger,
     server_loop,
 )
+from NetUtils import ClientStatus
 
-from .Locations import BOSS_ROOM_TO_LOCATION_ID, SCORE_LOCATION_COUNT, hades_ii_base_location_id
+from .Locations import (
+    SCORE_LOCATION_COUNT,
+    hades_ii_base_location_id,
+    location_table,
+)
 
-POLL_INTERVAL = 1.0
+POLL_INTERVAL = 0.5
+
+# name→id for every non-event location; used to resolve names from the outbox
+_LOCATION_NAME_TO_ID = {name: d.code for name, d in location_table.items() if d.code is not None}
 
 
 def get_ipc_dir() -> Path:
@@ -46,34 +55,32 @@ class HadesIIClientCommandProcessor(ClientCommandProcessor):
             logger.warning(f"Could not read outbox: {e}")
 
     def _cmd_resync(self):
-        """Manually trigger a resync."""
-        #This is a really stupid solution, but it works so idk
-        Utils.async_start(self.ctx.check_connection_and_send_items_and_request_starting_info(""))
+        """Re-read the outbox and re-send all pending checks to the server."""
+        if isinstance(self.ctx, HadesIIContext):
+            Utils.async_start(self.ctx.resync())
 
     def _cmd_deathlink(self) -> bool:
-        """Toggle deathlink tag of client."""
+        """Toggle DeathLink for this session."""
         if isinstance(self.ctx, HadesIIContext):
-            # Toggle the deathlink enabled state and set the override flag to prevent automatic enabling from server packages
             self.ctx.deathlink_enabled = not self.ctx.deathlink_enabled
             self.ctx.deathlink_client_override = True
-
-            # Send the update to the context which changes the tags for the player
             Utils.async_start(self.ctx.update_death_link(self.ctx.deathlink_enabled))
-
         return True
 
 
 class HadesIIContext(CommonContext):
     game = "Hades II"
     command_processor = HadesIIClientCommandProcessor
-    items_handling = 0b111  # receive all items
+    items_handling = 0b111  # full — receive all items including starting inventory
 
     def __init__(self, server_address: str, password: Optional[str]):
         super().__init__(server_address, password)
         self.ipc_dir = get_ipc_dir()
         self.ipc_dir.mkdir(exist_ok=True)
+        self.deathlink_client_override = False
         self._last_checks_sent = 0
-        self._last_boss_status: Optional[str] = None
+        self._last_death_count = 0
+        self._sent_goal = False
 
     # ── AP server callbacks ───────────────────────────────────────────────────
 
@@ -85,31 +92,98 @@ class HadesIIContext(CommonContext):
 
     def on_package(self, cmd: str, args: dict):
         super().on_package(cmd, args)
-        if cmd == "ReceivedItems":
+        if cmd == "Connected":
+            slot_data = args.get("slot_data", {})
+            self._write_settings(slot_data)
             self._write_inbox()
+            # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
+            if not self.deathlink_client_override and slot_data.get("death_link"):
+                Utils.async_start(self.update_death_link(True))
+        elif cmd == "ReceivedItems":
+            self._write_inbox()
+        elif cmd == "Bounced":
+            # DeathLink bounce from another player
+            if "DeathLink" in args.get("tags", []) and "DeathLink" in self.tags:
+                self._handle_incoming_deathlink(args)
 
-    # ── Inbox (client → game mod) ─────────────────────────────────────────────
+    # ── Settings (slot data → game mod) ──────────────────────────────────────
+
+    def _write_settings(self, slot_data: dict):
+        """Write the AP slot data so the Lua mod can read its configuration."""
+        path = self.ipc_dir / "ap_settings.json"
+        with open(path, "w") as f:
+            json.dump(slot_data, f, indent=2)
+        logger.info("Wrote slot data to ap_settings.json")
+
+    # ── Inbox (AP server → game mod) ─────────────────────────────────────────
 
     def _write_inbox(self):
+        """
+        Write all received items to ap_in.json.
+        Each entry has: index (int), item_code (int), item_name (str).
+        The Lua mod maps item_name to its internal resource IDs.
+        """
         items = []
         for i, net_item in enumerate(self.items_received):
             item_name = self.item_names.lookup_in_slot(net_item.item, self.slot)
-            items.append({"index": i, "item_code": net_item.item, "item_name": item_name})
+            items.append({
+                "index":     i,
+                "item_code": net_item.item,
+                "item_name": item_name,
+            })
 
         inbox = {
-            "connected":           True,
-            "items_count":         len(items),
-            "items":               items,
-            "points_per_room":     1,
-            "points_per_location": 10,
+            "connected":   True,
+            "items_count": len(items),
+            "items":       items,
         }
-
         with open(self.ipc_dir / "ap_in.json", "w") as f:
             json.dump(inbox, f)
-
         logger.info(f"Inbox updated — {len(items)} item(s)")
 
-    # ── Outbox polling (game mod → client) ────────────────────────────────────
+    # ── DeathLink ────────────────────────────────────────────────────────────
+
+    def _handle_incoming_deathlink(self, args: dict):
+        """Append a deathlink flag to ap_in.json so the Lua mod can kill Melinoë."""
+        try:
+            with open(self.ipc_dir / "ap_in.json") as f:
+                inbox = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            inbox = {"connected": True, "items": []}
+        inbox["deathlink_seq"] = inbox.get("deathlink_seq", 0) + 1
+        inbox["deathlink"] = True
+        inbox["deathlink_source"] = args.get("data", {}).get("source", "unknown")
+        with open(self.ipc_dir / "ap_in.json", "w") as f:
+            json.dump(inbox, f)
+        logger.info(f"DeathLink received from {inbox['deathlink_source']}")
+
+    async def _send_deathlink(self):
+        source = self.username or "Hades II"
+        await self.send_msgs([{
+            "cmd": "Bounce",
+            "tags": ["DeathLink"],
+            "data": {
+                "time":   time.time(),
+                "cause":  "Melinoë was defeated",
+                "source": source,
+            },
+        }])
+        logger.info("DeathLink sent")
+
+    # ── Outbox polling (game mod → AP server) ────────────────────────────────
+
+    async def resync(self):
+        """Reset client-side counters and reprocess the outbox from scratch."""
+        self._last_checks_sent = 0
+        self._last_death_count = 0
+        self._sent_goal = False
+        outbox_path = self.ipc_dir / "ap_out.json"
+        try:
+            with open(outbox_path) as f:
+                data = json.load(f)
+            await self._process_outbox(data)
+        except (OSError, json.JSONDecodeError):
+            logger.warning("Resync: could not read outbox")
 
     async def poll_outbox(self):
         outbox_path = self.ipc_dir / "ap_out.json"
@@ -118,13 +192,19 @@ class HadesIIContext(CommonContext):
                 if outbox_path.exists() and self.server:
                     with open(outbox_path) as f:
                         data = json.load(f)
-                    await self._process_score_checks(data)
-                    await self._process_boss_cleared(data)
+                    await self._process_outbox(data)
             except (json.JSONDecodeError, OSError) as e:
                 logger.debug(f"Outbox read error: {e}")
             await asyncio.sleep(POLL_INTERVAL)
 
+    async def _process_outbox(self, data: dict):
+        await self._process_score_checks(data)
+        await self._process_named_checks(data)
+        await self._process_victory(data)
+        await self._process_deathlink(data)
+
     async def _process_score_checks(self, data: dict):
+        """Convert the Lua mod's checks_sent counter into AP LocationChecks."""
         checks_sent = data.get("checks_sent", 0)
         if checks_sent <= self._last_checks_sent:
             return
@@ -138,23 +218,48 @@ class HadesIIContext(CommonContext):
 
         if new_locations:
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
-            logger.info(f"Sent {len(new_locations)} score check(s)")
+            logger.info(f"Sent {len(new_locations)} score check(s) (total: {checks_sent})")
 
         self._last_checks_sent = checks_sent
 
-    async def _process_boss_cleared(self, data: dict):
-        if data.get("status") != "boss_cleared":
-            return
-        boss_room = data.get("boss_room")
-        if boss_room == self._last_boss_status:
+    async def _process_named_checks(self, data: dict):
+        """
+        Handle all non-score location checks reported by name from the game.
+        The outbox 'checked_locations' field is a list of AP location name strings.
+        Covers: boss rewards, keepsakes, weapons, tools, hidden aspects,
+                incantations, and prophecy checks.
+        """
+        checked = data.get("checked_locations", [])
+        if not checked:
             return
 
-        loc_id = BOSS_ROOM_TO_LOCATION_ID.get(boss_room)
-        if loc_id and loc_id not in self.checked_locations:
-            await self.send_msgs([{"cmd": "LocationChecks", "locations": [loc_id]}])
-            logger.info(f"Sent boss check: {boss_room} → location {loc_id}")
+        new_locations = set()
+        for name in checked:
+            loc_id = _LOCATION_NAME_TO_ID.get(name)
+            if loc_id is not None and loc_id not in self.checked_locations:
+                new_locations.add(loc_id)
 
-        self._last_boss_status = boss_room
+        if new_locations:
+            await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
+            logger.info(f"Sent {len(new_locations)} named check(s)")
+
+    async def _process_victory(self, data: dict):
+        """Send goal status when the game signals the run is complete."""
+        if self._sent_goal:
+            return
+        if data.get("victory"):
+            await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+            self._sent_goal = True
+            logger.info("Goal complete — victory sent to server!")
+
+    async def _process_deathlink(self, data: dict):
+        """Forward deaths from the game to other AP players via DeathLink bounce."""
+        if "DeathLink" not in self.tags:
+            return
+        death_count = data.get("deaths", 0)
+        if death_count > self._last_death_count:
+            self._last_death_count = death_count
+            await self._send_deathlink()
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

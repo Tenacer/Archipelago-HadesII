@@ -13,26 +13,27 @@ _BOSS_VICTORY_NAMES = {
     "Polyphemus Victory", "Eris Victory", "Prometheus Victory", "Typhon Victory",
 }
 
-# (options attribute, base item name, is_multi_rank)
-# Multi-rank vows take N copies of ranks 1..N; single-rank vows take 1 copy when amount >= 1.
+# (base item name, is_multi_rank, shrine_upgrade_name)
+# Multi-rank vows add N items (ranks 1..N); single-rank vows add 1 item when rank >= 1.
+# Vow items only enter the pool in reverse_Fear mode; amounts come from world.vow_ranks.
 _VOW_OPTIONS = [
-    ("pain_vow_amount",    "Vow of Pain",    True),
-    ("grit_vow_amount",    "Vow of Grit",    True),
-    ("wards_vow_amount",   "Vow of Wards",   True),
-    ("frenzy_vow_amount",  "Vow of Frenzy",  True),
-    ("hordes_vow_amount",  "Vow of Hordes",  True),
-    ("menace_vow_amount",  "Vow of Menace",  True),
-    ("return_vow_amount",  "Vow of Return",  True),
-    ("fangs_vow_amount",   "Vow of Fangs",   True),
-    ("scars_vow_amount",   "Vow of Scars",   True),
-    ("debt_vow_amount",    "Vow of Debt",    True),
-    ("shadow_vow_amount",  "Vow of Shadow",  False),
-    ("forfeit_vow_amount", "Vow of Forfeit", False),
-    ("time_vow_amount",    "Vow of Time",    True),
-    ("void_vow_amount",    "Vow of Void",    True),
-    ("hubris_vow_amount",  "Vow of Hubris",  True),
-    ("denial_vow_amount",  "Vow of Denial",  False),
-    ("rivals_vow_amount",  "Vow of Rivals",  True),
+    ("Vow of Pain",    True,  "EnemyDamageShrineUpgrade"),
+    ("Vow of Grit",    True,  "EnemyHealthShrineUpgrade"),
+    ("Vow of Wards",   True,  "EnemyShieldShrineUpgrade"),
+    ("Vow of Frenzy",  True,  "EnemySpeedShrineUpgrade"),
+    ("Vow of Hordes",  True,  "EnemyCountShrineUpgrade"),
+    ("Vow of Menace",  True,  "NextBiomeEnemyShrineUpgrade"),
+    ("Vow of Return",  True,  "EnemyRespawnShrineUpgrade"),
+    ("Vow of Fangs",   True,  "EnemyEliteShrineUpgrade"),
+    ("Vow of Scars",   True,  "HealingReductionShrineUpgrade"),
+    ("Vow of Debt",    True,  "ShopPricesShrineUpgrade"),
+    ("Vow of Shadow",  False, "MinibossCountShrineUpgrade"),
+    ("Vow of Forfeit", False, "BoonSkipShrineUpgrade"),
+    ("Vow of Time",    True,  "BiomeSpeedShrineUpgrade"),
+    ("Vow of Void",    True,  "LimitGraspShrineUpgrade"),
+    ("Vow of Hubris",  True,  "BoonManaReserveShrineUpgrade"),
+    ("Vow of Denial",  False, "BanUnpickedBoonsShrineUpgrade"),
+    ("Vow of Rivals",  True,  "BossDifficultyShrineUpgrade"),
 ]
 
 
@@ -112,11 +113,12 @@ def create_items(self) -> None:
     local_location_table = setup_location_table_with_settings(self.options).copy()
     pool: List[Item] = []
 
-    # Fear vows — one item per rank of each vow the player chose to randomize.
-    # Vanilla Fear (fear_system == 3) means no vow items enter the pool.
-    if self.options.fear_system.value != 3:
-        for opt_name, base, is_multi in _VOW_OPTIONS:
-            amount = getattr(self.options, opt_name).value
+    # Fear vows — only in reverse_Fear (1); amounts from the randomly distributed vow_ranks.
+    # minimal_Fear (2) and vanilla_Fear (3) add no vow items to the pool.
+    if self.options.fear_system.value == 1:
+        vow_ranks = getattr(self, "vow_ranks", {})
+        for base, is_multi, shrine_name in _VOW_OPTIONS:
+            amount = vow_ranks.get(shrine_name, 0)
             if is_multi:
                 for rank in range(1, amount + 1):
                     pool.append(self.create_item(f"{base} Rank {rank}"))
@@ -182,15 +184,18 @@ def create_items(self) -> None:
     handle_fillers(self, pool, local_location_table)
 
     # Place in boss event pseudo-items
-    place_boss_events(self.multiworld, self.player)
+    place_boss_events(self.multiworld, self.player, self.options)
 
     # Add items to pool
     self.multiworld.itempool += pool
 
 
 # Places boss event pseudo-items at each location
-def place_boss_events(world, player) -> None:
-    for boss in _BOSS_VICTORY_NAMES:
+def place_boss_events(world, player, options) -> None:
+    names = set(_BOSS_VICTORY_NAMES)
+    if options.true_ending:
+        names.add("Chronos True Victory")
+    for boss in names:
         location = world.get_location(boss, player)
         event_item = Item(boss, ItemClassification.progression, None, player)
         location.place_locked_item(event_item)
@@ -207,6 +212,7 @@ def handle_fillers(self, pool, local_location_table):
         "nectar":      self.options.nectar_pack_percentage,
         "ambrosia":    self.options.ambrosia_pack_percentage,
         "nightmare":   self.options.nightmare_pack_percentage,
+        "moon_dust":   self.options.moon_dust_pack_percentage,
         "fate_fabric": self.options.fate_fabric_pack_percentage,
         "traps":       self.options.filler_trap_percentage,
     }
@@ -234,6 +240,7 @@ def handle_fillers(self, pool, local_location_table):
         "Nectar":      counts["nectar"],
         "Ambrosia":    counts["ambrosia"],
         "Nightmare":   counts["nightmare"],
+        "Moon Dust":   counts["moon_dust"],
         "Fate Fabric": counts["fate_fabric"],
     }
 
