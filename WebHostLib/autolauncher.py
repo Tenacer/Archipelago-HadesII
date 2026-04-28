@@ -108,7 +108,7 @@ def cleanup(config: dict[str, Any]):
         # True
         rooms = Room.select(lambda room: room.owner == UUID(int=0)).delete(bulk=True)
         seeds = Seed.select(lambda seed: seed.owner == UUID(int=0) and not seed.rooms).delete(bulk=True)
-        if auto_delete:
+        if auto_delete > 0:
             cutoff = utcnow() - timedelta(days=auto_delete)
             rooms += Room.select(lambda room: room.last_activity < cutoff).delete(bulk=True)
             seeds += Seed.select(lambda seed: not seed.rooms and seed.creation_time < cutoff).delete(bulk=True)
