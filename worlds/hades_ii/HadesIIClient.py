@@ -5,6 +5,7 @@ Bridges the Hades II game mod (via JSON files in ~/hadesii_ap/) with the AP serv
 
 import asyncio
 import json
+import re
 import time
 from pathlib import Path
 from typing import Optional
@@ -39,7 +40,7 @@ def get_ipc_dir() -> Path:
 class HadesIIClientCommandProcessor(ClientCommandProcessor):
     def _cmd_score(self):
         """Show current score and checks sent from the game."""
-        outbox = get_ipc_dir() / "ap_out.json"
+        outbox = self.ctx._ipc_file("ap_out.json") if isinstance(self.ctx, HadesIIContext) else get_ipc_dir() / "ap_out.json"
         if not outbox.exists():
             logger.info("No outbox found — is the game running with the mod?")
             return
@@ -78,9 +79,17 @@ class HadesIIContext(CommonContext):
         self.ipc_dir = get_ipc_dir()
         self.ipc_dir.mkdir(exist_ok=True)
         self.deathlink_client_override = False
+        self._world_id: Optional[str] = None
         self._last_checks_sent = 0
         self._last_death_count = 0
         self._sent_goal = False
+
+    def _ipc_file(self, name: str) -> Path:
+        """Return the world-specific path for an IPC file (e.g. ap_in_seed_1.json)."""
+        if self._world_id:
+            base, ext = name.rsplit(".", 1)
+            return self.ipc_dir / f"{base}_{self._world_id}.{ext}"
+        return self.ipc_dir / name
 
     # ── AP server callbacks ───────────────────────────────────────────────────
 
@@ -94,6 +103,9 @@ class HadesIIContext(CommonContext):
         super().on_package(cmd, args)
         if cmd == "Connected":
             slot_data = args.get("slot_data", {})
+            world_id = re.sub(r'[^a-zA-Z0-9_-]', '_', f"{self.seed_name}_{self.slot}")
+            self._world_id = world_id
+            logger.info(f"World ID: {world_id}")
             self._write_settings(slot_data)
             self._write_inbox()
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
@@ -110,10 +122,12 @@ class HadesIIContext(CommonContext):
 
     def _write_settings(self, slot_data: dict):
         """Write the AP slot data so the Lua mod can read its configuration."""
+        data = dict(slot_data)
+        data["world_id"] = self._world_id
         path = self.ipc_dir / "ap_settings.json"
         with open(path, "w") as f:
-            json.dump(slot_data, f, indent=2)
-        logger.info("Wrote slot data to ap_settings.json")
+            json.dump(data, f, indent=2)
+        logger.info(f"Wrote slot data to ap_settings.json (world_id={self._world_id})")
 
     # ── Inbox (AP server → game mod) ─────────────────────────────────────────
 
@@ -137,23 +151,24 @@ class HadesIIContext(CommonContext):
             "items_count": len(items),
             "items":       items,
         }
-        with open(self.ipc_dir / "ap_in.json", "w") as f:
+        with open(self._ipc_file("ap_in.json"), "w") as f:
             json.dump(inbox, f)
         logger.info(f"Inbox updated — {len(items)} item(s)")
 
     # ── DeathLink ────────────────────────────────────────────────────────────
 
     def _handle_incoming_deathlink(self, args: dict):
-        """Append a deathlink flag to ap_in.json so the Lua mod can kill Melinoë."""
+        """Append a deathlink flag to the world inbox so the Lua mod can kill Melinoë."""
+        inbox_path = self._ipc_file("ap_in.json")
         try:
-            with open(self.ipc_dir / "ap_in.json") as f:
+            with open(inbox_path) as f:
                 inbox = json.load(f)
         except (OSError, json.JSONDecodeError):
             inbox = {"connected": True, "items": []}
         inbox["deathlink_seq"] = inbox.get("deathlink_seq", 0) + 1
         inbox["deathlink"] = True
         inbox["deathlink_source"] = args.get("data", {}).get("source", "unknown")
-        with open(self.ipc_dir / "ap_in.json", "w") as f:
+        with open(inbox_path, "w") as f:
             json.dump(inbox, f)
         logger.info(f"DeathLink received from {inbox['deathlink_source']}")
 
@@ -177,7 +192,7 @@ class HadesIIContext(CommonContext):
         self._last_checks_sent = 0
         self._last_death_count = 0
         self._sent_goal = False
-        outbox_path = self.ipc_dir / "ap_out.json"
+        outbox_path = self._ipc_file("ap_out.json")
         try:
             with open(outbox_path) as f:
                 data = json.load(f)
@@ -186,13 +201,14 @@ class HadesIIContext(CommonContext):
             logger.warning("Resync: could not read outbox")
 
     async def poll_outbox(self):
-        outbox_path = self.ipc_dir / "ap_out.json"
         while not self.exit_event.is_set():
             try:
-                if outbox_path.exists() and self.server:
-                    with open(outbox_path) as f:
-                        data = json.load(f)
-                    await self._process_outbox(data)
+                if self._world_id and self.server:
+                    outbox_path = self._ipc_file("ap_out.json")
+                    if outbox_path.exists():
+                        with open(outbox_path) as f:
+                            data = json.load(f)
+                        await self._process_outbox(data)
             except (json.JSONDecodeError, OSError) as e:
                 logger.debug(f"Outbox read error: {e}")
             await asyncio.sleep(POLL_INTERVAL)
