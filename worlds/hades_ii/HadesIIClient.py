@@ -101,7 +101,9 @@ class HadesIIContext(CommonContext):
 
     def on_package(self, cmd: str, args: dict):
         super().on_package(cmd, args)
-        if cmd == "Connected":
+        if cmd == "RoomInfo":
+            self.seed_name = args.get("seed_name")
+        elif cmd == "Connected":
             slot_data = args.get("slot_data", {})
             world_id = re.sub(r'[^a-zA-Z0-9_-]', '_', f"{self.seed_name}_{self.slot}")
             self._world_id = world_id
