@@ -81,6 +81,7 @@ class HadesIIContext(CommonContext):
         self.deathlink_client_override = False
         self._world_id: Optional[str] = None
         self._last_checks_sent = 0
+        self._sent_named_location_ids: set = set()
         self._last_death_count = 0
         self._sent_goal = False
 
@@ -155,7 +156,7 @@ class HadesIIContext(CommonContext):
         }
         with open(self._ipc_file("ap_in.json"), "w") as f:
             json.dump(inbox, f)
-        logger.info(f"Inbox updated — {len(items)} item(s)")
+        logger.debug(f"Inbox updated — {len(items)} item(s)")
 
     # ── DeathLink ────────────────────────────────────────────────────────────
 
@@ -192,6 +193,7 @@ class HadesIIContext(CommonContext):
     async def resync(self):
         """Reset client-side counters and reprocess the outbox from scratch."""
         self._last_checks_sent = 0
+        self._sent_named_location_ids.clear()
         self._last_death_count = 0
         self._sent_goal = False
         outbox_path = self._ipc_file("ap_out.json")
@@ -254,10 +256,11 @@ class HadesIIContext(CommonContext):
         new_locations = set()
         for name in checked:
             loc_id = _LOCATION_NAME_TO_ID.get(name)
-            if loc_id is not None and loc_id not in self.checked_locations:
+            if loc_id is not None and loc_id not in self.checked_locations and loc_id not in self._sent_named_location_ids:
                 new_locations.add(loc_id)
 
         if new_locations:
+            self._sent_named_location_ids.update(new_locations)
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
             logger.info(f"Sent {len(new_locations)} named check(s)")
 
