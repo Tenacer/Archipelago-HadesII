@@ -20,16 +20,19 @@ from .Locations import (
     should_ignore_weapon_location,
 )
 
-# Biome → (event location table, boss reward location name or None)
+# Biome → (event location table, boss reward base name or None).
+# When base name is set, per-kill rewards "<base> N" are emitted up to the
+# matching option count (chronos_kills_needed / typhon_kills_needed) in True
+# Ending mode only.
 _biome_data = {
     "Erebus":    (location_table_erebus,   None),
     "Oceanus":   (location_table_oceanus,  None),
     "Fields":    (location_table_fields,   None),
-    "Tartarus":  (location_table_tartarus, "Chronos Kill Reward"),
+    "Tartarus":  (location_table_tartarus, ("Chronos Kill Reward", "chronos_kills_needed")),
     "Ephyra":    (location_table_ephyra,   None),
     "Thessaly":  (location_table_thessaly, None),
     "Olympus":   (location_table_olympus,  None),
-    "Summit":    (location_table_summit,   "Typhon Kill Reward"),
+    "Summit":    (location_table_summit,   ("Typhon Kill Reward", "typhon_kills_needed")),
 }
 
 _region_connections = {
@@ -61,17 +64,23 @@ def create_regions(player, multiworld, location_database, options):
             name = f"Score Check {i}"
             _add_location(regions["Menu"], name, location_table_score_checks[name])
 
-    # Biome victory events + boss reward checks
+    # Biome victory events + boss reward checks.
     # `Chronos True Victory` is the True-Ending-only sentinel — the second Chronos
     # kill performed after Dissolution of Time. Skip it unless the goal needs it.
-    for region_name, (event_table, boss_reward_name) in _biome_data.items():
+    # Boss rewards are only emitted in True Ending mode, up to the per-boss kill
+    # count option (chronos_kills_needed / typhon_kills_needed).
+    for region_name, (event_table, boss_reward) in _biome_data.items():
         region = regions[region_name]
         for event_name in event_table:
             if event_name == "Chronos True Victory" and not options.true_ending:
                 continue
             _add_location(region, event_name, None)  # event — address is None
-        if boss_reward_name:
-            _add_location(region, boss_reward_name, location_table_boss_rewards[boss_reward_name])
+        if boss_reward and options.true_ending:
+            base_name, count_option = boss_reward
+            count = getattr(options, count_option).value
+            for i in range(1, count + 1):
+                name = f"{base_name} {i}"
+                _add_location(region, name, location_table_boss_rewards[name])
 
     # Option-gated locations
     if options.keepsakesanity:

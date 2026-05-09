@@ -499,8 +499,8 @@ id,name,region,category
 498,Score Check 498,Menu,score
 499,Score Check 499,Menu,score
 500,Score Check 500,Menu,score
-2717,Chronos Kill Reward,Tartarus,boss_reward
-2718,Typhon Kill Reward,Summit,boss_reward
+2717,Chronos Kill Reward 1,Tartarus,boss_reward
+2718,Typhon Kill Reward 1,Summit,boss_reward
 ,Hecate Victory,Erebus,biome_victory
 ,Scylla Victory,Oceanus,biome_victory
 ,Cerberus Victory,Fields,biome_victory
@@ -545,7 +545,7 @@ id,name,region,category
 2534,Torches Weapon Unlock Location,Crossroads,weapon
 2535,Axe Weapon Unlock Location,Crossroads,weapon
 2536,Skull Weapon Unlock Location,Crossroads,weapon
-2537,Coat weapon Unlock Location,Crossroads,weapon
+2537,Coat Weapon Unlock Location,Crossroads,weapon
 2538,Crescent Pickaxe Tool Unlock Location,Crossroads,tool
 2539,Silver Spade Tool Unlock Location,Crossroads,tool
 2540,Tablet of Peace Tool Unlock Location,Crossroads,tool
@@ -733,3 +733,31 @@ id,name,region,category
 2724,Coat Weapon Shiva Aspect Unlock Location,Crossroads,hidden_aspect
 2725,Dissolution of Time,Crossroads,incantation
 2726,Disintegration of Monstrosity,Crossroads,incantation
+2735,Chronos Kill Reward 2,Tartarus,boss_reward
+2736,Chronos Kill Reward 3,Tartarus,boss_reward
+2737,Chronos Kill Reward 4,Tartarus,boss_reward
+2738,Chronos Kill Reward 5,Tartarus,boss_reward
+2739,Chronos Kill Reward 6,Tartarus,boss_reward
+2740,Chronos Kill Reward 7,Tartarus,boss_reward
+2741,Chronos Kill Reward 8,Tartarus,boss_reward
+2742,Chronos Kill Reward 9,Tartarus,boss_reward
+2743,Chronos Kill Reward 10,Tartarus,boss_reward
+2744,Chronos Kill Reward 11,Tartarus,boss_reward
+2745,Chronos Kill Reward 12,Tartarus,boss_reward
+2746,Chronos Kill Reward 13,Tartarus,boss_reward
+2747,Chronos Kill Reward 14,Tartarus,boss_reward
+2748,Chronos Kill Reward 15,Tartarus,boss_reward
+2749,Typhon Kill Reward 2,Summit,boss_reward
+2750,Typhon Kill Reward 3,Summit,boss_reward
+2751,Typhon Kill Reward 4,Summit,boss_reward
+2752,Typhon Kill Reward 5,Summit,boss_reward
+2753,Typhon Kill Reward 6,Summit,boss_reward
+2754,Typhon Kill Reward 7,Summit,boss_reward
+2755,Typhon Kill Reward 8,Summit,boss_reward
+2756,Typhon Kill Reward 9,Summit,boss_reward
+2757,Typhon Kill Reward 10,Summit,boss_reward
+2758,Typhon Kill Reward 11,Summit,boss_reward
+2759,Typhon Kill Reward 12,Summit,boss_reward
+2760,Typhon Kill Reward 13,Summit,boss_reward
+2761,Typhon Kill Reward 14,Summit,boss_reward
+2762,Typhon Kill Reward 15,Summit,boss_reward

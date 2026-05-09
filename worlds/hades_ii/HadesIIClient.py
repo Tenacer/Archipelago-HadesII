@@ -32,6 +32,29 @@ POLL_INTERVAL = 0.5
 # name→id for every non-event location; used to resolve names from the outbox
 _LOCATION_NAME_TO_ID = {name: d.code for name, d in location_table.items() if d.code is not None}
 
+# id→name for locations whose item placements we display in-game (cauldron / Fated List)
+_INCANTATION_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "incantation" and d.code is not None
+}
+_PROPHECY_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "prophecy" and d.code is not None
+}
+# Boss kill reward locations are scouted so the Lua mod can decide whether to
+# spawn the AP icon obstacle (other player's item, or our own non-resource item)
+# or the matching vanilla resource-drop obstacle (when the placed item is one
+# of our own resources like Zodiac Sand / Void Lens / etc).
+_BOSS_REWARD_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "boss_reward" and d.code is not None
+}
+_SCOUTABLE_LOCATION_IDS: dict = {
+    **_INCANTATION_LOCATION_IDS,
+    **_PROPHECY_LOCATION_IDS,
+    **_BOSS_REWARD_LOCATION_IDS,
+}
+
 
 def get_ipc_dir() -> Path:
     return Path.home() / "hadesii_ap"
@@ -82,6 +105,7 @@ class HadesIIContext(CommonContext):
         self._world_id: Optional[str] = None
         self._last_checks_sent = 0
         self._sent_named_location_ids: set = set()
+        self._sent_hint_location_ids: set = set()
         self._last_death_count = 0
         self._sent_goal = False
 
@@ -114,6 +138,31 @@ class HadesIIContext(CommonContext):
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
             if not self.deathlink_client_override and slot_data.get("death_link"):
                 Utils.async_start(self.update_death_link(True))
+            # Scout incantation/prophecy locations so the game mod can display
+            # AP item names. Boss reward locations are scouted in TrueEnding mode
+            # so the mod can pick the matching obstacle on each boss kill.
+            to_scout: list = []
+            if slot_data.get("cauldronsanity") == 1:
+                to_scout.extend(_INCANTATION_LOCATION_IDS.keys())
+            if slot_data.get("fatesanity") == 1:
+                to_scout.extend(_PROPHECY_LOCATION_IDS.keys())
+            if slot_data.get("true_ending"):
+                chronos_n = slot_data.get("chronos_kills_needed", 7)
+                typhon_n = slot_data.get("typhon_kills_needed", 5)
+                for name, loc_id in [(n, i) for i, n in _BOSS_REWARD_LOCATION_IDS.items()]:
+                    # name pattern is "Chronos Kill Reward N" / "Typhon Kill Reward N"
+                    parts = name.rsplit(" ", 1)
+                    if len(parts) != 2 or not parts[1].isdigit():
+                        continue
+                    idx = int(parts[1])
+                    if name.startswith("Chronos") and idx <= chronos_n:
+                        to_scout.append(loc_id)
+                    elif name.startswith("Typhon") and idx <= typhon_n:
+                        to_scout.append(loc_id)
+            if to_scout:
+                Utils.async_start(self._scout_locations(to_scout))
+        elif cmd == "LocationInfo":
+            self._write_location_items(args)
         elif cmd == "ReceivedItems":
             self._write_inbox()
         elif cmd == "Bounced":
@@ -130,7 +179,7 @@ class HadesIIContext(CommonContext):
         path = self.ipc_dir / "ap_settings.json"
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
-        logger.info(f"Wrote slot data to ap_settings.json (world_id={self._world_id})")
+        logger.debug(f"Wrote slot data to ap_settings.json (world_id={self._world_id})")
 
     # ── Inbox (AP server → game mod) ─────────────────────────────────────────
 
@@ -188,12 +237,71 @@ class HadesIIContext(CommonContext):
         }])
         logger.info("DeathLink sent")
 
+    # ── Location scouting (item names for in-game display) ───────────────────────
+
+    async def _scout_locations(self, location_ids: list) -> None:
+        """Scout the given location IDs so the game mod can display AP item names."""
+        await self.send_msgs([{
+            "cmd": "LocationScouts",
+            "locations": location_ids,
+            "create_as_hint": 0,
+        }])
+        logger.debug(f"Scouted {len(location_ids)} locations")
+
+    def _write_location_items(self, args: dict) -> None:
+        """Merge LocationInfo into ap_location_items.json (location_name → entry).
+
+        Each entry is structured as:
+            {"item_name": str, "player_slot": int, "player_name": str,
+             "is_local": bool, "display": str}
+
+        - `item_name` is the raw item (no [Player] suffix).
+        - `is_local` lets the Lua mod tell apart our own items vs other players'.
+        - `display` is the cauldron/Fated List label ("Item Name" or
+          "Item Name [Player]" for remote items).
+        """
+        if not self._world_id:
+            return
+        path = self._ipc_file("ap_location_items.json")
+        try:
+            with open(path) as f:
+                location_items: dict = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            location_items = {}
+        added = 0
+        for net_item in args.get("locations", []):
+            loc_id = net_item.location
+            if loc_id not in _SCOUTABLE_LOCATION_IDS:
+                continue
+            location_name = _SCOUTABLE_LOCATION_IDS[loc_id]
+            try:
+                item_name = self.item_names.lookup_in_slot(net_item.item, net_item.player)
+            except Exception:
+                item_name = f"Item {net_item.item}"
+            is_local = (net_item.player == self.slot)
+            player_name = self.player_names.get(net_item.player, f"Player {net_item.player}")
+            display = item_name if is_local else f"{item_name} [{player_name}]"
+            location_items[location_name] = {
+                "item_name":   item_name,
+                "player_slot": net_item.player,
+                "player_name": player_name,
+                "is_local":    is_local,
+                "display":     display,
+            }
+            added += 1
+        if not added:
+            return
+        with open(path, "w") as f:
+            json.dump(location_items, f, indent=2)
+        logger.debug(f"Wrote {added} item names to {path.name} (total {len(location_items)})")
+
     # ── Outbox polling (game mod → AP server) ────────────────────────────────
 
     async def resync(self):
         """Reset client-side counters and reprocess the outbox from scratch."""
         self._last_checks_sent = 0
         self._sent_named_location_ids.clear()
+        self._sent_hint_location_ids.clear()
         self._last_death_count = 0
         self._sent_goal = False
         outbox_path = self._ipc_file("ap_out.json")
@@ -220,6 +328,7 @@ class HadesIIContext(CommonContext):
     async def _process_outbox(self, data: dict):
         await self._process_score_checks(data)
         await self._process_named_checks(data)
+        await self._process_hints(data)
         await self._process_victory(data)
         await self._process_deathlink(data)
 
@@ -264,6 +373,37 @@ class HadesIIContext(CommonContext):
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
             logger.info(f"Sent {len(new_locations)} named check(s)")
 
+    async def _process_hints(self, data: dict):
+        """
+        Hint locations the game has displayed (cauldron tab / Fated List).
+        Lua sends a cumulative 'hinted_locations' array; we dedupe via a session
+        set and call LocationScouts with create_as_hint=2 (free hint, no point cost).
+        Already-checked locations are skipped — hinting a collected location is a no-op.
+        """
+        hinted = data.get("hinted_locations", [])
+        if not hinted:
+            return
+        new_ids = set()
+        for name in hinted:
+            loc_id = _LOCATION_NAME_TO_ID.get(name)
+            if loc_id is None:
+                continue
+            if loc_id in self._sent_hint_location_ids:
+                continue
+            if loc_id in self.checked_locations:
+                self._sent_hint_location_ids.add(loc_id)
+                continue
+            new_ids.add(loc_id)
+        if not new_ids:
+            return
+        self._sent_hint_location_ids.update(new_ids)
+        await self.send_msgs([{
+            "cmd": "LocationScouts",
+            "locations": list(new_ids),
+            "create_as_hint": 2,
+        }])
+        logger.debug(f"Hinted {len(new_ids)} location(s)")
+
     async def _process_victory(self, data: dict):
         """Send goal status when the game signals the run is complete."""
         if self._sent_goal:
@@ -271,7 +411,7 @@ class HadesIIContext(CommonContext):
         if data.get("victory"):
             await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
             self._sent_goal = True
-            logger.info("Goal complete — victory sent to server!")
+            logger.debug("Goal complete — victory sent to server!")
 
     async def _process_deathlink(self, data: dict):
         """Forward deaths from the game to other AP players via DeathLink bounce."""

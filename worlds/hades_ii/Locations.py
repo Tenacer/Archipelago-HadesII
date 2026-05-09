@@ -69,18 +69,12 @@ location_incantations       = _by_category("incantation")
 location_table_prophecies   = _by_category("prophecy")
 
 # Boss kill reward locations — separate from biome-victory events above.
+# Names follow the pattern "Chronos Kill Reward N" / "Typhon Kill Reward N".
 location_table_boss_rewards: Dict[str, int] = _by_category("boss_reward")
 
 # Unused placeholder (kept for back-compat — no Crossroads-category locations
 # live outside the specialised tables above).
 location_table_crossroads: Dict[str, int] = {}
-
-# Maps in-game boss room name → AP location ID (used by HadesIIClient)
-BOSS_ROOM_TO_LOCATION_ID: Dict[str, int] = {
-    "I_Boss01": location_table_boss_rewards["Chronos Kill Reward"],
-    "Q_Boss01": location_table_boss_rewards["Typhon Kill Reward"],
-    "Q_Boss02": location_table_boss_rewards["Typhon Kill Reward"],
-}
 
 # Location groups (exported as `location_name_groups` on the World class).
 location_name_groups = {
@@ -103,8 +97,15 @@ def setup_location_table_with_settings(options) -> dict:
     """Returns the locations actually in play for this seed, filtered by options."""
     total: Dict[str, Optional[int]] = {}
 
-    # Boss rewards always in play.
-    total.update(location_table_boss_rewards)
+    # Boss kill rewards: only in True Ending mode. BossDefeats mode counts
+    # successful runs and doesn't need to replace the per-kill rewards.
+    if options.true_ending:
+        for i in range(1, options.chronos_kills_needed.value + 1):
+            name = f"Chronos Kill Reward {i}"
+            total[name] = location_table_boss_rewards[name]
+        for i in range(1, options.typhon_kills_needed.value + 1):
+            name = f"Typhon Kill Reward {i}"
+            total[name] = location_table_boss_rewards[name]
 
     # Score checks only under score_based system; limited to first N.
     if options.location_system == "score_based":

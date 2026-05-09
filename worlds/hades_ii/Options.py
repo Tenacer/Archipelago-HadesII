@@ -121,6 +121,26 @@ class BossDefeatsNeeded(Range):
     range_end = 20
     default = 5
 
+class ChronosKillsNeeded(Range):
+    """
+    True Ending only: how many Chronos kills produce AP location checks.
+    Each kill 1..N drops an AP item; kills past N drop Nightmare and Gemstones instead.
+    """
+    display_name = "Chronos Kills Needed"
+    range_start = 1
+    range_end = 15
+    default = 7
+
+class TyphonKillsNeeded(Range):
+    """
+    True Ending only: how many Typhon kills produce AP location checks.
+    Each kill 1..N drops an AP item; kills past N drop Nightmare and Gemstones instead.
+    """
+    display_name = "Typhon Kills Needed"
+    range_start = 1
+    range_end = 15
+    default = 5
+
 class WeaponsClearsNeeded(Range):
     """
     How many different weapons clears are needed to win the world.
@@ -434,6 +454,8 @@ class HadesIIOptions(PerGameCommonOptions):
     zodiac_sand_needed: ZodiacSandNeeded
     void_lens_needed: VoidLensNeeded
     boss_defeats_needed: BossDefeatsNeeded
+    chronos_kills_needed: ChronosKillsNeeded
+    typhon_kills_needed: TyphonKillsNeeded
     weapons_clears_needed: WeaponsClearsNeeded
     keepsakes_needed: KeepsakesNeeded
     fates_needed: FatesNeeded
@@ -484,6 +506,8 @@ hades_ii_option_groups = [
         TrueEnding,
         ZodiacSandNeeded,
         VoidLensNeeded,
+        ChronosKillsNeeded,
+        TyphonKillsNeeded,
         BossDefeatsNeeded,
         WeaponsClearsNeeded,
         KeepsakesNeeded,

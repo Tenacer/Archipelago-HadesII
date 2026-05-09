@@ -112,6 +112,8 @@ class HadesIIWorld(World):
             "true_ending",
             "zodiac_sand_needed",
             "void_lens_needed",
+            "chronos_kills_needed",
+            "typhon_kills_needed",
             "boss_defeats_needed",
             "weapons_clears_needed",
             "keepsakes_needed",

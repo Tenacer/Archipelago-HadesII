@@ -19,11 +19,10 @@ class TestDefaultGeneration(HadesIITestBase):
         self.assertLessEqual(len(excluded_score), pure_filler,
             "More score checks excluded than pure filler items — fill will fail")
 
-    def test_boss_rewards_not_excluded(self) -> None:
-        for name in ("Chronos Kill Reward", "Typhon Kill Reward"):
-            loc = self.multiworld.get_location(name, self.player)
-            self.assertNotEqual(loc.progress_type, LocationProgressType.EXCLUDED,
-                f"{name} must not be EXCLUDED")
+    def test_no_boss_rewards_when_not_true_ending(self) -> None:
+        # BossDefeats mode counts run completions; no per-kill reward locations.
+        for name in ("Chronos Kill Reward 1", "Typhon Kill Reward 1"):
+            self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
 
 
 class TestTrueEnding(HadesIITestBase):
@@ -34,9 +33,30 @@ class TestTrueEnding(HadesIITestBase):
         self.assertIsNotNone(loc)
 
     def test_boss_rewards_not_excluded(self) -> None:
-        for name in ("Chronos Kill Reward", "Typhon Kill Reward"):
+        for name in ("Chronos Kill Reward 1", "Typhon Kill Reward 1"):
             loc = self.multiworld.get_location(name, self.player)
             self.assertNotEqual(loc.progress_type, LocationProgressType.EXCLUDED)
+
+    def test_per_boss_reward_counts_default(self) -> None:
+        # Defaults: 7 Chronos rewards, 5 Typhon rewards.
+        chronos = [loc for loc in self.multiworld.get_locations(self.player)
+                   if loc.name.startswith("Chronos Kill Reward ")]
+        typhon = [loc for loc in self.multiworld.get_locations(self.player)
+                  if loc.name.startswith("Typhon Kill Reward ")]
+        self.assertEqual(len(chronos), 7)
+        self.assertEqual(len(typhon), 5)
+
+
+class TestTrueEndingCustomKillCounts(HadesIITestBase):
+    options = {"true_ending": 1, "chronos_kills_needed": 3, "typhon_kills_needed": 2}
+
+    def test_kill_counts_honored(self) -> None:
+        chronos = [loc for loc in self.multiworld.get_locations(self.player)
+                   if loc.name.startswith("Chronos Kill Reward ")]
+        typhon = [loc for loc in self.multiworld.get_locations(self.player)
+                  if loc.name.startswith("Typhon Kill Reward ")]
+        self.assertEqual(len(chronos), 3)
+        self.assertEqual(len(typhon), 2)
 
 
 class TestTrueEndingAllSanities(HadesIITestBase):
