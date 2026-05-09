@@ -103,9 +103,24 @@ class HadesIILogic(LogicMixin):
     def _enough_weapons_victories(self, player: int, options, amount: int) -> bool:
         return self._can_reach_endgame(player, options) and self._has_enough_weapons(player, options, amount)
     
-    # Incantations not yet implemented — surface/moros always accessible for now
-    def _has_surface_access(self, player: int) -> bool:
-        return True
+    # Surface access in cauldronsanity: the two surface gating incantations.
+    # Permeation of Witching-Wards (WorldUpgradeAltRunDoor) opens the surface
+    # run door at the Crossroads. Unraveling a Fateful Bond
+    # (WorldUpgradeSurfacePenaltyCure) cures the surface penalty so runs are
+    # actually viable. Only gate when cauldronsanity is on — otherwise the
+    # player brews these naturally and they aren't AP items.
+    def _has_surface_door(self, player: int, options) -> bool:
+        if not options.cauldronsanity:
+            return True
+        return self.has("Permeation of Witching-Wards", player)  # type: ignore
+
+    def _has_surface_access(self, player: int, options) -> bool:
+        if not options.cauldronsanity:
+            return True
+        return (
+            self.has("Permeation of Witching-Wards", player)  # type: ignore
+            and self.has("Unraveling a Fateful Bond", player)  # type: ignore
+        )
 
     def _has_moros_access(self, player: int) -> bool:
         return True
@@ -137,7 +152,7 @@ def _mark_score_check_exclusions(world, player: int, options) -> None:
 
 
 def set_rules(world, player: int, location_table: dict, options) -> None:
-    handle_area_logic(world, player)
+    handle_area_logic(world, player, options)
     _mark_score_check_exclusions(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
@@ -146,6 +161,9 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
 
     # Hidden aspects: require the weapon to be in logic before the chant can happen.
     handle_hidden_aspects(world, player, options)
+
+    # Cauldronsanity: gate surface incantation brewing on the surface unlock items.
+    handle_surface_incantations(world, player, options)
 
     # True Ending: the final Chronos kill can only happen after the first
     # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Gigaros).
@@ -170,19 +188,26 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
 
 # Defines logic for each area / region
 # TODO: Make these actual event "items" / make them work
-def handle_area_logic(world, player):
+def handle_area_logic(world, player, options):
     area_rules = [ # ("Region name", "Boss Victory")
     ("Erebus -> Oceanus", "Hecate Victory"),
     ("Oceanus -> Fields", "Scylla Victory"),
     ("Fields -> Tartarus", "Cerberus Victory"),
-    
+
     ("Ephyra -> Thessaly", "Polyphemus Victory"),
     ("Thessaly -> Olympus", "Eris Victory"),
     ("Olympus -> Summit", "Prometheus Victory"),
     ]
-    
+
     for entrance_name, victory_item in area_rules:
         add_rule(world.get_entrance(entrance_name, player), lambda state, v=victory_item: state.has(v, player))
+
+    # Surface biome entrance: Permeation of Witching-Wards opens the surface
+    # run door. No-op when cauldronsanity is off.
+    add_rule(
+        world.get_entrance("Crossroads -> Ephyra", player),
+        lambda state: state._has_surface_door(player, options),  # type: ignore
+    )
 
 # Each hidden aspect can only be unlocked once the player has the corresponding weapon.
 def handle_hidden_aspects(world, player, options):
@@ -225,7 +250,7 @@ def handle_keepsakes(world, player, options):
                 world.get_location(person_keepsake, player),
                 lambda state, boss=boss, surface=surface:
                     (boss is None or state._has_defeated_final_boss(boss, player, options)) # type: ignore
-                    and (not surface or state._has_surface_access(player)) # type: ignore
+                    and (not surface or state._has_surface_door(player, options)) # type: ignore
             )
         
         # Specifically Moros
@@ -233,5 +258,52 @@ def handle_keepsakes(world, player, options):
             world.get_location("Moros Keepsake", player),
             lambda state: state._has_moros_access(player) # type: ignore
             )
-        
+
     # When keepsakesanity is off there are no keepsake locations, nothing to do.
+
+
+# Incantations whose cauldron recipes transitively require the surface door
+# (Permeation of Witching-Wards) AND the surface penalty cure
+# (Unraveling a Fateful Bond) to be brewable in-game. Sourced from
+# WorldUpgradeData.lua GameStateRequirements chains.
+_SURFACE_GATED_INCANTATIONS = (
+    "Summoning a Colony of Bats",     # WorldUpgradeEphyraZoomOut
+    "Rush of Fresh Air",              # WorldUpgradeSurfaceShops
+    "Surge of Fresh Air",             # WorldUpgradePostBossSurfaceShops
+    "Sandy Lifespring",               # WorldUpgradeThessalyReprieve
+    "Frozen Lifespring",              # WorldUpgradeOlympusReprieve
+    "Rage of the Elements",           # WorldUpgradeOlympusStatues
+    "Arisen Troves",                  # WorldUpgradeChallengeSwitchesSurface1
+    "Eyes of Night and Darkness",     # WorldUpgradeChallengeSwitchesExtra1
+    "Bounties of the Infinite Abyss", # WorldUpgradeMetaRewardStands
+    "Circles of Protection",          # WorldUpgradeErebusSafeZones
+    "Circles of the Moon",            # WorldUpgradeSafeZoneSpellCharge
+)
+
+
+def handle_surface_incantations(world, player, options):
+    """Cauldronsanity logic for surface-gated incantation brew locations.
+
+    In-game the cauldron only reveals an incantation once its prerequisite
+    chain is satisfied. Surface incantations all root at Permeation of
+    Witching-Wards (opens the surface door) and Unraveling a Fateful Bond
+    (cures the surface penalty so Moros's recipes unlock). Without these
+    encoded as logical gates AP fill can place progression items behind
+    incantations the player cannot brew yet.
+    """
+    if not options.cauldronsanity:
+        return
+
+    # Unraveling a Fateful Bond requires Moros to have appeared, which requires
+    # taking a surface run — i.e. only the door is needed (no cure yet, since
+    # this is the cure).
+    add_rule(
+        world.get_location("Unraveling a Fateful Bond", player),
+        lambda state: state._has_surface_door(player, options),  # type: ignore
+    )
+
+    for loc_name in _SURFACE_GATED_INCANTATIONS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_access(player, options),  # type: ignore
+        )

@@ -155,9 +155,16 @@ def create_items(self) -> None:
     # Tools — always available (no toolsanity option yet)
     pool.extend(self.create_item(name) for name in item_table_tools)
 
-    # Incantations — gated by cauldronsanity
+    # Incantations — gated by cauldronsanity. Promote the two surface-unlock
+    # incantations to progression so Rules.py's `_has_surface_*` checks can see
+    # them in `state.has(...)`. The other incantations are CSV-classified as
+    # useful and don't gate further locations.
     if self.options.cauldronsanity:
-        pool.extend(self.create_item(name) for name in item_table_incantations)
+        for name in item_table_incantations:
+            item = self.create_item(name)
+            if name in ("Permeation of Witching-Wards", "Unraveling a Fateful Bond"):
+                item.classification = ItemClassification.progression
+            pool.append(item)
 
     # True Ending goal items: Zodiac Sand (N), Void Lens (M), Gigaros (1),
     # and the two goal incantations (items only — no locations).
