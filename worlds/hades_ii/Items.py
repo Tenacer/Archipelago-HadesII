@@ -142,8 +142,8 @@ def create_items(self) -> None:
     # Weapons
     if self.options.weaponsanity:
         for name in item_table_weapons:
-            # item name is e.g. "Staff Weapon Unlock Item"; location is "Staff Weapon Unlock Location"
-            location_name = name.replace(" Item", " Location")
+            # item name is e.g. "Staff Weapon Unlock"; location is "Staff Weapon Unlock Location"
+            location_name = f"{name} Location"
             if should_ignore_weapon_location(location_name, self.options):
                 continue
             pool.append(Hades_II_Item(name, self.player))

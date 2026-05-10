@@ -636,95 +636,91 @@ id,name,region,category
 2625,Summoning of Personal Insights,Crossroads,incantation
 2626,Returning to a Real Possibility,Crossroads,incantation
 2627,Greater Removal of Rubbish,Crossroads,incantation
-2628,"Melinoë, Help Us Check",Crossroads,prophecy
-2629,"Melinoë, Remember Us Check",Crossroads,prophecy
-2630,"Melinoë, Seek Us Check",Crossroads,prophecy
-2631,"Melinoë, Find Us Check",Crossroads,prophecy
-2632,Storm in the Heavens Check,Crossroads,prophecy
-2633,Temporary Setback Check,Crossroads,prophecy
-2634,Harbinger of Doom Check,Crossroads,prophecy
-2635,Witch of the Crossroads Check,Crossroads,prophecy
-2636,Natural Talent Check,Crossroads,prophecy
-2637,Sword of the Night Check,Crossroads,prophecy
-2638,Arcana of the Ages Check,Crossroads,prophecy
-2639,Unrivaled Prowess Check,Crossroads,prophecy
-2640,Bearing Dark Gifts Check,Crossroads,prophecy
-2641,Den Mother Check,Crossroads,prophecy
-2642,Family in Need Check,Crossroads,prophecy
-2643,Visions of Victory Check,Crossroads,prophecy
-2644,Unfinished Business Check,Crossroads,prophecy
-2645,Haunted by the Past Check,Crossroads,prophecy
-2646,Silk and Spitefulness Check,Crossroads,prophecy
-2647,Voice and Vanity Check,Crossroads,prophecy
-2648,Bitter Tears Check,Crossroads,prophecy
-2649,Drowned Ambitions Check,Crossroads,prophecy
-2650,The Jackal's Aspect Check,Crossroads,prophecy
-2651,The Crow's Aspect Check,Crossroads,prophecy
-2652,The Shadow's Aspect Check,Crossroads,prophecy
-2653,The Warrior's Aspect Check,Crossroads,prophecy
-2654,The Grave's Aspect Check,Crossroads,prophecy
-2655,The Destroyer's Aspect Check,Crossroads,prophecy
-2656,Nobody but Nobody Check,Crossroads,prophecy
-2657,Born to Win Check,Crossroads,prophecy
-2658,Improbable Outcomes Check,Crossroads,prophecy
-2659,Soundest of Slumbers Check,Crossroads,prophecy
-2660,Customary Gift Check,Crossroads,prophecy
-2661,Mindful Craft Check,Crossroads,prophecy
-2662,Blades of Pure Silver Check,Crossroads,prophecy
-2663,The Arms of Night Check,Crossroads,prophecy
-2664,The Unseen Sentinel Check,Crossroads,prophecy
-2665,Awakened Aspect Check,Crossroads,prophecy
-2666,Major Arcana Check,Crossroads,prophecy
-2667,Familiar Confidant Check,Crossroads,prophecy
-2668,Note to Self Check,Crossroads,prophecy
-2669,The Invoker Check,Crossroads,prophecy
-2670,Whims of Chaos Check,Crossroads,prophecy
-2671,Breadth of Knowledge Check,Crossroads,prophecy
-2672,Weight in Gold Check,Crossroads,prophecy
-2673,Valued Customer Check,Crossroads,prophecy
-2674,Close Companions Check,Crossroads,prophecy
-2675,Beyond Familiar Check,Crossroads,prophecy
-2676,Denizen of the Depths Check,Crossroads,prophecy
-2677,Keeper of Shadows Check,Crossroads,prophecy
-2678,Tools of the Unseen Check,Crossroads,prophecy
-2679,Precision Instrument Check,Crossroads,prophecy
-2680,Home in the Crossroads Check,Crossroads,prophecy
-2681,Spectral Forms Check,Crossroads,prophecy
-2682,Shadow of Death Check,Crossroads,prophecy
-2683,Shadow of Doom Check,Crossroads,prophecy
-2684,Gifts of the Moon Check,Crossroads,prophecy
-2685,Godsent Favor Check,Crossroads,prophecy
-2686,Master of the Dead Check,Crossroads,prophecy
-2687,Master of the Heavens Check,Crossroads,prophecy
-2688,Mistress of Wedlock Check,Crossroads,prophecy
-2689,Master of the Sea Check,Crossroads,prophecy
-2690,Mistress of Seasons Check,Crossroads,prophecy
-2691,Master of Light Check,Crossroads,prophecy
-2692,Mistress of Beauty Check,Crossroads,prophecy
-2693,Master of the Forge Check,Crossroads,prophecy
-2694,Mistress of the Hearth Check,Crossroads,prophecy
-2695,Master of War Check,Crossroads,prophecy
-2696,Mistress of the Hunt Check,Crossroads,prophecy
-2697,Master of Swiftness Check,Crossroads,prophecy
-2698,Mistress of Battle Check,Crossroads,prophecy
-2699,Master of Revelry Check,Crossroads,prophecy
-2700,Original Sins Check,Crossroads,prophecy
-2701,Original Virtues Check,Crossroads,prophecy
-2702,Power Beyond Legend Check,Crossroads,prophecy
-2703,Combined Might Check,Crossroads,prophecy
-2704,Weaver of Fineries Check,Crossroads,prophecy
-2705,Denier of Suitors Check,Crossroads,prophecy
-2706,Voice of Truth Check,Crossroads,prophecy
-2707,Witch of Shadows Check,Crossroads,prophecy
-2708,Witch of Changing Check,Crossroads,prophecy
-2709,Wings of Freedom Check,Crossroads,prophecy
-2710,Bared Fangs Check,Crossroads,prophecy
-2711,The Witch's Staff Check,Crossroads,prophecy
-2712,The Sister Blades Check,Crossroads,prophecy
-2713,The Umbral Flames Check,Crossroads,prophecy
-2714,The Moonstone Axe Check,Crossroads,prophecy
-2715,The Argent Skull Check,Crossroads,prophecy
-2716,The Black Coat Check,Crossroads,prophecy
+2632,Storm in the Heavens,Crossroads,prophecy
+2633,Temporary Setback,Crossroads,prophecy
+2634,Harbinger of Doom,Crossroads,prophecy
+2635,Witch of the Crossroads,Crossroads,prophecy
+2636,Natural Talent,Crossroads,prophecy
+2637,Sword of the Night,Crossroads,prophecy
+2638,Arcana of the Ages,Crossroads,prophecy
+2639,Unrivaled Prowess,Crossroads,prophecy
+2640,Bearing Dark Gifts,Crossroads,prophecy
+2641,Den Mother,Crossroads,prophecy
+2642,Family in Need,Crossroads,prophecy
+2643,Visions of Victory,Crossroads,prophecy
+2644,Unfinished Business,Crossroads,prophecy
+2645,Haunted by the Past,Crossroads,prophecy
+2646,Silk and Spitefulness,Crossroads,prophecy
+2647,Voice and Vanity,Crossroads,prophecy
+2648,Bitter Tears,Crossroads,prophecy
+2649,Drowned Ambitions,Crossroads,prophecy
+2650,The Jackal's Aspect,Crossroads,prophecy
+2651,The Crow's Aspect,Crossroads,prophecy
+2652,The Shadow's Aspect,Crossroads,prophecy
+2653,The Warrior's Aspect,Crossroads,prophecy
+2654,The Grave's Aspect,Crossroads,prophecy
+2655,The Destroyer's Aspect,Crossroads,prophecy
+2656,Nobody but Nobody,Crossroads,prophecy
+2657,Born to Win,Crossroads,prophecy
+2658,Improbable Outcomes,Crossroads,prophecy
+2659,Soundest of Slumbers,Crossroads,prophecy
+2660,Customary Gift,Crossroads,prophecy
+2661,Mindful Craft,Crossroads,prophecy
+2662,Blades of Pure Silver,Crossroads,prophecy
+2663,The Arms of Night,Crossroads,prophecy
+2664,The Unseen Sentinel,Crossroads,prophecy
+2665,Awakened Aspect,Crossroads,prophecy
+2666,Major Arcana,Crossroads,prophecy
+2667,Familiar Confidant,Crossroads,prophecy
+2668,Note to Self,Crossroads,prophecy
+2669,The Invoker,Crossroads,prophecy
+2670,Whims of Chaos,Crossroads,prophecy
+2671,Breadth of Knowledge,Crossroads,prophecy
+2672,Weight in Gold,Crossroads,prophecy
+2673,Valued Customer,Crossroads,prophecy
+2674,Close Companions,Crossroads,prophecy
+2675,Beyond Familiar,Crossroads,prophecy
+2676,Denizen of the Depths,Crossroads,prophecy
+2677,Keeper of Shadows,Crossroads,prophecy
+2678,Tools of the Unseen,Crossroads,prophecy
+2679,Precision Instrument,Crossroads,prophecy
+2680,Home in the Crossroads,Crossroads,prophecy
+2681,Spectral Forms,Crossroads,prophecy
+2682,Shadow of Death,Crossroads,prophecy
+2683,Shadow of Doom,Crossroads,prophecy
+2684,Gifts of the Moon,Crossroads,prophecy
+2685,Godsent Favor,Crossroads,prophecy
+2686,Master of the Dead,Crossroads,prophecy
+2687,Master of the Heavens,Crossroads,prophecy
+2688,Mistress of Wedlock,Crossroads,prophecy
+2689,Master of the Sea,Crossroads,prophecy
+2690,Mistress of Seasons,Crossroads,prophecy
+2691,Master of Light,Crossroads,prophecy
+2692,Mistress of Beauty,Crossroads,prophecy
+2693,Master of the Forge,Crossroads,prophecy
+2694,Mistress of the Hearth,Crossroads,prophecy
+2695,Master of War,Crossroads,prophecy
+2696,Mistress of the Hunt,Crossroads,prophecy
+2697,Master of Swiftness,Crossroads,prophecy
+2698,Mistress of Battle,Crossroads,prophecy
+2699,Master of Revelry,Crossroads,prophecy
+2700,Original Sins,Crossroads,prophecy
+2701,Original Virtues,Crossroads,prophecy
+2702,Power Beyond Legend,Crossroads,prophecy
+2703,Combined Might,Crossroads,prophecy
+2704,Weaver of Fineries,Crossroads,prophecy
+2705,Denier of Suitors,Crossroads,prophecy
+2706,Voice of Truth,Crossroads,prophecy
+2707,Witch of Shadows,Crossroads,prophecy
+2708,Witch of Changing,Crossroads,prophecy
+2709,Wings of Freedom,Crossroads,prophecy
+2710,Bared Fangs,Crossroads,prophecy
+2711,The Witch's Staff,Crossroads,prophecy
+2712,The Sister Blades,Crossroads,prophecy
+2713,The Umbral Flames,Crossroads,prophecy
+2714,The Moonstone Axe,Crossroads,prophecy
+2715,The Argent Skull,Crossroads,prophecy
+2716,The Black Coat,Crossroads,prophecy
 2719,Staff Weapon Anubis Aspect Unlock Location,Crossroads,hidden_aspect
 2720,Daggers Weapon Morrigan Aspect Unlock Location,Crossroads,hidden_aspect
 2721,Torches Weapon Supay Aspect Unlock Location,Crossroads,hidden_aspect

@@ -80,26 +80,22 @@ id,name,classification,groups
 79,Zagreus Keepsake,useful,post_ending_keepsakes
 80,Chronos Keepsake,useful,post_ending_keepsakes
 81,Chaos Keepsake,useful,keepsakes
-82,Staff Weapon Unlock Item,progression,weapons
-83,Daggers Weapon Unlock Item,progression,weapons
-84,Torches Weapon Unlock Item,progression,weapons
-85,Axe Weapon Unlock Item,progression,weapons
-86,Skull Weapon Unlock Item,progression,weapons
-87,Coat Weapon Unlock Item,progression,weapons
-88,Crescent Pickaxe Tool Unlock Item,progression,tools
-89,Tablet of Peace Tool Unlock Item,progression,tools
-90,Silver Spade Tool Unlock Item,progression,tools
-91,Rod of Fishing Tool Unlock Item,progression,tools
-92,Staff Weapon Anubis Aspect Unlock Item,useful,hidden_aspects
-93,Daggers Weapon Morrigan Aspect Unlock Item,useful,hidden_aspects
-94,Torches Weapon Supay Aspect Unlock Item,useful,hidden_aspects
-95,Axe Weapon Nergal Aspect Unlock Item,useful,hidden_aspects
-96,Skull Weapon Hel Aspect Unlock Item,useful,hidden_aspects
-97,Coat Weapon Shiva Aspect Unlock Item,useful,hidden_aspects
-98,"Melinoë, Help Us Reward",useful,prophecies
-99,"Melinoë, Remember Us Reward",useful,prophecies
-100,"Melinoë, Seek Us Reward",useful,prophecies
-101,"Melinoë, Find Us Reward",useful,prophecies
+82,Staff Weapon Unlock,progression,weapons
+83,Daggers Weapon Unlock,progression,weapons
+84,Torches Weapon Unlock,progression,weapons
+85,Axe Weapon Unlock,progression,weapons
+86,Skull Weapon Unlock,progression,weapons
+87,Coat Weapon Unlock,progression,weapons
+88,Crescent Pickaxe Tool Unlock,progression,tools
+89,Tablet of Peace Tool Unlock,progression,tools
+90,Silver Spade Tool Unlock,progression,tools
+91,Rod of Fishing Tool Unlock,progression,tools
+92,Anubis Aspect Unlock,useful,hidden_aspects
+93,Morrigan Aspect Unlock,useful,hidden_aspects
+94,Supay Aspect Unlock,useful,hidden_aspects
+95,Nergal Aspect Unlock,useful,hidden_aspects
+96,Hel Aspect Unlock,useful,hidden_aspects
+97,Shiva Aspect Unlock,useful,hidden_aspects
 102,Storm in the Heavens Reward,useful,prophecies
 103,Temporary Setback Reward,useful,prophecies
 104,Harbinger of Doom Reward,useful,prophecies

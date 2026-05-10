@@ -37,7 +37,7 @@ class HadesIILogic(LogicMixin):
         if not options.weaponsanity:
             return True
         idx = weapons.index(weaponName)
-        return (options.initial_weapon == idx or self.has(f"{weaponName} Unlock Item", player)) # type: ignore
+        return (options.initial_weapon == idx or self.has(f"{weaponName} Unlock", player)) # type: ignore
     
     # Checks if the player has enough keepsakes for goal
     def _has_enough_keepsakes(self, player: int, amount: int) -> bool:
