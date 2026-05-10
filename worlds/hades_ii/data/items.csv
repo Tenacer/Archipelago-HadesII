@@ -272,3 +272,8 @@ id,name,classification,groups
 275,Gigaros,progression,true_ending_ingredients
 276,Dissolution of Time,progression,true_ending_incantations
 277,Disintegration of Monstrosity,progression,true_ending_incantations
+278,Money Punishment,trap,traps
+279,Health Punishment,trap,traps
+280,Max Health Helper,useful,helpers
+281,Boon Boost Helper,useful,helpers
+282,Initial Money Helper,useful,helpers

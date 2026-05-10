@@ -356,38 +356,38 @@ class FillerTrapPercentage(Range):
 
 # -- Helpers
 
-# class FillerHelperPercentage(Range):
-#     """
-#     Choose the percentage of filler items in the pool that will be helpers instead. 
-#     Helpers give a boost to your max Health or starting money.
-#     Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
-#     """
-#     display_name = "Filler Helper Percentage"
-#     range_start = 0
-#     range_end = 100
-#     default = 10
+class FillerHelperPercentage(Range):
+    """
+    Choose the percentage of filler items in the pool that will be helpers instead.
+    Helpers give a boost to your max health, your starting money, or your boon rarity.
+    Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
+    """
+    display_name = "Filler Helper Percentage"
+    range_start = 0
+    range_end = 100
+    default = 10
 
-# class MaxHealthHelperPercentage(Range):
-#     """
-#     Choose the percentage of helper items that will boost your max health.
-#     The remaning percentage will go towards initial money helpers, which boost initial money by X AMOUNT.
-#     """
-#     display_name = "Max Health Helper Percentage"
-#     range_start = 0
-#     range_end = 100
-#     default = 50
+class MaxHealthHelperPercentage(Range):
+    """
+    Choose the percentage of helper items that will boost your max health by 5 (permanently).
+    The remaining percentage is split between initial-money helpers and boon-boost helpers.
+    """
+    display_name = "Max Health Helper Percentage"
+    range_start = 0
+    range_end = 100
+    default = 50
 
-# class InitialMoneyHelperPercentage(Range):
-#     """
-#     Choose the percentage of helper items that will boost your initial money by 25 each run.
-#     This gets capped by the percentage being left from the MaxHealthHelpers. 
-#     What percentage remains from this and the MaxHealthHelpers will give you items that boost the 
-#     rarity of the boons obtained in runs.
-#     """
-#     display_name = "Initial Money Helper Percentage"
-#     range_start = 0
-#     range_end = 100
-#     default = 35
+class InitialMoneyHelperPercentage(Range):
+    """
+    Choose the percentage of helper items that will boost your starting money by 25 each run.
+    This is capped by the percentage left after MaxHealthHelpers.
+    What's left after both becomes Boon Boost helpers, each adding +1% to rare/epic/heroic/legendary
+    boon rolls.
+    """
+    display_name = "Initial Money Helper Percentage"
+    range_start = 0
+    range_end = 100
+    default = 35
 
 # -----------------------Settings for QoL -------------------------
 
@@ -482,6 +482,9 @@ class HadesIIOptions(PerGameCommonOptions):
     fate_fabric_pack_percentage: FateFabricPackPercentage
 
     filler_trap_percentage: FillerTrapPercentage
+    filler_helper_percentage: FillerHelperPercentage
+    max_health_helper_percentage: MaxHealthHelperPercentage
+    initial_money_helper_percentage: InitialMoneyHelperPercentage
 
     reverse_order_rivals: ReverseOrderRivals
     ignore_win_deaths: IgnoreWinDeaths
@@ -536,8 +539,11 @@ hades_ii_option_groups = [
         FateFabricPackValue,
         FateFabricPackPercentage,
     ]),
-    OptionGroup("Trap Options", [
+    OptionGroup("Trap & Helper Options", [
         FillerTrapPercentage,
+        FillerHelperPercentage,
+        MaxHealthHelperPercentage,
+        InitialMoneyHelperPercentage,
     ]),
     OptionGroup("Quality of Life Options", [
         ReverseOrderRivals,

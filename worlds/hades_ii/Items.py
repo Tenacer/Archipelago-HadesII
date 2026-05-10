@@ -222,6 +222,7 @@ def handle_fillers(self, pool, local_location_table):
         "moon_dust":   self.options.moon_dust_pack_percentage,
         "fate_fabric": self.options.fate_fabric_pack_percentage,
         "traps":       self.options.filler_trap_percentage,
+        "helpers":     self.options.filler_helper_percentage,
     }
 
     total_percentage = sum(percentages.values())
@@ -254,13 +255,28 @@ def handle_fillers(self, pool, local_location_table):
     for name, count in filler_counts.items():
         pool.extend(self.create_item(name) for _ in range(count))
 
-    # Fill traps — only if any trap items are defined. The trap implementation
-    # isn't in place yet; when it is, repopulate the `traps` group in items.csv.
+    # Fill traps — cycle through the trap items so the count is split evenly.
     trap_pool = list(item_table_traps.keys())
     if trap_pool:
         for i in range(counts["traps"]):
             item_name = trap_pool[i % len(trap_pool)]
             pool.append(Hades_II_Item(item_name, self.player))
     else:
-        # No traps available — backfill the shortfall with bones.
         pool.extend(self.create_item("Bones") for _ in range(counts["traps"]))
+
+    # Fill helpers — split among MaxHealth / InitialMoney / BoonBoost using
+    # the helper-sub options. Initial-money is bounded by what's left after
+    # max-health (per the option's docstring); the remainder is boon-boost.
+    helper_total = counts["helpers"]
+    if helper_total > 0 and item_table_helpers:
+        pct_mh = self.options.max_health_helper_percentage.value
+        pct_im = min(self.options.initial_money_helper_percentage.value,
+                     max(0, 100 - pct_mh))
+        mh_count = helper_total * pct_mh // 100
+        im_count = helper_total * pct_im // 100
+        bb_count = helper_total - mh_count - im_count
+        pool.extend(self.create_item("Max Health Helper")    for _ in range(mh_count))
+        pool.extend(self.create_item("Initial Money Helper") for _ in range(im_count))
+        pool.extend(self.create_item("Boon Boost Helper")    for _ in range(bb_count))
+    else:
+        pool.extend(self.create_item("Bones") for _ in range(helper_total))
