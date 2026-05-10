@@ -343,11 +343,20 @@ class NightmarePackPercentage(Range):
 
 # -- Traps
 
+class EnableTraps(Toggle):
+    """
+    When enabled, the filler pool contains trap items (Money Punishment,
+    Health Punishment). The share is set by FillerTrapPercentage; this
+    toggle simply gates whether traps are included at all.
+    """
+    display_name = "Enable Traps"
+
 class FillerTrapPercentage(Range):
     """
-    Choose the percentage of filler items in the pool that will be traps instead. 
+    Choose the percentage of filler items in the pool that will be traps instead.
     Traps diminish your money or health during a run.
     Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
+    Ignored when EnableTraps is off.
     """
     display_name = "Filler Trap Percentage"
     range_start = 0
@@ -356,11 +365,21 @@ class FillerTrapPercentage(Range):
 
 # -- Helpers
 
+class EnableHelpers(DefaultOnToggle):
+    """
+    When enabled, the filler pool contains helper items (Max Health Helper,
+    Initial Money Helper, Boon Boost Helper). The share is set by
+    FillerHelperPercentage; this toggle simply gates whether helpers are
+    included at all.
+    """
+    display_name = "Enable Helpers"
+
 class FillerHelperPercentage(Range):
     """
     Choose the percentage of filler items in the pool that will be helpers instead.
     Helpers give a boost to your max health, your starting money, or your boon rarity.
     Note if filler percentage doesn't sum up to 100 the system will treat them as proportions.
+    Ignored when EnableHelpers is off.
     """
     display_name = "Filler Helper Percentage"
     range_start = 0
@@ -481,7 +500,9 @@ class HadesIIOptions(PerGameCommonOptions):
     fate_fabric_pack_value: FateFabricPackValue
     fate_fabric_pack_percentage: FateFabricPackPercentage
 
+    enable_traps: EnableTraps
     filler_trap_percentage: FillerTrapPercentage
+    enable_helpers: EnableHelpers
     filler_helper_percentage: FillerHelperPercentage
     max_health_helper_percentage: MaxHealthHelperPercentage
     initial_money_helper_percentage: InitialMoneyHelperPercentage
@@ -540,7 +561,9 @@ hades_ii_option_groups = [
         FateFabricPackPercentage,
     ]),
     OptionGroup("Trap & Helper Options", [
+        EnableTraps,
         FillerTrapPercentage,
+        EnableHelpers,
         FillerHelperPercentage,
         MaxHealthHelperPercentage,
         InitialMoneyHelperPercentage,
@@ -569,6 +592,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "moon_dust_pack_value": 1,
         "nightmare_pack_value": 1,
         "fate_fabric_pack_value": 1,
+        "enable_traps": False,
         "filler_trap_percentage": 0,
     },
     "Normal": {
@@ -585,6 +609,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "moon_dust_pack_value": 1,
         "nightmare_pack_value": 1,
         "fate_fabric_pack_value": 1,
+        "enable_traps": True,
         "filler_trap_percentage": 5,
     },
     "Hard": {
@@ -601,6 +626,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "moon_dust_pack_value": 1,
         "nightmare_pack_value": 1,
         "fate_fabric_pack_value": 1,
+        "enable_traps": True,
         "filler_trap_percentage": 10,
     },
 }

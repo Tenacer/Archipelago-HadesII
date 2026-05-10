@@ -212,6 +212,9 @@ def place_boss_events(world, player, options) -> None:
 def handle_fillers(self, pool, local_location_table):
     total_fillers_needed = len(local_location_table) - len(pool)
 
+    trap_pct   = self.options.filler_trap_percentage   if self.options.enable_traps   else 0
+    helper_pct = self.options.filler_helper_percentage if self.options.enable_helpers else 0
+
     percentages = {
         "ash":         self.options.ash_pack_percentage,
         "bones":       self.options.bones_pack_percentage,
@@ -221,8 +224,8 @@ def handle_fillers(self, pool, local_location_table):
         "nightmare":   self.options.nightmare_pack_percentage,
         "moon_dust":   self.options.moon_dust_pack_percentage,
         "fate_fabric": self.options.fate_fabric_pack_percentage,
-        "traps":       self.options.filler_trap_percentage,
-        "helpers":     self.options.filler_helper_percentage,
+        "traps":       trap_pct,
+        "helpers":     helper_pct,
     }
 
     total_percentage = sum(percentages.values())
