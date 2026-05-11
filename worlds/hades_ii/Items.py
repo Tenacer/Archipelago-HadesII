@@ -13,6 +13,12 @@ _BOSS_VICTORY_NAMES = {
     "Polyphemus Victory", "Eris Victory", "Prometheus Victory", "Typhon Victory",
 }
 
+# The two surface-unlock incantations are AP-controlled solely by
+# lock_surface_incantations, never by cauldronsanity. Used in create_items to
+# exclude them from the cauldronsanity loop and to add them as progression
+# items under the lock toggle.
+SURFACE_LOCK_ITEMS = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
+
 # (base item name, is_multi_rank, shrine_upgrade_name)
 # Multi-rank vows add N items (ranks 1..N); single-rank vows add 1 item when rank >= 1.
 # Vow items only enter the pool in reverse_fear mode; amounts come from world.vow_ranks.
@@ -155,16 +161,22 @@ def create_items(self) -> None:
     # Tools — always available (no toolsanity option yet)
     pool.extend(self.create_item(name) for name in item_table_tools)
 
-    # Incantations — gated by cauldronsanity. Promote the two surface-unlock
-    # incantations to progression so Rules.py's `_has_surface_*` checks can see
-    # them in `state.has(...)`. The other incantations are CSV-classified as
-    # useful and don't gate further locations.
+    # Surface-unlock incantations — owned exclusively by lock_surface_incantations
+    # (independent of cauldronsanity). Always progression so Rules.py's
+    # `_has_surface_*` predicates can see them in `state.has(...)`.
+    if self.options.lock_surface_incantations:
+        for name in SURFACE_LOCK_ITEMS:
+            item = self.create_item(name)
+            item.classification = ItemClassification.progression
+            pool.append(item)
+
+    # Cauldronsanity covers the other 86 incantations. Surface-unlock incantations
+    # are skipped here — they're handled above.
     if self.options.cauldronsanity:
         for name in item_table_incantations:
-            item = self.create_item(name)
-            if name in ("Permeation of Witching-Wards", "Unraveling a Fateful Bond"):
-                item.classification = ItemClassification.progression
-            pool.append(item)
+            if name in SURFACE_LOCK_ITEMS:
+                continue
+            pool.append(self.create_item(name))
 
     # True Ending goal items: Zodiac Sand (N), Void Lens (M), Gigaros (1),
     # and the two goal incantations (items only — no locations).

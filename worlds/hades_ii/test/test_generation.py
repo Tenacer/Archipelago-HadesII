@@ -88,8 +88,93 @@ class TestAllSanitiesOff(HadesIITestBase):
         "weaponsanity": 0,
         "hidden_aspectsanity": 0,
         "cauldronsanity": 0,
+        "lock_surface_incantations": 0,
         "fatesanity": 0,
     }
+
+
+_SURFACE_LOCK_NAMES = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
+
+
+class TestLockSurfaceIncantationsDefault(HadesIITestBase):
+    """lock_surface_incantations on, cauldronsanity off — the two surface
+    incantations are AP items + locations and nothing else."""
+    options = {"lock_surface_incantations": 1, "cauldronsanity": 0}
+
+    def test_surface_items_are_progression(self) -> None:
+        for name in _SURFACE_LOCK_NAMES:
+            matching = [i for i in self.multiworld.itempool
+                        if i.name == name and i.player == self.player]
+            self.assertEqual(len(matching), 1,
+                f"Expected exactly one {name!r} in the pool, got {len(matching)}")
+            self.assertTrue(matching[0].advancement,
+                f"{name!r} must be progression so _has_surface_* predicates see it")
+
+    def test_surface_locations_exist(self) -> None:
+        for name in _SURFACE_LOCK_NAMES:
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertIsNotNone(loc)
+
+    def test_other_incantations_absent(self) -> None:
+        from worlds.hades_ii.Items import item_table_incantations
+        cauldron_names = {n for n in item_table_incantations
+                          if n not in _SURFACE_LOCK_NAMES}
+        present = {i.name for i in self.multiworld.itempool
+                   if i.player == self.player and i.name in cauldron_names}
+        self.assertEqual(present, set(),
+            "Cauldronsanity is off — non-surface incantations must not be in the pool")
+
+
+class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
+    """lock_surface_incantations off, cauldronsanity on — the surface 2 are NOT
+    AP items/locations. The cauldronsanity pool has 86 entries, not 88."""
+    options = {"lock_surface_incantations": 0, "cauldronsanity": 1}
+
+    def test_surface_items_absent(self) -> None:
+        for name in _SURFACE_LOCK_NAMES:
+            matching = [i for i in self.multiworld.itempool
+                        if i.name == name and i.player == self.player]
+            self.assertEqual(matching, [],
+                f"{name!r} must not be in the pool when lock_surface_incantations is off")
+
+    def test_surface_locations_absent(self) -> None:
+        for name in _SURFACE_LOCK_NAMES:
+            self.assertRaises(KeyError,
+                self.multiworld.get_location, name, self.player)
+
+    def test_cauldronsanity_has_86_incantations(self) -> None:
+        from worlds.hades_ii.Items import item_table_incantations
+        cauldron_names = {n for n in item_table_incantations
+                          if n not in _SURFACE_LOCK_NAMES}
+        present = {i.name for i in self.multiworld.itempool
+                   if i.player == self.player and i.name in cauldron_names}
+        self.assertEqual(present, cauldron_names,
+            "Cauldronsanity should add every non-surface incantation to the pool")
+
+
+class TestLockSurfaceAndCauldronsanity(HadesIITestBase):
+    """Both options on — surface 2 owned by the lock toggle, 86 by cauldronsanity,
+    surface keepsakes + surface biome + the 11 surface-gated cauldron incantations
+    are gated on the surface unlock items."""
+    options = {
+        "lock_surface_incantations": 1,
+        "cauldronsanity": 1,
+        "keepsakesanity": 1,
+    }
+
+    def test_no_duplicate_surface_items(self) -> None:
+        for name in _SURFACE_LOCK_NAMES:
+            matching = [i for i in self.multiworld.itempool
+                        if i.name == name and i.player == self.player]
+            self.assertEqual(len(matching), 1,
+                f"Expected exactly one {name!r}, got {len(matching)}")
+            self.assertTrue(matching[0].advancement)
+
+    def test_all_incantation_locations_present(self) -> None:
+        from worlds.hades_ii.Locations import location_incantations
+        for name in location_incantations:
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertIsNotNone(loc)
 
 
 class TestVanillaFear(HadesIITestBase):

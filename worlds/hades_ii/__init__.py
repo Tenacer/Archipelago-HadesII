@@ -109,6 +109,7 @@ class HadesIIWorld(World):
             "weaponsanity",
             "hidden_aspectsanity",
             "cauldronsanity",
+            "lock_surface_incantations",
             "fatesanity",
             # Goal configuration
             "true_ending",

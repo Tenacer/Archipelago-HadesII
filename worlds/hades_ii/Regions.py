@@ -1,6 +1,7 @@
 from BaseClasses import Region, Entrance
 from .Locations import (
     HadesIILocation,
+    SURFACE_LOCK_LOCATIONS,
     location_table_score_checks,
     location_table_boss_rewards,
     location_keepsakes,
@@ -96,9 +97,18 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_hidden_aspects.items():
             _add_location(regions["Crossroads"], name, loc_id)
 
+    # Cauldronsanity owns the 86 non-surface incantation locations.
     if options.cauldronsanity:
         for name, loc_id in location_incantations.items():
+            if name in SURFACE_LOCK_LOCATIONS:
+                continue
             _add_location(regions["Crossroads"], name, loc_id)
+
+    # Lock-surface toggle owns the two surface-unlock incantation locations,
+    # independent of cauldronsanity.
+    if options.lock_surface_incantations:
+        for name in SURFACE_LOCK_LOCATIONS:
+            _add_location(regions["Crossroads"], name, location_incantations[name])
 
     if options.fatesanity:
         for name, loc_id in location_table_prophecies.items():

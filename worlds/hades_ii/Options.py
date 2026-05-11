@@ -69,8 +69,25 @@ class CauldronSanity(DefaultOnToggle):
     """
     Shuffles incantations from the Cauldron in the item pool.
     Need to be sent the items to gain the different perks that make runs easier.
+    Note: the two surface-unlock incantations (Permeation of Witching-Wards and
+    Unraveling a Fateful Bond) are NOT part of this pool — they are controlled
+    independently by LockSurfaceIncantations.
     """
     display_name = "Cauldron Sanity"
+
+class LockSurfaceIncantations(DefaultOnToggle):
+    """
+    Locks the two surface-unlock incantations (Permeation of Witching-Wards and
+    Unraveling a Fateful Bond) behind AP item checks. While locked, neither
+    incantation appears in the Cauldron until the matching AP item is received;
+    once received, the entry appears and brewing it normally fires the AP check
+    and applies the vanilla effect (opens the Crossroads surface door / cures
+    the surface penalty).
+
+    Independent of Cauldron Sanity: these two incantations are always handled
+    by this option, never by Cauldron Sanity.
+    """
+    display_name = "Lock Surface Incantations"
 
 class FateSanity(DefaultOnToggle):
     """
@@ -480,6 +497,7 @@ class HadesIIOptions(PerGameCommonOptions):
     weaponsanity: WeaponSanity
     hidden_aspectsanity: HiddenAspectSanity
     cauldronsanity: CauldronSanity
+    lock_surface_incantations: LockSurfaceIncantations
     fatesanity: FateSanity
 
     true_ending: TrueEnding
@@ -536,6 +554,7 @@ hades_ii_option_groups = [
         WeaponSanity,
         HiddenAspectSanity,
         CauldronSanity,
+        LockSurfaceIncantations,
         FateSanity,
         DeathLink,
         DeathLinkAmnesty,

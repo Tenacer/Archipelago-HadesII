@@ -68,6 +68,10 @@ location_tools              = _by_category("tool")
 location_incantations       = _by_category("incantation")
 location_table_prophecies   = _by_category("prophecy")
 
+# The two surface-unlock incantation locations — owned by
+# lock_surface_incantations, never by cauldronsanity.
+SURFACE_LOCK_LOCATIONS = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
+
 # Boss kill reward locations — separate from biome-victory events above.
 # Names follow the pattern "Chronos Kill Reward N" / "Typhon Kill Reward N".
 location_table_boss_rewards: Dict[str, int] = _by_category("boss_reward")
@@ -127,8 +131,18 @@ def setup_location_table_with_settings(options) -> dict:
     if options.hidden_aspectsanity.value == 1:
         total.update(location_hidden_aspects)
 
+    # Cauldronsanity covers the 86 non-surface incantation locations.
     if options.cauldronsanity.value == 1:
-        total.update(location_incantations)
+        for name, code in location_incantations.items():
+            if name in SURFACE_LOCK_LOCATIONS:
+                continue
+            total[name] = code
+
+    # Lock-surface toggle owns the two surface-unlock incantation locations,
+    # independent of cauldronsanity.
+    if options.lock_surface_incantations.value == 1:
+        for name in SURFACE_LOCK_LOCATIONS:
+            total[name] = location_incantations[name]
 
     if options.fatesanity == 1:
         total.update(location_table_prophecies)
