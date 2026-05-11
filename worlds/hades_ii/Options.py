@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Dict, Any
-from Options import Range, Toggle, DeathLink, Choice, StartInventoryPool, PerGameCommonOptions,  OptionGroup, \
+from Options import Range, Toggle, DeathLink, Choice, StartInventoryPool, PerGameCommonOptions, OptionGroup, \
     DefaultOnToggle
 
 
@@ -11,14 +11,15 @@ class InitialWeapon(Choice):
     """
     Chooses an initial weapon to start with.
     """
-    display_name = "Weapon"
+    display_name = "Initial Weapon"
     option_Staff = 0
     option_Daggers = 1
     option_Torches = 2
     option_Axe = 3
     option_Skull = 4
     option_Coat = 5
-    
+    default = "random"
+
 class LocationSystem(Choice):
     """
     Chooses how the game gives you items. Currently only score_based is supported.
@@ -36,7 +37,7 @@ class ScoreRewardsAmount(Range):
     point to be unlocked (so check 10 needs 10 points, which can be obtained, for example,
     by completing rooms 5 and 6)
     """
-    display_name = "ScoreRewardsAmount"
+    display_name = "Score Rewards Amount"
     range_start = 72
     range_end = 500
     default = 150
@@ -47,7 +48,7 @@ class KeepsakeSanity(DefaultOnToggle):
     Shuffles NPCs' keepsakes into the item pool, and makes each keepsake location a check. 
     For simplicity this does not affect post TrueEnding characters (Zagreus, Chronos and Hades/Persephone).
     """
-    display_name = "KeepsakeSanity"
+    display_name = "Keepsake Sanity"
 
 class WeaponSanity(DefaultOnToggle):
     """
@@ -55,21 +56,21 @@ class WeaponSanity(DefaultOnToggle):
     each weapon at the Training Grounds a check.
     Need to be sent the weapon item to gain the skill to equip them.
     """
-    display_name = "WeaponSanity"
+    display_name = "Weapon Sanity"
 
 class HiddenAspectSanity(DefaultOnToggle):
     """
     Shuffles weapon aspects into the item pool, and makes obtaining each aspect a check 
     (which needs to be unlocked before being able to be bought).
     """
-    display_name = "HiddenAspectSanity"
+    display_name = "Hidden Aspect Sanity"
 
 class CauldronSanity(DefaultOnToggle):
     """
     Shuffles incantations from the Cauldron in the item pool.
     Need to be sent the items to gain the different perks that make runs easier.
     """
-    display_name = "CauldronSanity"
+    display_name = "Cauldron Sanity"
 
 class FateSanity(DefaultOnToggle):
     """
@@ -77,7 +78,7 @@ class FateSanity(DefaultOnToggle):
     and makes the corresponding items from the list a check. 
     Can make the games significantly longer.
     """
-    display_name = "FateSanity"
+    display_name = "Fate Sanity"
 
 # -- Completion
 
@@ -114,17 +115,35 @@ class VoidLensNeeded(Range):
 
 class BossDefeatsNeeded(Range):
     """
-    How many times you need to defeat Chronos or Typhon (combined) to win the world.
+    BossDefeats goal mode (combined counting): how many total Chronos+Typhon
+    kills are required to win the world. Ignored when TrueEnding is on, or
+    when BossDefeatsMode is set to separate.
     """
-    display_name = "BossDefeatsNeeded"
+    display_name = "Boss Defeats Needed"
     range_start = 1
     range_end = 20
     default = 5
 
+class BossDefeatsMode(Choice):
+    """
+    In BossDefeats goal mode, choose whether Chronos and Typhon kills are
+    counted together (combined) or independently (separate).
+    Combined: BossDefeatsNeeded total Chronos+Typhon kills wins the world.
+    Separate: requires ChronosKillsNeeded Chronos kills AND TyphonKillsNeeded
+    Typhon kills.
+    Ignored when TrueEnding is on.
+    """
+    display_name = "Boss Defeats Counting Mode"
+    option_combined = 0
+    option_separate = 1
+    default = 0
+
 class ChronosKillsNeeded(Range):
     """
-    True Ending only: how many Chronos kills produce AP location checks.
-    Each kill 1..N drops an AP item; kills past N drop Nightmare and Gemstones instead.
+    How many Chronos kills are required. In TrueEnding mode, kills 1..N each
+    drop an AP location reward (past N, drops Nightmare/Gemstones). In
+    BossDefeats mode with separate counting, this is the per-boss goal
+    threshold.
     """
     display_name = "Chronos Kills Needed"
     range_start = 1
@@ -133,8 +152,10 @@ class ChronosKillsNeeded(Range):
 
 class TyphonKillsNeeded(Range):
     """
-    True Ending only: how many Typhon kills produce AP location checks.
-    Each kill 1..N drops an AP item; kills past N drop Nightmare and Gemstones instead.
+    How many Typhon kills are required. In TrueEnding mode, kills 1..N each
+    drop an AP location reward (past N, drops Nightmare/Gemstones). In
+    BossDefeats mode with separate counting, this is the per-boss goal
+    threshold.
     """
     display_name = "Typhon Kills Needed"
     range_start = 1
@@ -145,7 +166,7 @@ class WeaponsClearsNeeded(Range):
     """
     How many different weapons clears are needed to win the world.
     """
-    display_name = "WeaponsClearsNeeded"
+    display_name = "Weapon Clears Needed"
     range_start = 1
     range_end = 6
     default = 1
@@ -156,7 +177,7 @@ class KeepsakesNeeded(Range):
     Post-ending keepsakes (Hades/Persephone, Zagreus, Chronos) do not count
     toward this threshold — only the 30 keepsakes that have corresponding checks.
     """
-    display_name = "KeepsakesNeeded"
+    display_name = "Keepsakes Needed"
     range_start = 0
     range_end = 30
     default = 0
@@ -166,7 +187,7 @@ class FatesNeeded(Range):
     How many different Fated List CHECKS you need to finish in order to win the world.
     Note that larger amounts can make the game significantly longer.
     """
-    display_name = "FatesNeeded"
+    display_name = "Fates Needed"
     range_start = 0
     range_end = 89
     default = 0
@@ -175,25 +196,25 @@ class FatesNeeded(Range):
 
 class FearSystem(Choice):
     """
-    Choose either ReverseFear (1), MinimalFear (2) or VanillaFear (3) for the game.
-    In ReverseFear you start with randomly distributed Fear vows that are locked on until
+    Choose either reverse_fear (1), minimal_fear (2) or vanilla_fear (3) for the game.
+    In reverse_fear you start with randomly distributed Fear vows that are locked on until
     you receive the corresponding vow items from the AP world.
-    In MinimalFear the game starts with randomly distributed vows that act as a permanent
+    In minimal_fear the game starts with randomly distributed vows that act as a permanent
     floor — the shrine is hidden and levels never change.
-    VanillaFear leaves all vow control to the player (shrine works normally).
+    vanilla_fear leaves all vow control to the player (shrine works normally).
     The total shrine points distributed is set by InitialFearLevel / MinimalFearLevel.
     Maximum possible fear level is 67 (all vows at max rank).
     """
     display_name = "Fear System"
-    option_reverse_Fear = 1
-    option_minimal_Fear = 2
-    option_vanilla_Fear = 3
+    option_reverse_fear = 1
+    option_minimal_fear = 2
+    option_vanilla_fear = 3
     default = 1
 
 
 class InitialFearLevel(Range):
     """
-    Total shrine points to randomly distribute across vows at game start (reverse_Fear only).
+    Total shrine points to randomly distribute across vows at game start (reverse_fear only).
     The points are spread randomly — individual vow ranks are not configurable.
     Maximum is 67 (all vows at max rank). Unused points if no affordable rank remains.
     """
@@ -205,7 +226,7 @@ class InitialFearLevel(Range):
 
 class MinimalFearLevel(Range):
     """
-    Total shrine points to randomly distribute as the permanent vow floor (minimal_Fear only).
+    Total shrine points to randomly distribute as the permanent vow floor (minimal_fear only).
     The shrine is hidden; these levels never change during the run.
     Maximum is 67 (all vows at max rank). Unused points if no affordable rank remains.
     """
@@ -301,7 +322,7 @@ class AmbrosiaPackPercentage(Range):
 
 class MoonDustPackValue(Range):
     """Choose the value of each Moon Dust pack."""
-    display_name = "Nightmare Pack Value"
+    display_name = "Moon Dust Pack Value"
     range_start = 0
     range_end = 50
     default = FILLER_CONFIG["moon_dust"]["value"]
@@ -424,7 +445,7 @@ class IgnoreWinDeaths(Toggle):
     If deaths after a completed run count for Deathlink. 
     Turn on for the memes.
     """
-    display_name = "Win Deaths Count"
+    display_name = "Win-Deaths Count for DeathLink"
 
 
 class CauldronGiveHints(DefaultOnToggle):
@@ -434,14 +455,6 @@ class CauldronGiveHints(DefaultOnToggle):
     """
     display_name = "Cauldron/FatedList Give Hints"
 
-
-# class AutomaticRoomsFinishOnHadesDefeat(Toggle):
-#     """
-#     If defeating Hades should give all room clears on Room based location mode 
-#     or all rooms clears with the equipped weapon on Room weapon based location mode. 
-#     """
-#     display_name = "Automatic Room Finish On Hades Defeat"
-#     default = 0
 
 class DeathLinkAmnesty(Range):
     """
@@ -473,6 +486,7 @@ class HadesIIOptions(PerGameCommonOptions):
     zodiac_sand_needed: ZodiacSandNeeded
     void_lens_needed: VoidLensNeeded
     boss_defeats_needed: BossDefeatsNeeded
+    boss_defeats_mode: BossDefeatsMode
     chronos_kills_needed: ChronosKillsNeeded
     typhon_kills_needed: TyphonKillsNeeded
     weapons_clears_needed: WeaponsClearsNeeded
@@ -532,6 +546,7 @@ hades_ii_option_groups = [
         VoidLensNeeded,
         ChronosKillsNeeded,
         TyphonKillsNeeded,
+        BossDefeatsMode,
         BossDefeatsNeeded,
         WeaponsClearsNeeded,
         KeepsakesNeeded,
@@ -582,7 +597,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "score_rewards_amount": 100,
         "hidden_aspectsanity": False,
         "fatesanity": False,
-        "fear_system": "reverse_Fear",
+        "fear_system": "reverse_fear",
         "initial_fear_level": 11,
         "ash_pack_value": 20,
         "bones_pack_value": 100,
@@ -599,7 +614,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "score_rewards_amount": 150,
         "hidden_aspectsanity": True,
         "fatesanity": False,
-        "fear_system": "reverse_Fear",
+        "fear_system": "reverse_fear",
         "initial_fear_level": 28,
         "ash_pack_value": 10,
         "bones_pack_value": 50,
@@ -616,7 +631,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "score_rewards_amount": 150,
         "hidden_aspectsanity": True,
         "fatesanity": True,
-        "fear_system": "reverse_Fear",
+        "fear_system": "reverse_fear",
         "initial_fear_level": 57,
         "ash_pack_value": 5,
         "bones_pack_value": 25,
@@ -628,5 +643,31 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "fate_fabric_pack_value": 1,
         "enable_traps": True,
         "filler_trap_percentage": 10,
+    },
+    "True Ending": {
+        "true_ending": True,
+        "boss_defeats_mode": "combined",
+        "zodiac_sand_needed": 4,
+        "void_lens_needed": 2,
+        "chronos_kills_needed": 7,
+        "typhon_kills_needed": 5,
+        "weapons_clears_needed": 1,
+        "keepsakes_needed": 0,
+        "fates_needed": 0,
+        "score_rewards_amount": 150,
+        "hidden_aspectsanity": True,
+        "fatesanity": False,
+        "fear_system": "reverse_fear",
+        "initial_fear_level": 28,
+        "ash_pack_value": 10,
+        "bones_pack_value": 50,
+        "psyche_pack_value": 30,
+        "nectar_pack_value": 1,
+        "ambrosia_pack_value": 1,
+        "moon_dust_pack_value": 1,
+        "nightmare_pack_value": 1,
+        "fate_fabric_pack_value": 1,
+        "enable_traps": True,
+        "filler_trap_percentage": 5,
     },
 }

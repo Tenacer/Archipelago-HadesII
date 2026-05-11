@@ -15,7 +15,7 @@ _BOSS_VICTORY_NAMES = {
 
 # (base item name, is_multi_rank, shrine_upgrade_name)
 # Multi-rank vows add N items (ranks 1..N); single-rank vows add 1 item when rank >= 1.
-# Vow items only enter the pool in reverse_Fear mode; amounts come from world.vow_ranks.
+# Vow items only enter the pool in reverse_fear mode; amounts come from world.vow_ranks.
 _VOW_OPTIONS = [
     ("Vow of Pain",    True,  "EnemyDamageShrineUpgrade"),
     ("Vow of Grit",    True,  "EnemyHealthShrineUpgrade"),
@@ -113,8 +113,8 @@ def create_items(self) -> None:
     local_location_table = setup_location_table_with_settings(self.options).copy()
     pool: List[Item] = []
 
-    # Fear vows — only in reverse_Fear (1); amounts from the randomly distributed vow_ranks.
-    # minimal_Fear (2) and vanilla_Fear (3) add no vow items to the pool.
+    # Fear vows — only in reverse_fear (1); amounts from the randomly distributed vow_ranks.
+    # minimal_fear (2) and vanilla_fear (3) add no vow items to the pool.
     if self.options.fear_system.value == 1:
         vow_ranks = getattr(self, "vow_ranks", {})
         for base, is_multi, shrine_name in _VOW_OPTIONS:

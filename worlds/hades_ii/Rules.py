@@ -95,8 +95,14 @@ class HadesIILogic(LogicMixin):
     def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
         return self.has(boss_event, player)  # type: ignore
 
-    # Checks if the player has reached the end-game (Chronos or Typhon cleared)
+    # Checks if the player has reached the end-game.
+    # Combined mode: either Chronos or Typhon cleared (kill counts enforced
+    # client-side via the BossDefeatsNeeded victory signal).
+    # Separate mode: both Chronos AND Typhon cleared (per-boss kill counts
+    # enforced client-side via the Chronos/TyphonKillsNeeded victory signal).
     def _can_reach_endgame(self, player: int, options) -> bool:
+        if options.boss_defeats_mode == 1:  # separate
+            return self.has("Chronos Victory", player) and self.has("Typhon Victory", player)  # type: ignore
         return self.has("Chronos Victory", player) or self.has("Typhon Victory", player)  # type: ignore
 
     # Checks if the player has enough weapon wins for goal

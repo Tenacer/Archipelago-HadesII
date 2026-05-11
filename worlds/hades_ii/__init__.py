@@ -1,6 +1,7 @@
 from typing import Dict, List
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, Type, components
+from . import web_world
 from .Options import HadesIIOptions
 from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings
 from .Regions import create_regions
@@ -48,6 +49,7 @@ class HadesIIWorld(World):
     options_dataclass = HadesIIOptions
     topology_present: bool = False
     required_client_version: tuple = (0, 6, 4)
+    web = web_world.HadesIIWebWorld()
 
     item_name_to_id = {name: data.code for name, data in item_table.items() if data.code is not None}
     location_name_to_id = give_all_locations_table()
@@ -115,6 +117,7 @@ class HadesIIWorld(World):
             "chronos_kills_needed",
             "typhon_kills_needed",
             "boss_defeats_needed",
+            "boss_defeats_mode",
             "weapons_clears_needed",
             "keepsakes_needed",
             "fates_needed",
@@ -137,6 +140,6 @@ class HadesIIWorld(World):
             "death_link_amnesty",
         )
         # vow_ranks: shrine_upgrade_name -> rank (only non-zero entries).
-        # Lua mod applies these as starting/locked levels (reverse_Fear) or floor (minimal_Fear).
+        # Lua mod applies these as starting/locked levels (reverse_fear) or floor (minimal_fear).
         slot_data["vow_ranks"] = self.vow_ranks
         return slot_data
