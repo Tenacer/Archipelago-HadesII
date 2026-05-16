@@ -175,13 +175,14 @@ def create_items(self) -> None:
             pool.append(self.create_item(name))
 
     # True Ending goal items: Zodiac Sand (N), Void Lens (M), Gigaros (1),
-    # and the two goal incantations (items only — no locations).
+    # Entropy (1), and the two goal incantations (items only — no locations).
     if self.options.true_ending:
         for _ in range(self.options.zodiac_sand_needed.value):
             pool.append(self.create_item("Zodiac Sand"))
         for _ in range(self.options.void_lens_needed.value):
             pool.append(self.create_item("Void Lens"))
         pool.append(self.create_item("Gigaros"))
+        pool.append(self.create_item("Entropy"))
         for name in item_table_true_ending_incantations:
             pool.append(self.create_item(name))
 

@@ -77,14 +77,16 @@ class HadesIILogic(LogicMixin):
 
         return can_win
 
-    # True Ending: both final bosses, ingredient counts, Gigaros, both goal
-    # incantations, and a *final* Chronos kill performed after Dissolution of
-    # Time has been cast (represented by the `Chronos True Victory` event).
+    # True Ending: both final bosses, ingredient counts, Gigaros, Entropy,
+    # both goal incantations, and a *final* Chronos kill performed after
+    # Dissolution of Time has been cast (represented by the
+    # `Chronos True Victory` event).
     def _has_true_ending_requirements(self, player: int, options) -> bool:
         return (
             self.has("Chronos True Victory", player)  # type: ignore
             and self.has("Typhon Victory", player)  # type: ignore
             and self.has("Gigaros", player)  # type: ignore
+            and self.has("Entropy", player)  # type: ignore
             and self.has("Dissolution of Time", player)  # type: ignore
             and self.has("Disintegration of Monstrosity", player)  # type: ignore
             and self.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value  # type: ignore
@@ -173,7 +175,9 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     handle_surface_incantations(world, player, options)
 
     # True Ending: the final Chronos kill can only happen after the first
-    # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Gigaros).
+    # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Entropy);
+    # Gigaros is required because the True-Ending run also needs Disintegration
+    # of Monstrosity brewed.
     if options.true_ending:
         add_rule(
             world.get_location("Chronos True Victory", player),
@@ -181,6 +185,7 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
                 state.has("Chronos Victory", player)
                 and state.has("Dissolution of Time", player)
                 and state.has("Gigaros", player)
+                and state.has("Entropy", player)
                 and state.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value
             ),
         )
