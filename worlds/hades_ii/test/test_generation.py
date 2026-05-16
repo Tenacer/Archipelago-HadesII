@@ -266,3 +266,28 @@ class TestScoreRewardsMax(HadesIITestBase):
             and loc.name.startswith("Score Check ")
         ]
         self.assertLessEqual(len(excluded_score), pure_filler)
+
+
+_WEAPON_UNLOCK_LOCATIONS = [
+    "Staff Weapon Unlock Location",
+    "Daggers Weapon Unlock Location",
+    "Torches Weapon Unlock Location",
+    "Axe Weapon Unlock Location",
+    "Skull Weapon Unlock Location",
+    "Coat Weapon Unlock Location",
+]
+
+
+class TestRandomInitialWeapon(HadesIITestBase):
+    options = {"initial_weapon": 6, "weaponsanity": 1}
+
+    def test_random_resolves_to_concrete_weapon(self) -> None:
+        self.assertIn(self.world.options.initial_weapon.value, range(0, 6))
+
+    def test_starting_weapon_location_excluded(self) -> None:
+        idx = self.world.options.initial_weapon.value
+        location_names = {loc.name for loc in self.multiworld.get_locations(self.player)}
+        self.assertNotIn(_WEAPON_UNLOCK_LOCATIONS[idx], location_names)
+        for i, name in enumerate(_WEAPON_UNLOCK_LOCATIONS):
+            if i != idx:
+                self.assertIn(name, location_names)

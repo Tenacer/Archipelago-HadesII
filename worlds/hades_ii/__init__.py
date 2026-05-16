@@ -86,6 +86,12 @@ class HadesIIWorld(World):
         return {name: rank for name, rank in ranks.items() if rank > 0}
 
     def generate_early(self) -> None:
+        # option_Random (value 6) resolves to a concrete pick (0..5) here so that
+        # Rules, Locations, fill_slot_data and the Lua mod all see a fixed weapon.
+        # Uses self.random for seed-deterministic results in multiworlds.
+        if self.options.initial_weapon.value == 6:
+            self.options.initial_weapon.value = self.random.randint(0, 5)
+
         self.vow_ranks: Dict[str, int] = {}
         fear = self.options.fear_system.value
         if fear == 1:
