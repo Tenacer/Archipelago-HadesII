@@ -1,4 +1,5 @@
-from typing import Dict, List
+from typing import ClassVar, Dict, List
+import settings
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, Type, components
 from . import web_world
@@ -7,6 +8,16 @@ from .Locations import give_all_locations_table, location_name_groups, setup_loc
 from .Regions import create_regions
 from .Items import item_table, item_name_groups, create_items, Hades_II_Item
 from .Rules import set_rules
+
+
+class HadesIISettings(settings.Group):
+    class IpcDirectory(str):
+        """Optional override path for the JSON IPC directory shared with the
+        Hades II game mod. Leave blank to use the OS user-data dir
+        (~/.local/share/HadesII_AP/ on Linux, %LOCALAPPDATA%\\HadesII_AP\\ on
+        Windows, ~/Library/Application Support/HadesII_AP/ on macOS)."""
+
+    ipc_directory: IpcDirectory = IpcDirectory("")
 
 # Shrine point costs per rank for each vow (index 0 = cost of rank 1, etc.)
 _VOW_POINT_COSTS: Dict[str, List[int]] = {
@@ -47,6 +58,7 @@ class HadesIIWorld(World):
 
     game: str = "Hades II"
     options_dataclass = HadesIIOptions
+    settings: ClassVar[HadesIISettings]
     topology_present: bool = False
     required_client_version: tuple = (0, 6, 4)
     web = web_world.HadesIIWebWorld()

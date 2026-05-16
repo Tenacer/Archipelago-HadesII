@@ -1,11 +1,16 @@
 """
 Hades II Archipelago Client
-Bridges the Hades II game mod (via JSON files in ~/hadesii_ap/) with the AP server.
+Bridges the Hades II game mod (via JSON files in the OS user-data dir, e.g.
+~/.local/share/HadesII_AP/ on Linux or %LOCALAPPDATA%\\HadesII_AP\\ on Windows)
+with the AP server. The location can be overridden via the `hades_ii_options.ipc_directory`
+setting in host.yaml.
 """
 
 import asyncio
 import json
+import os
 import re
+import sys
 import time
 from pathlib import Path
 from typing import Optional
@@ -56,8 +61,25 @@ _SCOUTABLE_LOCATION_IDS: dict = {
 }
 
 
+def _platform_default_ipc_dir() -> Path:
+    if sys.platform == "win32":
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+        return Path(base) / "HadesII_AP"
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "HadesII_AP"
+    base = os.environ.get("XDG_DATA_HOME") or str(Path.home() / ".local" / "share")
+    return Path(base) / "HadesII_AP"
+
+
 def get_ipc_dir() -> Path:
-    return Path.home() / "hadesii_ap"
+    try:
+        from . import HadesIIWorld
+        override = str(HadesIIWorld.settings.ipc_directory or "").strip()
+        if override:
+            return Path(override).expanduser()
+    except Exception:
+        pass
+    return _platform_default_ipc_dir()
 
 
 class HadesIIClientCommandProcessor(ClientCommandProcessor):
