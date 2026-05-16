@@ -19,27 +19,27 @@ _BOSS_VICTORY_NAMES = {
 # items under the lock toggle.
 SURFACE_LOCK_ITEMS = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
 
-# (base item name, is_multi_rank, shrine_upgrade_name)
-# Multi-rank vows add N items (ranks 1..N); single-rank vows add 1 item when rank >= 1.
-# Vow items only enter the pool in reverse_fear mode; amounts come from world.vow_ranks.
+# (base item name, shrine_upgrade_name)
+# One AP item per vow; pool gets N copies where N = world.vow_ranks[shrine].
+# Vow items only enter the pool in reverse_fear mode.
 _VOW_OPTIONS = [
-    ("Vow of Pain",    True,  "EnemyDamageShrineUpgrade"),
-    ("Vow of Grit",    True,  "EnemyHealthShrineUpgrade"),
-    ("Vow of Wards",   True,  "EnemyShieldShrineUpgrade"),
-    ("Vow of Frenzy",  True,  "EnemySpeedShrineUpgrade"),
-    ("Vow of Hordes",  True,  "EnemyCountShrineUpgrade"),
-    ("Vow of Menace",  True,  "NextBiomeEnemyShrineUpgrade"),
-    ("Vow of Return",  True,  "EnemyRespawnShrineUpgrade"),
-    ("Vow of Fangs",   True,  "EnemyEliteShrineUpgrade"),
-    ("Vow of Scars",   True,  "HealingReductionShrineUpgrade"),
-    ("Vow of Debt",    True,  "ShopPricesShrineUpgrade"),
-    ("Vow of Shadow",  False, "MinibossCountShrineUpgrade"),
-    ("Vow of Forfeit", False, "BoonSkipShrineUpgrade"),
-    ("Vow of Time",    True,  "BiomeSpeedShrineUpgrade"),
-    ("Vow of Void",    True,  "LimitGraspShrineUpgrade"),
-    ("Vow of Hubris",  True,  "BoonManaReserveShrineUpgrade"),
-    ("Vow of Denial",  False, "BanUnpickedBoonsShrineUpgrade"),
-    ("Vow of Rivals",  True,  "BossDifficultyShrineUpgrade"),
+    ("Vow of Pain",    "EnemyDamageShrineUpgrade"),
+    ("Vow of Grit",    "EnemyHealthShrineUpgrade"),
+    ("Vow of Wards",   "EnemyShieldShrineUpgrade"),
+    ("Vow of Frenzy",  "EnemySpeedShrineUpgrade"),
+    ("Vow of Hordes",  "EnemyCountShrineUpgrade"),
+    ("Vow of Menace",  "NextBiomeEnemyShrineUpgrade"),
+    ("Vow of Return",  "EnemyRespawnShrineUpgrade"),
+    ("Vow of Fangs",   "EnemyEliteShrineUpgrade"),
+    ("Vow of Scars",   "HealingReductionShrineUpgrade"),
+    ("Vow of Debt",    "ShopPricesShrineUpgrade"),
+    ("Vow of Shadow",  "MinibossCountShrineUpgrade"),
+    ("Vow of Forfeit", "BoonSkipShrineUpgrade"),
+    ("Vow of Time",    "BiomeSpeedShrineUpgrade"),
+    ("Vow of Void",    "LimitGraspShrineUpgrade"),
+    ("Vow of Hubris",  "BoonManaReserveShrineUpgrade"),
+    ("Vow of Denial",  "BanUnpickedBoonsShrineUpgrade"),
+    ("Vow of Rivals",  "BossDifficultyShrineUpgrade"),
 ]
 
 
@@ -123,12 +123,8 @@ def create_items(self) -> None:
     # minimal_fear (2) and vanilla_fear (3) add no vow items to the pool.
     if self.options.fear_system.value == 1:
         vow_ranks = getattr(self, "vow_ranks", {})
-        for base, is_multi, shrine_name in _VOW_OPTIONS:
-            amount = vow_ranks.get(shrine_name, 0)
-            if is_multi:
-                for rank in range(1, amount + 1):
-                    pool.append(self.create_item(f"{base} Rank {rank}"))
-            elif amount >= 1:
+        for base, shrine_name in _VOW_OPTIONS:
+            for _ in range(vow_ranks.get(shrine_name, 0)):
                 pool.append(self.create_item(base))
 
     # Keepsakes (canonical 30 as checks, plus 3 post-ending keepsakes as

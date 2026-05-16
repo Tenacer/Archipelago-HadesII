@@ -1,44 +1,21 @@
 id,name,classification,groups
-1,Vow of Pain Rank 1,useful,fears
-2,Vow of Pain Rank 2,useful,fears
-3,Vow of Pain Rank 3,useful,fears
-4,Vow of Grit Rank 1,useful,fears
-5,Vow of Grit Rank 2,useful,fears
-6,Vow of Grit Rank 3,useful,fears
-7,Vow of Wards Rank 1,useful,fears
-8,Vow of Wards Rank 2,useful,fears
-9,Vow of Frenzy Rank 1,useful,fears
-10,Vow of Frenzy Rank 2,useful,fears
-11,Vow of Hordes Rank 1,useful,fears
-12,Vow of Hordes Rank 2,useful,fears
-13,Vow of Hordes Rank 3,useful,fears
-14,Vow of Menace Rank 1,useful,fears
-15,Vow of Menace Rank 2,useful,fears
-16,Vow of Return Rank 1,useful,fears
-17,Vow of Return Rank 2,useful,fears
-18,Vow of Fangs Rank 1,useful,fears
-19,Vow of Fangs Rank 2,useful,fears
-20,Vow of Scars Rank 1,useful,fears
-21,Vow of Scars Rank 2,useful,fears
-22,Vow of Scars Rank 3,useful,fears
-23,Vow of Debt Rank 1,useful,fears
-24,Vow of Debt Rank 2,useful,fears
-25,Vow of Shadow,useful,fears
-26,Vow of Forfeit,useful,fears
-27,Vow of Time Rank 1,useful,fears
-28,Vow of Time Rank 2,useful,fears
-29,Vow of Time Rank 3,useful,fears
-30,Vow of Void Rank 1,useful,fears
-31,Vow of Void Rank 2,useful,fears
-32,Vow of Void Rank 3,useful,fears
-33,Vow of Void Rank 4,useful,fears
-34,Vow of Hubris Rank 1,useful,fears
-35,Vow of Hubris Rank 2,useful,fears
-36,Vow of Denial,useful,fears
-37,Vow of Rivals Rank 1,useful,fears
-38,Vow of Rivals Rank 2,useful,fears
-39,Vow of Rivals Rank 3,useful,fears
-40,Vow of Rivals Rank 4,useful,fears
+1,Vow of Pain,useful,fears
+2,Vow of Grit,useful,fears
+3,Vow of Wards,useful,fears
+4,Vow of Frenzy,useful,fears
+5,Vow of Hordes,useful,fears
+6,Vow of Menace,useful,fears
+7,Vow of Return,useful,fears
+8,Vow of Fangs,useful,fears
+9,Vow of Scars,useful,fears
+10,Vow of Debt,useful,fears
+11,Vow of Shadow,useful,fears
+12,Vow of Forfeit,useful,fears
+13,Vow of Time,useful,fears
+14,Vow of Void,useful,fears
+15,Vow of Hubris,useful,fears
+16,Vow of Denial,useful,fears
+17,Vow of Rivals,useful,fears
 41,Ash,filler,fillers
 42,Psyche,filler,fillers
 43,Nectar,filler,fillers
