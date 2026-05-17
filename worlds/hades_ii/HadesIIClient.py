@@ -393,7 +393,7 @@ class HadesIIContext(CommonContext):
         if new_locations:
             self._sent_named_location_ids.update(new_locations)
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
-            logger.info(f"Sent {len(new_locations)} named check(s)")
+            logger.debug(f"Sent {len(new_locations)} named check(s)")
 
     async def _process_hints(self, data: dict):
         """

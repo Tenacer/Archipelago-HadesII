@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING
 from .Items import item_table_fears, item_table_keepsakes, item_table_prophecies
 from worlds.AutoWorld import LogicMixin
-from worlds.generic.Rules import add_rule
-from BaseClasses import LocationProgressType
+from worlds.generic.Rules import add_rule, add_item_rule
 
 # NOTE: All the `# type: ignore` blocks are to clear the unknown property error sometimes caused by state stuff
 
@@ -134,35 +133,25 @@ class HadesIILogic(LogicMixin):
     def _has_moros_access(self, player: int) -> bool:
         return True
 
-def _mark_score_check_exclusions(world, player: int, options) -> None:
-    """Mark score check locations as EXCLUDED up to the number of pure filler items available.
+def _restrict_score_check_progression(world, player: int, options) -> None:
+    """Block progression items from score checks.
 
-    AP's fill algorithm requires pure-filler item count >= EXCLUDED location count.
-    Items classified as useful (e.g. Nightmare, Fate Fabric) cannot fill EXCLUDED locations,
-    so we only exclude as many score checks as we have pure filler items to cover them.
-    Any overflow score checks stay DEFAULT, keeping them from starving the fill.
+    Score checks are intended for filler/useful (CLAUDE.md). Marking them
+    EXCLUDED forced filler-only and biased filler to the lowest-numbered
+    checks. A per-location item rule preserves the no-progression
+    constraint while letting AP's shuffled fill place useful + filler
+    uniformly across all score checks.
     """
-    if options.location_system.value != 0:  # only score_based
+    if options.location_system.value != 0:  # score_based only
         return
-
-    pure_filler_count = sum(
-        1 for item in world.itempool
-        if item.player == player and not item.advancement and not item.useful
-    )
-
-    score_checks = sorted(
-        (loc for loc in world.get_locations(player) if loc.name.startswith("Score Check ")),
-        key=lambda loc: int(loc.name.split()[-1]),
-    )
-
-    for i, loc in enumerate(score_checks):
-        if i < pure_filler_count:
-            loc.progress_type = LocationProgressType.EXCLUDED
+    for loc in world.get_locations(player):
+        if loc.name.startswith("Score Check "):
+            add_item_rule(loc, lambda item: not item.advancement)
 
 
 def set_rules(world, player: int, location_table: dict, options) -> None:
     handle_area_logic(world, player, options)
-    _mark_score_check_exclusions(world, player, options)
+    _restrict_score_check_progression(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
     # Keepsakes
@@ -214,11 +203,14 @@ def handle_area_logic(world, player, options):
     for entrance_name, victory_item in area_rules:
         add_rule(world.get_entrance(entrance_name, player), lambda state, v=victory_item: state.has(v, player))
 
-    # Surface biome entrance: Permeation of Witching-Wards opens the surface
-    # run door. No-op when cauldronsanity is off.
+    # Surface biome entrance: both surface-unlock incantations are needed for
+    # a viable run (Permeation opens the door; Unraveling cures the penalty).
+    # Requiring both here prevents either item from being placed at any
+    # surface-chain location (Ephyra → Summit), including Typhon Kill Rewards.
+    # No-op when lock_surface_incantations is off.
     add_rule(
         world.get_entrance("Crossroads -> Ephyra", player),
-        lambda state: state._has_surface_door(player, options),  # type: ignore
+        lambda state: state._has_surface_access(player, options),  # type: ignore
     )
 
 # Each hidden aspect can only be unlocked once the player has the corresponding weapon.

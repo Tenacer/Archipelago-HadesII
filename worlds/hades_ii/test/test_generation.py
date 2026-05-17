@@ -1,23 +1,35 @@
-from BaseClasses import LocationProgressType
+from BaseClasses import Item, ItemClassification, LocationProgressType
 from .bases import HadesIITestBase
+
+
+def _assert_score_checks_block_progression(test_case) -> None:
+    """Score checks must reject progression items via their per-location item rule.
+
+    Verifies the rule directly (no fill required) so the test is independent
+    of fill order or RNG. EXCLUDED marking is intentionally NOT used.
+    """
+    fake_progression = Item("test", ItemClassification.progression, None, test_case.player)
+    fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
+    score_locs = [
+        loc for loc in test_case.multiworld.get_locations(test_case.player)
+        if loc.name.startswith("Score Check ")
+    ]
+    test_case.assertGreater(len(score_locs), 0, "no score checks found")
+    for loc in score_locs:
+        test_case.assertNotEqual(loc.progress_type, LocationProgressType.EXCLUDED,
+            f"{loc.name} must not be EXCLUDED — rely on item rule instead")
+        test_case.assertFalse(loc.item_rule(fake_progression),
+            f"{loc.name} should reject progression items")
+        test_case.assertTrue(loc.item_rule(fake_filler),
+            f"{loc.name} should accept filler items")
 
 
 class TestDefaultGeneration(HadesIITestBase):
     """Default options: score_based system, all sanities enabled, normal fear."""
     options = {}
 
-    def test_score_checks_excluded_up_to_pure_filler(self) -> None:
-        pure_filler = sum(
-            1 for item in self.multiworld.itempool
-            if item.player == self.player and not item.advancement and not item.useful
-        )
-        excluded_score = [
-            loc for loc in self.multiworld.get_locations(self.player)
-            if loc.progress_type == LocationProgressType.EXCLUDED
-            and loc.name.startswith("Score Check ")
-        ]
-        self.assertLessEqual(len(excluded_score), pure_filler,
-            "More score checks excluded than pure filler items — fill will fail")
+    def test_score_checks_block_progression(self) -> None:
+        _assert_score_checks_block_progression(self)
 
     def test_no_boss_rewards_when_not_true_ending(self) -> None:
         # BossDefeats mode counts run completions; no per-kill reward locations.
@@ -69,17 +81,8 @@ class TestTrueEndingAllSanities(HadesIITestBase):
         "fatesanity": 1,
     }
 
-    def test_score_checks_excluded_up_to_pure_filler(self) -> None:
-        pure_filler = sum(
-            1 for item in self.multiworld.itempool
-            if item.player == self.player and not item.advancement and not item.useful
-        )
-        excluded_score = [
-            loc for loc in self.multiworld.get_locations(self.player)
-            if loc.progress_type == LocationProgressType.EXCLUDED
-            and loc.name.startswith("Score Check ")
-        ]
-        self.assertLessEqual(len(excluded_score), pure_filler)
+    def test_score_checks_block_progression(self) -> None:
+        _assert_score_checks_block_progression(self)
 
 
 class TestAllSanitiesOff(HadesIITestBase):
@@ -127,7 +130,7 @@ class TestLockSurfaceIncantationsDefault(HadesIITestBase):
 
 class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
     """lock_surface_incantations off, cauldronsanity on — the surface 2 are NOT
-    AP items/locations. The cauldronsanity pool has 86 entries, not 88."""
+    AP items/locations. The cauldronsanity pool covers every non-surface incantation."""
     options = {"lock_surface_incantations": 0, "cauldronsanity": 1}
 
     def test_surface_items_absent(self) -> None:
@@ -142,7 +145,7 @@ class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
             self.assertRaises(KeyError,
                 self.multiworld.get_location, name, self.player)
 
-    def test_cauldronsanity_has_86_incantations(self) -> None:
+    def test_cauldronsanity_covers_all_non_surface_incantations(self) -> None:
         from worlds.hades_ii.Items import item_table_incantations
         cauldron_names = {n for n in item_table_incantations
                           if n not in _SURFACE_LOCK_NAMES}
@@ -153,9 +156,10 @@ class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
 
 
 class TestLockSurfaceAndCauldronsanity(HadesIITestBase):
-    """Both options on — surface 2 owned by the lock toggle, 86 by cauldronsanity,
-    surface keepsakes + surface biome + the 11 surface-gated cauldron incantations
-    are gated on the surface unlock items."""
+    """Both options on — surface 2 owned by the lock toggle, the remaining
+    non-surface incantations by cauldronsanity, surface keepsakes + surface
+    biome + the 11 surface-gated cauldron incantations are gated on the
+    surface unlock items."""
     options = {
         "lock_surface_incantations": 1,
         "cauldronsanity": 1,
@@ -230,19 +234,8 @@ class TestScoreRewards72(HadesIITestBase):
         ]
         self.assertEqual(len(score_locs), 72)
 
-    def test_excluded_count_safe(self) -> None:
-        pure_filler = sum(
-            1 for item in self.multiworld.itempool
-            if item.player == self.player and not item.advancement and not item.useful
-        )
-        excluded_score = [
-            loc for loc in self.multiworld.get_locations(self.player)
-            if loc.progress_type == LocationProgressType.EXCLUDED
-            and loc.name.startswith("Score Check ")
-        ]
-        self.assertLessEqual(len(excluded_score), pure_filler)
-        # All 72 checks that fit within pure filler should be excluded
-        self.assertEqual(len(excluded_score), min(72, pure_filler))
+    def test_score_checks_block_progression(self) -> None:
+        _assert_score_checks_block_progression(self)
 
 
 class TestScoreRewardsMax(HadesIITestBase):
@@ -255,17 +248,8 @@ class TestScoreRewardsMax(HadesIITestBase):
         ]
         self.assertEqual(len(score_locs), 150)
 
-    def test_excluded_count_safe(self) -> None:
-        pure_filler = sum(
-            1 for item in self.multiworld.itempool
-            if item.player == self.player and not item.advancement and not item.useful
-        )
-        excluded_score = [
-            loc for loc in self.multiworld.get_locations(self.player)
-            if loc.progress_type == LocationProgressType.EXCLUDED
-            and loc.name.startswith("Score Check ")
-        ]
-        self.assertLessEqual(len(excluded_score), pure_filler)
+    def test_score_checks_block_progression(self) -> None:
+        _assert_score_checks_block_progression(self)
 
 
 _WEAPON_UNLOCK_LOCATIONS = [
