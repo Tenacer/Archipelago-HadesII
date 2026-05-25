@@ -11,12 +11,12 @@ grinding your game. For this reason I implemented a "True Ending" mode alongside
 
 So, let's review the two options available:
 
-- Boss Defeats: This works in a similar way to the original Hades, but given that we have two routes there are 
+- **Boss Defeats**: This works in a similar way to the original Hades, but given that we have two routes there are 
 already more options. Essentially, you select the number of necessary Underworld and Surface wins you need in
 order to complete your goal. But, you can either combine the wins (so you could complete the goal just doing
 one route) or count them separately (and therefore set the number of wins in each route you'll need).
 
-- True Ending: With this, the two incantations needed to finish the game are required progression items you need 
+- **True Ending**: With this, the two incantations needed to finish the game are required progression items you need 
 to get from the multiworld and the necessary resources to make the incantations (Zodiac Sand, Void Lenses and a 
 certain weapon) are also scattered in the multiworld. Once you're able to brew the incantation, another 
 multiworld location check fires to keep items/locations balanced. In order to make this work, I also decided to 
@@ -35,3 +35,24 @@ you choose. This works in the same way that the True Ending incantations work.
 
 - Hidden aspect sanity: Hidden aspects of each weapon are checks and you receive the unlocks form the 
 multiworld.
+
+- Cauldron sanity: All incantations from the cauldron are location checks and their rewards are randomized. 
+This is a time intensive setting, so be ready for a long game.
+
+- Fatesanity: not for the faint of heart. All prophecies are checks and their items are randomized. Probably the
+most time intensive setting.
+
+## Installation
+
+Installation should be relatively simple. Hades II uses r2modman to load mods, which makes things much easier compared 
+to how mods worked in Hades 1. Installation instructions are covered in the documentation.
+
+## Known issues
+
+Please report any by submitting an issue through this Github repository.
+
+## Acknowledgements
+
+This implementation wouldn't be possible without the work from Archipelago team and the Hades II modding community, 
+and really most of the credit should go to them. I'd also like to thank Jay_Playz2019 for getting this project on 
+the road, and to NaixGames for doing the Hades 1 implementation, which this mod took a lot of inspiration from.
