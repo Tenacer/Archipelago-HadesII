@@ -275,3 +275,145 @@ class TestRandomInitialWeapon(HadesIITestBase):
         for i, name in enumerate(_WEAPON_UNLOCK_LOCATIONS):
             if i != idx:
                 self.assertIn(name, location_names)
+
+
+# ── handle_X refactor coverage ──────────────────────────────────────────────
+# The plan replaced handle_surface_{incantations,fates,keepsakes} with three
+# unified handlers (handle_keepsakes, handle_incantations, handle_prophecies)
+# and folded surface gating into each per-entry table.
+
+class TestExpandedSurfaceKeepsakes(HadesIITestBase):
+    """Every keepsake in `_KEEPSAKE_RULES_SURFACE_ACCESS` must be blocked
+    when the player has no surface-unlock items. Data-driven so the test
+    follows the tuple — adjust the tuple, not the test."""
+    options = {"keepsakesanity": 1, "lock_surface_incantations": 1}
+
+    def test_surface_keepsakes_require_surface_access(self) -> None:
+        from worlds.hades_ii.Rules import _KEEPSAKE_RULES_SURFACE_ACCESS
+        from BaseClasses import CollectionState
+        for loc_name in _KEEPSAKE_RULES_SURFACE_ACCESS:
+            loc = self.multiworld.get_location(loc_name, self.player)
+            state = CollectionState(self.multiworld)
+            # Empty state — access_rule must refuse entry.
+            self.assertFalse(loc.access_rule(state),
+                f"{loc_name} should require surface access in an empty state")
+
+
+class TestUnfinishedBusinessRemoved(HadesIITestBase):
+    """`Unfinished Business` (QuestHelpOdysseus) was removed because it
+    requires ReachedTrueEnding (post-goal). Confirm it appears as neither
+    a location nor an item under any sanity combo."""
+    options = {"fatesanity": 1}
+
+    def test_unfinished_business_location_absent(self) -> None:
+        self.assertRaises(KeyError,
+            self.multiworld.get_location, "Unfinished Business", self.player)
+
+    def test_unfinished_business_item_absent(self) -> None:
+        from worlds.hades_ii.Items import item_table
+        self.assertNotIn("Unfinished Business Reward", item_table)
+        present = [i for i in self.multiworld.itempool
+                   if i.player == self.player
+                   and i.name == "Unfinished Business Reward"]
+        self.assertEqual(present, [])
+
+
+class TestRivalsOldAndRotExcludedUnderTrueEnding(HadesIITestBase):
+    """Rivals of Old and Rot (T4) is excluded from cauldronsanity when
+    true_ending is on — vanilla requires ReachedTrueEnding."""
+    options = {"true_ending": 1, "cauldronsanity": 1}
+
+    def test_t4_location_absent(self) -> None:
+        self.assertRaises(KeyError,
+            self.multiworld.get_location, "Rivals of Old and Rot", self.player)
+
+    def test_t4_item_absent(self) -> None:
+        present = [i for i in self.multiworld.itempool
+                   if i.player == self.player
+                   and i.name == "Rivals of Old and Rot"]
+        self.assertEqual(present, [])
+
+
+class TestRivalsOldAndRotPresentInBossDefeatsMode(HadesIITestBase):
+    """Outside true_ending, T4 is still in the cauldronsanity pool."""
+    options = {"true_ending": 0, "cauldronsanity": 1}
+
+    def test_t4_location_present(self) -> None:
+        loc = self.multiworld.get_location("Rivals of Old and Rot", self.player)
+        self.assertIsNotNone(loc)
+
+    def test_t4_item_present(self) -> None:
+        present = [i for i in self.multiworld.itempool
+                   if i.player == self.player
+                   and i.name == "Rivals of Old and Rot"]
+        self.assertEqual(len(present), 1)
+
+
+class TestProphecyChainsAreProgression(HadesIITestBase):
+    """Prophecy items that appear as chain prereqs in Rules.py must be
+    progression-classified even when fates_needed is 0, otherwise
+    state.has(...) can't see them."""
+    options = {"fatesanity": 1, "fates_needed": 0}
+
+    def test_chain_prereqs_are_progression(self) -> None:
+        from worlds.hades_ii.Items import PROGRESSION_PROPHECY_ITEMS
+        for name in PROGRESSION_PROPHECY_ITEMS:
+            matching = [i for i in self.multiworld.itempool
+                        if i.player == self.player and i.name == name]
+            self.assertEqual(len(matching), 1, f"missing {name}")
+            self.assertTrue(matching[0].advancement,
+                f"{name} must be progression (used as a chain prereq)")
+
+
+class TestNaturalTalentRequiresWitchReward(HadesIITestBase):
+    """Natural Talent's access rule should require Hecate Victory AND
+    `Witch of the Crossroads Reward`."""
+    options = {"fatesanity": 1, "fates_needed": 0}
+
+    def test_rule_blocks_without_prereqs(self) -> None:
+        from BaseClasses import CollectionState
+        loc = self.multiworld.get_location("Natural Talent", self.player)
+        state = CollectionState(self.multiworld)
+        self.assertFalse(loc.access_rule(state),
+            "empty state must fail")
+
+        # Hecate alone — still blocked by missing chain prereq.
+        state.collect(
+            next(i for i in self.multiworld.get_locations(self.player)
+                 if i.name == "Hecate Victory").item, prevent_sweep=True)
+        self.assertFalse(loc.access_rule(state),
+            "Hecate alone must not satisfy Natural Talent")
+
+        # Add Witch of the Crossroads Reward — should now pass.
+        from worlds.hades_ii.Items import Hades_II_Item
+        state.prog_items[self.player]["Witch of the Crossroads Reward"] = 1
+        self.assertTrue(loc.access_rule(state),
+            "Hecate + Witch of the Crossroads Reward must satisfy Natural Talent")
+
+
+class TestIncantationChainsAreProgression(HadesIITestBase):
+    """Every incantation referenced via `_has_incantation(...)` in Rules.py
+    must be progression-classified so AP's all-state reachability check
+    sees it via state.has(...). Promoting happens in Items.create_items
+    via the PROGRESSION_INCANTATION_ITEMS set."""
+    options = {"cauldronsanity": 1, "lock_surface_incantations": 1}
+
+    def test_chain_heads_are_progression(self) -> None:
+        from worlds.hades_ii.Items import PROGRESSION_INCANTATION_ITEMS
+        # Spot-check a representative subset of chain heads.
+        critical = (
+            "Summoning of Mercantile Fortune",
+            "Night's Craftwork",
+            "Flourishing Soil",
+            "Rich Soil",
+            "Faith of Familiar Spirits",
+            "Abyssal Insight",
+            "Rise of Stygian Wells",
+        )
+        for name in critical:
+            self.assertIn(name, PROGRESSION_INCANTATION_ITEMS)
+            matching = [i for i in self.multiworld.itempool
+                        if i.player == self.player and i.name == name]
+            self.assertEqual(len(matching), 1, f"missing {name}")
+            self.assertTrue(matching[0].advancement,
+                f"{name} must be progression (used in _has_incantation gates)")

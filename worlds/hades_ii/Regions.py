@@ -98,9 +98,14 @@ def create_regions(player, multiworld, location_database, options):
             _add_location(regions["Crossroads"], name, loc_id)
 
     # Cauldronsanity owns the 86 non-surface incantation locations.
+    # `Rivals of Old and Rot` is excluded under true_ending — vanilla T4
+    # requires `ReachedTrueEnding` (post-goal). Mirror in Items.create_items
+    # and Locations.setup_location_table_with_settings.
     if options.cauldronsanity:
         for name, loc_id in location_incantations.items():
             if name in SURFACE_LOCK_LOCATIONS:
+                continue
+            if name == "Rivals of Old and Rot" and options.true_ending:
                 continue
             _add_location(regions["Crossroads"], name, loc_id)
 

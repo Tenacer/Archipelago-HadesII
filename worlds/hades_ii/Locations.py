@@ -132,9 +132,14 @@ def setup_location_table_with_settings(options) -> dict:
         total.update(location_hidden_aspects)
 
     # Cauldronsanity covers the 86 non-surface incantation locations.
+    # `Rivals of Old and Rot` is excluded under true_ending because vanilla
+    # T4 requires `ReachedTrueEnding` (post-goal) — see also the matching
+    # exclusion in Items.create_items.
     if options.cauldronsanity.value == 1:
         for name, code in location_incantations.items():
             if name in SURFACE_LOCK_LOCATIONS:
+                continue
+            if name == "Rivals of Old and Rot" and options.true_ending.value == 1:
                 continue
             total[name] = code
 

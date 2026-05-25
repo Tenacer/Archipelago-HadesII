@@ -19,7 +19,6 @@ weapons = [
 
 class HadesIILogic(LogicMixin):
     # Checks if the player has enough of a given item 
-    # TODO: Use this for max grasp logic?
     def _has_enough_of_item(self, player: int, amount: int, item: str) -> bool:
         return self.count(item, player) >= amount  # type: ignore
     
@@ -96,6 +95,22 @@ class HadesIILogic(LogicMixin):
     def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
         return self.has(boss_event, player)  # type: ignore
 
+    # Sugar over `_has_defeated_final_boss` that takes the boss base name
+    # ("Hecate", "Scylla", …) and appends " Victory". Used by the unified
+    # handle_keepsakes / handle_incantations / handle_prophecies handlers.
+    def _has_boss(self, boss: str, player: int) -> bool:
+        return self.has(f"{boss} Victory", player)  # type: ignore
+
+    # True when cauldronsanity is OFF (player brews the incantation freely)
+    # or the AP item for that incantation has been received. Used for
+    # incantation→incantation prerequisite chains in handle_incantations and
+    # handle_prophecies. The surface-unlock 2 are NOT routed through this —
+    # they have their own _has_surface_door / _has_surface_access predicates.
+    def _has_incantation(self, name: str, player: int, options) -> bool:
+        if not options.cauldronsanity:
+            return True
+        return self.has(name, player)  # type: ignore
+
     # Checks if the player has reached the end-game.
     # Combined mode: either Chronos or Typhon cleared (kill counts enforced
     # client-side via the BossDefeatsNeeded victory signal).
@@ -130,8 +145,11 @@ class HadesIILogic(LogicMixin):
             and self.has("Unraveling a Fateful Bond", player)  # type: ignore
         )
 
-    def _has_moros_access(self, player: int) -> bool:
-        return True
+    # Moros only appears at the Crossroads after Melinoë's first surface run,
+    # which requires `Permeation of Witching-Wards`. The Penalty Cure is not
+    # required to meet him — just to *survive* a real surface run.
+    def _has_moros_access(self, player: int, options) -> bool:
+        return self._has_surface_door(player, options)
 
 def _restrict_score_check_progression(world, player: int, options) -> None:
     """Block progression items from score checks.
@@ -154,14 +172,12 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     _restrict_score_check_progression(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
-    # Keepsakes
+    # Each sanity gets one unified handler. Surface gating is folded into each
+    # handler per the per-entry tables, not a separate pass.
     handle_keepsakes(world, player, options)
-
-    # Hidden aspects: require the weapon to be in logic before the chant can happen.
     handle_hidden_aspects(world, player, options)
-
-    # Cauldronsanity: gate surface incantation brewing on the surface unlock items.
-    handle_surface_incantations(world, player, options)
+    handle_incantations(world, player, options)
+    handle_prophecies(world, player, options)
 
     # True Ending: the final Chronos kill can only happen after the first
     # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Entropy);
@@ -188,7 +204,6 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     # set_fates_rules(world, player, location_table, options, " Event")
 
 # Defines logic for each area / region
-# TODO: Make these actual event "items" / make them work
 def handle_area_logic(world, player, options):
     area_rules = [ # ("Region name", "Boss Victory")
     ("Erebus -> Oceanus", "Hecate Victory"),
@@ -232,89 +247,438 @@ def handle_hidden_aspects(world, player, options):
         )
 
 
-# Defines logic for keepsakes, the logic doc lists NPCs in more detail
-def handle_keepsakes(world, player, options):
-    if options.keepsakesanity: # If randomized
-        keepsake_rules = [ # ("Name Keepsake", "Boss Victory" {OR NONE}, Surface Needed [bool])
-            ("Narcissus Keepsake", "Hecate Victory", False),
-            ("Hermes Keepsake", "Hecate Victory", False),
-            ("Echo Keepsake", "Scylla Victory", False),
-            ("Medea Keepsake", None, True),
-            ("Heracles Keepsake", None, True),
-            ("Icarus Keepsake", "Polyphemus Victory", True),
-            ("Circe Keepsake", "Polyphemus Victory", True),
-            ("Eris Keepsake", "Eris Victory", True), # ! Eris is probably accessible earlier, here right now for safety.
-            ("Dionysus Keepsake", "Eris Victory", True),        
-        ]
+# ── Keepsake gates ───────────────────────────────────────────────────────────
+# One unified `handle_keepsakes` replaces the previous boss-only +
+# surface-only split. Each keepsake is gated on the NPC's reachability:
+# Crossroads-only (no rule), boss-locked Crossroads (Hermes), surface (every
+# Ephyra / Thessaly / Olympus NPC), or surface-door (Moros only appears post-
+# first-surface-run).
+#
+# Rows marked `[VERIFY]` in the planning doc are encoded as written; revisit
+# when the underlying TextLine gates have been cross-checked against the
+# NPCData/KeepsakeData source.
 
-        # Apply logic to each keepsake check
-        # Location-based
-        for person_keepsake, boss, surface in keepsake_rules:
-            add_rule(
-                world.get_location(person_keepsake, player),
-                lambda state, boss=boss, surface=surface:
-                    (boss is None or state._has_defeated_final_boss(boss, player, options)) # type: ignore
-                    and (not surface or state._has_surface_door(player, options)) # type: ignore
-            )
-        
-        # Specifically Moros
-        add_rule(
-            world.get_location("Moros Keepsake", player),
-            lambda state: state._has_moros_access(player) # type: ignore
-            )
+_KEEPSAKE_RULES_BOSS = (
+    # (AP location, boss base name)
+    ("Hermes Keepsake", "Hecate"),
+)
 
-    # When keepsakesanity is off there are no keepsake locations, nothing to do.
+_KEEPSAKE_RULES_SURFACE_ACCESS = (
+    # Ephyra NPCs
+    "Medea Keepsake",
+    "Heracles Keepsake",
+    # Thessaly NPCs
+    "Circe Keepsake",
+    "Eris Keepsake",          # [VERIFY] ErisGift01 may pre-date the Eris boss room
+    # Olympus / surface NPCs
+    "Icarus Keepsake",
+    "Dionysus Keepsake",
+    "Athena Keepsake",
+    # Olympians whose first-pickup requires a surface trip
+    "Hera Keepsake",          # RequirementsData.lua:108 — HeraUnlocked needs WorldUpgradeSurfacePenaltyCure
+    "Ares Keepsake",          # AresUnlocked needs RoomsEntered.Q_Boss01 >= 1
+)
 
-
-# Incantations whose cauldron recipes transitively require the surface door
-# (Permeation of Witching-Wards) AND the surface penalty cure
-# (Unraveling a Fateful Bond) to be brewable in-game. Sourced from
-# WorldUpgradeData.lua GameStateRequirements chains.
-_SURFACE_GATED_INCANTATIONS = (
-    "Summoning a Colony of Bats",     # WorldUpgradeEphyraZoomOut
-    "Rush of Fresh Air",              # WorldUpgradeSurfaceShops
-    "Surge of Fresh Air",             # WorldUpgradePostBossSurfaceShops
-    "Sandy Lifespring",               # WorldUpgradeThessalyReprieve
-    "Frozen Lifespring",              # WorldUpgradeOlympusReprieve
-    "Rage of the Elements",           # WorldUpgradeOlympusStatues
-    "Arisen Troves",                  # WorldUpgradeChallengeSwitchesSurface1
-    "Eyes of Night and Darkness",     # WorldUpgradeChallengeSwitchesExtra1
-    "Bounties of the Infinite Abyss", # WorldUpgradeMetaRewardStands
-    "Circles of Protection",          # WorldUpgradeErebusSafeZones
-    "Circles of the Moon",            # WorldUpgradeSafeZoneSpellCharge
+_KEEPSAKE_RULES_SURFACE_DOOR = (
+    "Moros Keepsake",         
 )
 
 
-def handle_surface_incantations(world, player, options):
-    """Logic for surface-gated incantation brew locations.
+def handle_keepsakes(world, player, options):
+    """Gate every keepsake location on its NPC's reachability.
 
-    In-game the cauldron only reveals an incantation once its prerequisite
-    chain is satisfied. Surface incantations all root at Permeation of
-    Witching-Wards (opens the surface door) and Unraveling a Fateful Bond
-    (cures the surface penalty so Moros's recipes unlock). Without these
-    encoded as logical gates AP fill can place progression items behind
-    incantations the player cannot brew yet.
-
-    Two independent location sets are gated here:
-    - The two surface-unlock incantation locations themselves, which exist
-      only when lock_surface_incantations is on. "Unraveling a Fateful Bond"
-      requires the surface door to have been opened (Moros appears only after
-      a surface run).
-    - The 11 cauldronsanity surface-gated incantation locations, which exist
-      only when cauldronsanity is on AND need an AP gate only when
-      lock_surface_incantations is also on. When cauldronsanity is on but the
-      lock is off, the player brews the unlock 2 trivially and the 11 are
-      reachable in-game by normal play (over-permissive but not soft-locking).
+    Crossroads-only NPCs (Hecate, Odysseus, Schelemeus, Charon, Nemesis, Dora,
+    Selene, Artemis, Zeus, Poseidon, Demeter, Apollo, Aphrodite, Hephaestus,
+    Hestia, Chaos) have no rule — they're available as soon as
+    keepsakesanity is on. Underworld-biome NPCs (Arachne in F, Narcissus in G,
+    Echo in H) also have no rule — gifting them doesn't require a surface run.
     """
+    if not options.keepsakesanity:
+        return
+
+    for loc_name, boss in _KEEPSAKE_RULES_BOSS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, b=boss: state._has_boss(b, player),  # type: ignore
+        )
+
+    for loc_name in _KEEPSAKE_RULES_SURFACE_ACCESS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_access(player, options),  # type: ignore
+        )
+
+    for loc_name in _KEEPSAKE_RULES_SURFACE_DOOR:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_door(player, options),  # type: ignore
+        )
+
+
+# ── Incantation gates ────────────────────────────────────────────────────────
+# Sourced from WorldUpgradeData.lua GameStateRequirements chains. Surface
+# 2 (Permeation + Unraveling) are owned by `lock_surface_incantations`, the
+# remaining 84 cauldronsanity-controlled entries (we excluded Rivals of Old
+# and Rot under true_ending) are owned by `cauldronsanity`.
+
+# Cauldronsanity entries with no prereq (always reachable when the location
+# exists). Listed for completeness; no add_rule call needed.
+#
+# Tier-1 set documented in the plan file under "Group 1" / "Group 2" /
+# parts of "Group 4" / etc. Intentionally not enumerated in code.
+
+# Cauldronsanity entries that need one or more prereq incantations to be
+# brewable. Format: (location, [incantation prereqs]). Each prereq is
+# resolved via _has_incantation (inert when cauldronsanity is off).
+_INCANTATION_CHAIN_RULES = (
+    # Group 2 — underworld biome reprieves / Erebus shops
+    ("Surge of Stygian Wells",       ("Rise of Stygian Wells",)),
+    ("Surge of Desecrating Pools",   ("Revival of a Desecrating Pool",)),
+    ("Purification of Fountain-Waters", ("Cleansing of Fountain-Waters",)),
+    ("Gathering of Subterranean Riches", ("Gathering of Ancient Bones",)),
+    # Group 4 — Olympian market hub
+    ("Deathly Fortune",  ("Summoning of Mercantile Fortune",)),
+    ("Kinship Fortune",  ("Summoning of Mercantile Fortune",)),
+    ("Earthly Fortune",  ("Summoning of Mercantile Fortune",)),
+    ("Long Arm of the Unseen",
+        ("Summoning of Mercantile Fortune", "Night's Craftwork")),
+    # Group 5 — Tools / Garden chain
+    ("Night's Craftwork",        ("Summoning of Mercantile Fortune",)),
+    ("Greater Favor of Gaia",    ("Night's Craftwork",)),
+    ("Flourishing Soil",         ("Night's Craftwork",)),
+    ("Observance of Gaia's Secrets", ("Flourishing Soil",)),
+    ("Rich Soil",                ("Observance of Gaia's Secrets",)),
+    ("Verdant Soil",             ("Rich Soil",)),
+    ("Green Hand of Gaia",       ("Observance of Gaia's Secrets",)),
+    ("Greater Sowing of Gardens", ("Rich Soil",)),
+    ("Greatest Gift of Gaia",
+        ("Verdant Soil", "Observance of Gaia's Secrets")),
+    # Group 6 — Bounty / familiar systems
+    ("Abyssal Reflection",       ("Abyssal Insight",)),
+    ("Bravery of Familiar Spirits", ("Faith of Familiar Spirits",)),
+    # Group 8 — Hypnos chain
+    ("End to Dearest Slumber",   ("End to Deepest Slumber",)), 
+    # Group 9 — Misc
+    ("Path to Desired Blessings",
+        ("Forget-Me-Not", "Insight into Offerings")),
+    ("Kindred Keepsakes",        ("Favored of All Keepsakes",)),  # [VERIFY]
+)
+
+# Cauldronsanity entries that need a boss victory (post-Hecate dialogue,
+# post-Chronos dialogue, etc.). Format: (location, boss base name).
+_INCANTATION_BOSS_RULES = (
+    ("Necromantic Influence",   "Hecate"),
+    ("Abyssal Insight",         "Hecate"),
+    ("Faith of Familiar Spirits", "Hecate"),
+)
+
+# Cauldronsanity entries gated purely on surface access (no intra-cauldron
+# prereq besides the surface-unlock 2, which `_has_surface_access` already
+# enforces).
+_INCANTATION_SURFACE_ACCESS = (
+    # Group 1 tail
+    "Greater Removal of Rubbish",
+    # Group 3 — surface-gated proper
+    "Summoning a Colony of Bats",
+    "Rush of Fresh Air",
+    "Sandy Lifespring",
+    "Frozen Lifespring",
+    "Rage of the Elements",
+    "Arisen Troves",
+    "Bounties of the Infinite Abyss",
+    "Circles of Protection",
+    # Group 8 — surface NPC-quest incantations
+    "Purification of Crystal Clarity",
+    "Return of Latent Memories",
+    "Essence of Sorrow",
+)
+
+# Cauldronsanity entries gated on surface access AND a prereq incantation.
+# Format: (location, [incantation prereqs]).
+_INCANTATION_SURFACE_ACCESS_AND_CHAIN = (
+    ("Surge of Fresh Air",           ("Rush of Fresh Air",)),
+    ("Eyes of Night and Darkness",   ("Arisen Troves", "Exhumed Troves",)), 
+    ("Circles of the Moon",          ("Circles of Protection",)),
+    ("Alteration of Familiar Forms", ("Faith of Familiar Spirits",)),  # [VERIFY]
+)
+
+# Cauldronsanity entries gated on the surface door (Permeation only — Moros
+# appears post-first-surface-run, doesn't need the penalty cure).
+_INCANTATION_SURFACE_DOOR = (
+    "Doomed Beckoning",         # MorosUnlock
+)
+
+# Rivals chain: each tier needs the relevant bosses cleared AND (T2+) surface
+# access. Format: (location, [bosses], requires_surface).
+# [VERIFY] vanilla boss triples for T2/T3.
+# T4 ("Rivals of Old and Rot") is EXCLUDED from the pool under true_ending —
+# handled in Locations.py.setup_location_table_with_settings + Items.py.
+_INCANTATION_RIVALS_RULES = (
+    ("Rivals of Depth and Sea",   ("Scylla", "Eris"),             True),
+    ("Rivals of Plain and Peak",  ("Prometheus", "Cerberus"),     True),
+    ("Rivals of Old and Rot",     ("Chronos", "Typhon"),          True),
+)
+
+
+def handle_incantations(world, player, options):
+    """Gate cauldron-incantation locations on their in-game prerequisites.
+
+    Two independent option toggles drive what gets added:
+      • `lock_surface_incantations` owns the two surface-unlock locations
+        (Permeation, Unraveling). Permeation has no gate. Unraveling needs
+        the surface door (Moros must have appeared).
+      • `cauldronsanity` owns the 84+ remaining locations. Each gets the rule
+        from one of the tables above.
+    """
+    # Surface-unlock 2 — owned by lock_surface_incantations.
     if options.lock_surface_incantations:
         add_rule(
             world.get_location("Unraveling a Fateful Bond", player),
             lambda state: state._has_surface_door(player, options),  # type: ignore
         )
 
-    if options.cauldronsanity and options.lock_surface_incantations:
-        for loc_name in _SURFACE_GATED_INCANTATIONS:
-            add_rule(
-                world.get_location(loc_name, player),
-                lambda state: state._has_surface_access(player, options),  # type: ignore
-            )
+    if not options.cauldronsanity:
+        return
+
+    # Intra-cauldron prereq chains.
+    for loc_name, prereqs in _INCANTATION_CHAIN_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, ps=prereqs: all(
+                state._has_incantation(p, player, options) for p in ps  # type: ignore
+            ),
+        )
+
+    # Boss-victory gates.
+    for loc_name, boss in _INCANTATION_BOSS_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, b=boss: state._has_boss(b, player),  # type: ignore
+        )
+
+    # Surface-access-only gates.
+    for loc_name in _INCANTATION_SURFACE_ACCESS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_access(player, options),  # type: ignore
+        )
+
+    # Surface-access AND prereq incantation.
+    for loc_name, prereqs in _INCANTATION_SURFACE_ACCESS_AND_CHAIN:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, ps=prereqs: (
+                state._has_surface_access(player, options)  # type: ignore
+                and all(state._has_incantation(p, player, options) for p in ps)  # type: ignore
+            ),
+        )
+
+    # Surface-door only.
+    for loc_name in _INCANTATION_SURFACE_DOOR:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_door(player, options),  # type: ignore
+        )
+
+    # Rivals tiers — boss list + optional surface gate.
+    for loc_name, bosses, requires_surface in _INCANTATION_RIVALS_RULES:
+        # T4 is removed from the pool under true_ending; skip if not present.
+        try:
+            location = world.get_location(loc_name, player)
+        except KeyError:
+            continue
+        add_rule(
+            location,
+            lambda state, bs=bosses, surf=requires_surface: (
+                all(state._has_boss(b, player) for b in bs)  # type: ignore
+                and (state._has_surface_access(player, options) if surf else True)  # type: ignore
+            ),
+        )
+
+
+# ── Prophecy gates ───────────────────────────────────────────────────────────
+# Mirrors handle_incantations. Sourced from QuestData.lua
+# UnlockGameStateRequirements + CompleteGameStateRequirements. Surface-NPC
+# dialogue triggers map to _has_surface_access; coarse boss grinds map to
+# _has_boss; system-unlock prophecies map to _has_incantation.
+
+_PROPHECY_BOSS_RULES = (
+    # Group A — boss-defeat
+    ("Witch of the Crossroads",  "Hecate"),
+    ("Temporary Setback",        "Chronos"),
+    ("Storm in the Heavens",     "Typhon"),
+    ("Den Mother",               "Hecate"),   # [VERIFY] coarse — also requires 2 cleared runs
+    # Group F — system unlocks gated post-Hecate
+    ("Visions of Victory",       "Hecate"),   # [VERIFY] ChaosGrantsBountyBoard01
+    ("Whims of Chaos",           "Hecate"),   # [VERIFY] coarse — BountyBoard already viewed
+    ("Familiar Confidant",       "Hecate"),   # [VERIFY] HecateHideAndSeek03
+    ("Close Companions",         "Hecate"),   # [VERIFY] HecateBossGrantsFamiliarSystem01
+    ("Keeper of Shadows",        "Hecate"),
+    ("Improbable Outcomes",      "Hecate"),   # [VERIFY] coarse — ChaosGift06 + bounty board
+)
+
+# Prophecies whose UnlockGameStateRequirements chain off a *prereq prophecy*
+# being cashed out (QuestStatus IsAny CashedOut / QuestsCompleted HasAll).
+# Format: (AP location, boss base name, (prereq "X Reward" item names)).
+# The prereq item names follow items.csv naming — they are AP items, not
+# locations. Each prereq listed here must also be in
+# Items.PROGRESSION_PROPHECY_ITEMS so state.has(...) can see it.
+_PROPHECY_BOSS_AND_CHAIN_RULES = (
+    ("Natural Talent",      "Hecate",  ("Witch of the Crossroads Reward",)),  # QuestBeatHecateWithoutArcana → QuestBeatHecate
+    ("Arcana of the Ages",  "Chronos", ("Temporary Setback Reward",)),         # QuestBeatChronosWithArcana → QuestFirstUnderworldClear
+    ("Beyond Familiar",     "Hecate",  ("Close Companions Reward",)),          # QuestUpgradeFamiliars → QuestRecruitFamiliars
+)
+
+# Boss A OR boss B (Chronos or Typhon — either route can complete).
+_PROPHECY_BOSS_OR_RULES = (
+    ("Born to Win",        ("Chronos", "Typhon")),
+)
+
+# Surface-access only.
+_PROPHECY_SURFACE_ACCESS = (
+    # Group A
+    "Unrivaled Prowess",      # [VERIFY] also wants BossEris02 etc. EM2 grind
+    "Shadow of Doom",
+    # Group B — surface-only Olympians
+    "Mistress of Battle",     # [VERIFY] Athena
+    "Master of Revelry",      # [VERIFY] Dionysus
+    # Group C — NPC-bond on surface
+    "Haunted by the Past",
+    "Voice and Vanity",
+    "Bitter Tears",           # [VERIFY] MedeaAboutConcoctionQuest01
+    "Weaver of Fineries",
+    "Denier of Suitors",
+    "Voice of Truth",
+    "Witch of Shadows",
+    "Witch of Changing",
+    "Wings of Freedom",
+    # Group D — hidden-aspect deliveries through surface NPCs
+    "The Jackal's Aspect",    # [VERIFY] Anubis path
+    "The Shadow's Aspect",    # [VERIFY] Supay path
+    "The Grave's Aspect",     # [VERIFY] Hel path
+)
+
+# Surface-access AND a specific boss.
+_PROPHECY_SURFACE_ACCESS_AND_BOSS = (
+    ("Silk and Spitefulness", "Hecate"),
+    ("Drowned Ambitions",     "Scylla"),    # [VERIFY] CirceAboutScyllaQuest01
+    ("Nobody but Nobody",     "Polyphemus"),
+)
+
+# Surface-door only (Moros).
+_PROPHECY_SURFACE_DOOR = (
+    "Harbinger of Doom",      # QuestUnlockMoros
+)
+
+# Incantation-system gates (Group F-ish).
+_PROPHECY_INCANTATION_RULES = (
+    ("Tools of the Unseen",   ("Night's Craftwork",)),
+    ("Note to Self",          ("Forget-Me-Not",)),
+    ("Valued Customer",       ("Rise of Stygian Wells",)),
+    ("Spectral Forms",        ("Necromantic Influence",)),
+    ("Denizen of the Depths", ("Rite of River-Fording",)),  # [VERIFY] FishingPoint
+)
+
+# Sword of the Night needs Typhon Victory AND every weapon unlocked AND the
+# `Temporary Setback Reward` prereq prophecy (QuestFirstUnderworldClear).
+def _sword_of_the_night_rule(state, player, options):
+    if not state._has_boss("Typhon", player):  # type: ignore
+        return False
+    if not state._has_enough_weapons(player, options, 6):  # type: ignore
+        return False
+    return state.has("Temporary Setback Reward", player)  # type: ignore
+
+
+# Bearing Dark Gifts: (Chronos OR Typhon) AND The Unseen Sentinel Reward
+# (QuestClearedWithAllAspects chain on QuestUnlockAllWeaponAspects).
+def _bearing_dark_gifts_rule(state, player, options):
+    if not (state._has_boss("Chronos", player) or state._has_boss("Typhon", player)):  # type: ignore
+        return False
+    return state.has("The Unseen Sentinel Reward", player)  # type: ignore
+
+
+# Precision Instrument: incantation prereq (Greater Favor of Gaia, the tool
+# upgrade system) AND prereq prophecy `Tools of the Unseen Reward`
+# (QuestToolsUpgrades chains on QuestToolsUnlocks).
+def _precision_instrument_rule(state, player, options):
+    if not state._has_incantation("Greater Favor of Gaia", player, options):  # type: ignore
+        return False
+    return state.has("Tools of the Unseen Reward", player)  # type: ignore
+
+
+def handle_prophecies(world, player, options):
+    """Gate every prophecy location on its in-game completion prerequisites.
+
+    Crossroads-NPC bond prophecies, Olympian boon prophecies (route-agnostic
+    Olympians), Chaos blessings/curses, Selene duos, and pure-grind prophecies
+    have no AP gate. Surface NPCs, post-boss systems, and incantation-system
+    prophecies are gated here.
+    """
+    if not options.fatesanity:
+        return
+
+    for loc_name, boss in _PROPHECY_BOSS_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, b=boss: state._has_boss(b, player),  # type: ignore
+        )
+
+    # Boss-victory AND prereq prophecy cashed out (chain on another quest).
+    for loc_name, boss, prereqs in _PROPHECY_BOSS_AND_CHAIN_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, b=boss, ps=prereqs: (
+                state._has_boss(b, player)  # type: ignore
+                and all(state.has(p, player) for p in ps)  # type: ignore
+            ),
+        )
+
+    for loc_name, bosses in _PROPHECY_BOSS_OR_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, bs=bosses: any(
+                state._has_boss(b, player) for b in bs  # type: ignore
+            ),
+        )
+
+    for loc_name in _PROPHECY_SURFACE_ACCESS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_access(player, options),  # type: ignore
+        )
+
+    for loc_name, boss in _PROPHECY_SURFACE_ACCESS_AND_BOSS:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, b=boss: (
+                state._has_surface_access(player, options)  # type: ignore
+                and state._has_boss(b, player)  # type: ignore
+            ),
+        )
+
+    for loc_name in _PROPHECY_SURFACE_DOOR:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_surface_door(player, options),  # type: ignore
+        )
+
+    for loc_name, prereqs in _PROPHECY_INCANTATION_RULES:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state, ps=prereqs: all(
+                state._has_incantation(p, player, options) for p in ps  # type: ignore
+            ),
+        )
+
+    add_rule(
+        world.get_location("Sword of the Night", player),
+        lambda state: _sword_of_the_night_rule(state, player, options),
+    )
+    add_rule(
+        world.get_location("Bearing Dark Gifts", player),
+        lambda state: _bearing_dark_gifts_rule(state, player, options),
+    )
+    add_rule(
+        world.get_location("Precision Instrument", player),
+        lambda state: _precision_instrument_rule(state, player, options),
+    )

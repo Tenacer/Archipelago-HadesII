@@ -19,6 +19,61 @@ _BOSS_VICTORY_NAMES = {
 # items under the lock toggle.
 SURFACE_LOCK_ITEMS = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
 
+# Cauldronsanity incantations that appear in Rules.py logic gates
+# (`_has_incantation(name, ...)` calls). Must be promoted to progression so
+# `state.has(name, player)` sees them in AP's all-state reachability check —
+# CSV-classified `useful` items are invisible to `state.has` (see memory
+# `feedback_ap_item_classification`). Anything not listed here stays `useful`.
+PROGRESSION_INCANTATION_ITEMS = frozenset({
+    # Group 2 — underworld chain heads
+    "Rise of Stygian Wells",
+    "Revival of a Desecrating Pool",
+    "Cleansing of Fountain-Waters",
+    "Gathering of Ancient Bones",
+    # Group 4 — Market chain head
+    "Summoning of Mercantile Fortune",
+    # Group 5 — Tools / Garden chain
+    "Night's Craftwork",
+    "Flourishing Soil",
+    "Observance of Gaia's Secrets",
+    "Rich Soil",
+    "Verdant Soil",
+    # Group 6 — Bounty / familiar heads
+    "Abyssal Insight",
+    "Faith of Familiar Spirits",
+    # Group 2 — underworld prereq referenced by Group 3 surface chain
+    "Exhumed Troves",   # Eyes of Night and Darkness needs both Arisen + Exhumed
+    # Group 3 — surface-gated downstream-of-other-incantation links
+    "Rush of Fresh Air",
+    "Arisen Troves",
+    "Circles of Protection",
+    # Group 8 — Hypnos chain
+    "End to Deepest Slumber",
+    "End to Dearest Slumber",
+    # Group 9
+    "Forget-Me-Not",
+    "Insight into Offerings",
+    "Favored of All Keepsakes",
+    # Group F — gates referenced by prophecy rules
+    "Greater Favor of Gaia",
+    "Necromantic Influence",
+    "Rite of River-Fording",
+})
+
+# Prophecy items referenced as chain prereqs in Rules.py logic gates
+# (`state.has("<X> Reward", player)` inside `_PROPHECY_BOSS_AND_CHAIN_RULES`,
+# `_bearing_dark_gifts_rule`, `_sword_of_the_night_rule`,
+# `_precision_instrument_rule`). Must be promoted to progression so AP's
+# all-state reachability check sees them — same rationale as
+# PROGRESSION_INCANTATION_ITEMS.
+PROGRESSION_PROPHECY_ITEMS = frozenset({
+    "Witch of the Crossroads Reward",   # QuestBeatHecate → Natural Talent
+    "Temporary Setback Reward",          # QuestFirstUnderworldClear → Sword of the Night, Arcana of the Ages
+    "Close Companions Reward",           # QuestRecruitFamiliars → Beyond Familiar
+    "Tools of the Unseen Reward",        # QuestToolsUnlocks → Precision Instrument
+    "The Unseen Sentinel Reward",        # QuestUnlockAllWeaponAspects → Bearing Dark Gifts
+})
+
 # (base item name, shrine_upgrade_name)
 # One AP item per vow; pool gets N copies where N = world.vow_ranks[shrine].
 # Vow items only enter the pool in reverse_fear mode.
@@ -167,12 +222,20 @@ def create_items(self) -> None:
             pool.append(item)
 
     # Cauldronsanity covers the other 86 incantations. Surface-unlock incantations
-    # are skipped here — they're handled above.
+    # are skipped here — they're handled above. `Rivals of Old and Rot` is
+    # skipped under true_ending because vanilla T4 requires `ReachedTrueEnding`
+    # (post-goal); the matching location is also excluded in
+    # Locations.setup_location_table_with_settings.
     if self.options.cauldronsanity:
         for name in item_table_incantations:
             if name in SURFACE_LOCK_ITEMS:
                 continue
-            pool.append(self.create_item(name))
+            if name == "Rivals of Old and Rot" and self.options.true_ending:
+                continue
+            item = self.create_item(name)
+            if name in PROGRESSION_INCANTATION_ITEMS:
+                item.classification = ItemClassification.progression
+            pool.append(item)
 
     # True Ending goal items: Zodiac Sand (N), Void Lens (M), Gigaros (1),
     # Entropy (1), and the two goal incantations (items only — no locations).
@@ -187,12 +250,13 @@ def create_items(self) -> None:
             pool.append(self.create_item(name))
 
     # Prophecies — 89 items paired 1:1 with Fated List check locations.
-    # Promote to progression when the goal actually counts prophecies.
+    # Promote to progression when the goal actually counts prophecies, OR
+    # when the item gates another prophecy via Rules.py chain rules.
     if self.options.fatesanity:
-        promote = self.options.fates_needed.value > 0
+        promote_all = self.options.fates_needed.value > 0
         for name in item_table_prophecies:
             item = self.create_item(name)
-            if promote:
+            if promote_all or name in PROGRESSION_PROPHECY_ITEMS:
                 item.classification = ItemClassification.progression
             pool.append(item)
 
