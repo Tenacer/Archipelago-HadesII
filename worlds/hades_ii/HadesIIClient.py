@@ -208,16 +208,26 @@ class HadesIIContext(CommonContext):
     def _write_inbox(self):
         """
         Write all received items to ap_in.json.
-        Each entry has: index (int), item_code (int), item_name (str).
-        The Lua mod maps item_name to its internal resource IDs.
+        Each entry has: index, item_code, item_name, player_slot, player_name,
+        sender_game, is_local. The Lua mod uses item_name to grant the item and
+        the sender fields to label the in-game "Received" notification with
+        "from <Player> (<Game>)" for remote items.
         """
         items = []
         for i, net_item in enumerate(self.items_received):
             item_name = self.item_names.lookup_in_slot(net_item.item, self.slot)
+            sender_slot = net_item.player
+            player_name = self.player_names.get(sender_slot, f"Player {sender_slot}")
+            slot_info = self.slot_info.get(sender_slot) if self.slot_info else None
+            sender_game = slot_info.game if slot_info else ""
             items.append({
-                "index":     i,
-                "item_code": net_item.item,
-                "item_name": item_name,
+                "index":       i,
+                "item_code":   net_item.item,
+                "item_name":   item_name,
+                "player_slot": sender_slot,
+                "player_name": player_name,
+                "sender_game": sender_game,
+                "is_local":    sender_slot == self.slot,
             })
 
         inbox = {
@@ -275,12 +285,14 @@ class HadesIIContext(CommonContext):
 
         Each entry is structured as:
             {"item_name": str, "player_slot": int, "player_name": str,
-             "is_local": bool, "display": str}
+             "sender_game": str, "is_local": bool, "display": str}
 
         - `item_name` is the raw item (no [Player] suffix).
         - `is_local` lets the Lua mod tell apart our own items vs other players'.
-        - `display` is the cauldron/Fated List label ("Item Name" or
-          "Item Name [Player]" for remote items).
+        - `sender_game` is the receiving player's game (used by H2AP_NotifySent).
+        - `display` is the cauldron/Fated List label: "Item Name" for local,
+          "Item Name [Player (Game)]" for remote (falls back to
+          "Item Name [Player]" if sender_game is unavailable).
         """
         if not self._world_id:
             return
@@ -302,11 +314,19 @@ class HadesIIContext(CommonContext):
                 item_name = f"Item {net_item.item}"
             is_local = (net_item.player == self.slot)
             player_name = self.player_names.get(net_item.player, f"Player {net_item.player}")
-            display = item_name if is_local else f"{item_name} [{player_name}]"
+            slot_info = self.slot_info.get(net_item.player) if self.slot_info else None
+            sender_game = slot_info.game if slot_info else ""
+            if is_local:
+                display = item_name
+            elif sender_game:
+                display = f"{item_name} [{player_name} ({sender_game})]"
+            else:
+                display = f"{item_name} [{player_name}]"
             location_items[location_name] = {
                 "item_name":   item_name,
                 "player_slot": net_item.player,
                 "player_name": player_name,
+                "sender_game": sender_game,
                 "is_local":    is_local,
                 "display":     display,
             }
