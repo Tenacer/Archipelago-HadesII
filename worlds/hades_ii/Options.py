@@ -113,8 +113,12 @@ class TrueEnding(Toggle):
 
 class ZodiacSandNeeded(Range):
     """
-    How many Zodiac Sand items are required when True Ending is enabled.
-    Ignored when True Ending is off.
+    How many Zodiac Sand items are required to brew Dissolution of Time and
+    complete the True Ending goal. Must be <= ChronosKillsNeeded, which now
+    controls how many Zodiac Sands actually appear in the item pool
+    (one per Chronos kill reward). Extras above this threshold are free to
+    spend on Arcana cards that consume Zodiac Sand. Ignored when True
+    Ending is off.
     """
     display_name = "Zodiac Sand Needed"
     range_start = 0
@@ -124,8 +128,12 @@ class ZodiacSandNeeded(Range):
 
 class VoidLensNeeded(Range):
     """
-    How many Void Lens items are required when True Ending is enabled.
-    Ignored when True Ending is off.
+    How many Void Lens items are required to brew Disintegration of
+    Monstrosity and complete the True Ending goal. Must be <=
+    TyphonKillsNeeded, which now controls how many Void Lenses actually
+    appear in the item pool (one per Typhon kill reward). Extras above
+    this threshold are free to spend on Arcana cards that consume Void
+    Lens. Ignored when True Ending is off.
     """
     display_name = "Void Lens Needed"
     range_start = 0

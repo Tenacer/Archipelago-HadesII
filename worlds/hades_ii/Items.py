@@ -237,12 +237,16 @@ def create_items(self) -> None:
                 item.classification = ItemClassification.progression
             pool.append(item)
 
-    # True Ending goal items: Zodiac Sand (N), Void Lens (M), Gigaros (1),
-    # Entropy (1), and the two goal incantations (items only — no locations).
+    # True Ending goal items: Zodiac Sand and Void Lens pool counts derive
+    # from the boss-reward counts (one Z-Sand per Chronos kill we're
+    # replacing, one V-Lens per Typhon kill). The `zodiac_sand_needed` /
+    # `void_lens_needed` options stay as the goal/brewing threshold —
+    # extras above that flow into Arcana upgrades. Validated against
+    # kills_needed in `generate_early`.
     if self.options.true_ending:
-        for _ in range(self.options.zodiac_sand_needed.value):
+        for _ in range(self.options.chronos_kills_needed.value):
             pool.append(self.create_item("Zodiac Sand"))
-        for _ in range(self.options.void_lens_needed.value):
+        for _ in range(self.options.typhon_kills_needed.value):
             pool.append(self.create_item("Void Lens"))
         pool.append(self.create_item("Gigaros"))
         pool.append(self.create_item("Entropy"))

@@ -1,5 +1,6 @@
 from typing import ClassVar, Dict, List
 import settings
+from Options import OptionError
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, Type, components
 from . import web_world
@@ -91,6 +92,22 @@ class HadesIIWorld(World):
         # Uses self.random for seed-deterministic results in multiworlds.
         if self.options.initial_weapon.value == 6:
             self.options.initial_weapon.value = self.random.randint(0, 5)
+
+        # True Ending: the goal/brewing threshold must not exceed the per-boss
+        # kill count, which now drives the size of the Zodiac Sand / Void Lens
+        # item pool. Without this check, a misconfigured YAML would produce a
+        # pool that cannot satisfy its own goal predicate.
+        if self.options.true_ending:
+            if self.options.zodiac_sand_needed.value > self.options.chronos_kills_needed.value:
+                raise OptionError(
+                    "zodiac_sand_needed must be <= chronos_kills_needed "
+                    "(chronos_kills_needed sets the size of the Zodiac Sand item pool)."
+                )
+            if self.options.void_lens_needed.value > self.options.typhon_kills_needed.value:
+                raise OptionError(
+                    "void_lens_needed must be <= typhon_kills_needed "
+                    "(typhon_kills_needed sets the size of the Void Lens item pool)."
+                )
 
         self.vow_ranks: Dict[str, int] = {}
         fear = self.options.fear_system.value

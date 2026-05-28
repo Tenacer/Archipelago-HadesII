@@ -37,6 +37,11 @@ class TestDefaultGeneration(HadesIITestBase):
             self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
 
 
+def _count_items(test_case, name: str) -> int:
+    return sum(1 for i in test_case.multiworld.itempool
+               if i.player == test_case.player and i.name == name)
+
+
 class TestTrueEnding(HadesIITestBase):
     options = {"true_ending": 1}
 
@@ -58,9 +63,22 @@ class TestTrueEnding(HadesIITestBase):
         self.assertEqual(len(chronos), 7)
         self.assertEqual(len(typhon), 5)
 
+    def test_pool_size_matches_kills_needed_default(self) -> None:
+        # Defaults: chronos_kills_needed=7 → 7 Zodiac Sand; typhon_kills_needed=5 → 5 Void Lens.
+        # Pool count is decoupled from zodiac_sand_needed (4) / void_lens_needed (2);
+        # extras are the slack the player can spend on Arcana upgrades.
+        self.assertEqual(_count_items(self, "Zodiac Sand"), 7)
+        self.assertEqual(_count_items(self, "Void Lens"), 5)
+
 
 class TestTrueEndingCustomKillCounts(HadesIITestBase):
-    options = {"true_ending": 1, "chronos_kills_needed": 3, "typhon_kills_needed": 2}
+    options = {
+        "true_ending": 1,
+        "chronos_kills_needed": 3,
+        "typhon_kills_needed": 2,
+        "zodiac_sand_needed": 3,
+        "void_lens_needed": 2,
+    }
 
     def test_kill_counts_honored(self) -> None:
         chronos = [loc for loc in self.multiworld.get_locations(self.player)
@@ -69,6 +87,68 @@ class TestTrueEndingCustomKillCounts(HadesIITestBase):
                   if loc.name.startswith("Typhon Kill Reward ")]
         self.assertEqual(len(chronos), 3)
         self.assertEqual(len(typhon), 2)
+
+    def test_pool_size_matches_custom_kill_counts(self) -> None:
+        # Pool tracks kills_needed, not the threshold.
+        self.assertEqual(_count_items(self, "Zodiac Sand"), 3)
+        self.assertEqual(_count_items(self, "Void Lens"), 2)
+
+
+class TestTrueEndingThresholdEqualsKills(HadesIITestBase):
+    """Threshold == kills_needed is the boundary case: validation must allow it
+    and the player must collect every Z-Sand / V-Lens in the pool to win."""
+    options = {
+        "true_ending": 1,
+        "chronos_kills_needed": 4,
+        "typhon_kills_needed": 4,
+        "zodiac_sand_needed": 4,
+        "void_lens_needed": 4,
+    }
+
+    def test_pool_sizes_at_boundary(self) -> None:
+        self.assertEqual(_count_items(self, "Zodiac Sand"), 4)
+        self.assertEqual(_count_items(self, "Void Lens"), 4)
+
+
+class TestTrueEndingThresholdTooHighChronos(HadesIITestBase):
+    """zodiac_sand_needed > chronos_kills_needed must raise OptionError so the
+    seed never generates an unwinnable goal."""
+    auto_construct = False
+    options = {
+        "true_ending": 1,
+        "chronos_kills_needed": 3,
+        "zodiac_sand_needed": 5,
+    }
+
+    def test_raises_option_error(self) -> None:
+        from Options import OptionError
+        with self.assertRaises(OptionError):
+            self.world_setup()
+
+
+class TestTrueEndingThresholdTooHighTyphon(HadesIITestBase):
+    """void_lens_needed > typhon_kills_needed must also raise."""
+    auto_construct = False
+    options = {
+        "true_ending": 1,
+        "typhon_kills_needed": 2,
+        "void_lens_needed": 4,
+    }
+
+    def test_raises_option_error(self) -> None:
+        from Options import OptionError
+        with self.assertRaises(OptionError):
+            self.world_setup()
+
+
+class TestBossDefeatsModeHasNoSandOrLens(HadesIITestBase):
+    """Regression: when true_ending is off, the pool must contain no Zodiac Sand
+    or Void Lens regardless of chronos_kills_needed / typhon_kills_needed."""
+    options = {"true_ending": 0, "chronos_kills_needed": 10, "typhon_kills_needed": 10}
+
+    def test_no_sand_or_lens_in_pool(self) -> None:
+        self.assertEqual(_count_items(self, "Zodiac Sand"), 0)
+        self.assertEqual(_count_items(self, "Void Lens"), 0)
 
 
 class TestTrueEndingAllSanities(HadesIITestBase):
