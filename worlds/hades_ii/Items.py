@@ -232,6 +232,10 @@ def create_items(self) -> None:
                 continue
             if name == "Rivals of Old and Rot" and self.options.true_ending:
                 continue
+            # The Broker is granted for free at the start of the game, so its
+            # incantation is removed from the pool (mirror in Locations/Regions).
+            if name == "Summoning of Mercantile Fortune" and self.options.unlock_broker:
+                continue
             item = self.create_item(name)
             if name in PROGRESSION_INCANTATION_ITEMS:
                 item.classification = ItemClassification.progression

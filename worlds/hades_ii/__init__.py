@@ -172,6 +172,7 @@ class HadesIIWorld(World):
             "reverse_order_rivals",
             "ignore_win_deaths",
             "cauldron_give_hints",
+            "unlock_broker",
             "death_link",
             "death_link_amnesty",
         )

@@ -211,7 +211,9 @@ class TestLockSurfaceIncantationsDefault(HadesIITestBase):
 class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
     """lock_surface_incantations off, cauldronsanity on — the surface 2 are NOT
     AP items/locations. The cauldronsanity pool covers every non-surface incantation."""
-    options = {"lock_surface_incantations": 0, "cauldronsanity": 1}
+    # unlock_broker off so the Broker incantation stays in the cauldronsanity pool
+    # (this test asserts full non-surface coverage).
+    options = {"lock_surface_incantations": 0, "cauldronsanity": 1, "unlock_broker": 0}
 
     def test_surface_items_absent(self) -> None:
         for name in _SURFACE_LOCK_NAMES:
@@ -244,6 +246,8 @@ class TestLockSurfaceAndCauldronsanity(HadesIITestBase):
         "lock_surface_incantations": 1,
         "cauldronsanity": 1,
         "keepsakesanity": 1,
+        # unlock_broker off so every incantation location is present.
+        "unlock_broker": 0,
     }
 
     def test_no_duplicate_surface_items(self) -> None:
@@ -259,6 +263,66 @@ class TestLockSurfaceAndCauldronsanity(HadesIITestBase):
         for name in location_incantations:
             loc = self.multiworld.get_location(name, self.player)
             self.assertIsNotNone(loc)
+
+
+_BROKER_INCANTATION = "Summoning of Mercantile Fortune"
+# Incantations whose brewing requires the Broker (Summoning of Mercantile
+# Fortune) as a chain prereq in Rules._INCANTATION_CHAIN_RULES.
+_BROKER_DEPENDENTS = (
+    "Deathly Fortune",
+    "Kinship Fortune",
+    "Earthly Fortune",
+    "Long Arm of the Unseen",
+    "Night's Craftwork",
+)
+
+
+class TestUnlockBroker(HadesIITestBase):
+    """unlock_broker on (default) with cauldronsanity on: the Broker incantation
+    is removed from the item + location pools, but the incantations that depend
+    on it stay reachable because _has_incantation treats it as satisfied."""
+    options = {"cauldronsanity": 1, "unlock_broker": 1}
+
+    def test_market_item_absent(self) -> None:
+        matching = [i for i in self.multiworld.itempool
+                    if i.name == _BROKER_INCANTATION and i.player == self.player]
+        self.assertEqual(matching, [],
+            f"{_BROKER_INCANTATION!r} must not be in the pool when unlock_broker is on")
+
+    def test_market_location_absent(self) -> None:
+        self.assertRaises(KeyError,
+            self.multiworld.get_location, _BROKER_INCANTATION, self.player)
+
+    def test_dependent_locations_present(self) -> None:
+        for name in _BROKER_DEPENDENTS:
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertIsNotNone(loc)
+
+    def test_dependent_locations_reachable(self) -> None:
+        # all_state collects every pool item — but NOT the removed Broker
+        # incantation. The dependents must still be reachable, which only holds
+        # if _has_incantation treats Market as satisfied under unlock_broker.
+        all_state = self.multiworld.get_all_state()
+        for name in _BROKER_DEPENDENTS:
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertTrue(loc.can_reach(all_state),
+                f"{name} must be reachable with the Broker granted for free")
+
+
+class TestUnlockBrokerOff(HadesIITestBase):
+    """unlock_broker off with cauldronsanity on: the Broker incantation stays a
+    normal AP item + location."""
+    options = {"cauldronsanity": 1, "unlock_broker": 0}
+
+    def test_market_item_present(self) -> None:
+        matching = [i for i in self.multiworld.itempool
+                    if i.name == _BROKER_INCANTATION and i.player == self.player]
+        self.assertEqual(len(matching), 1,
+            f"{_BROKER_INCANTATION!r} must be in the pool when unlock_broker is off")
+
+    def test_market_location_present(self) -> None:
+        loc = self.multiworld.get_location(_BROKER_INCANTATION, self.player)
+        self.assertIsNotNone(loc)
 
 
 class TestVanillaFear(HadesIITestBase):
@@ -476,7 +540,8 @@ class TestIncantationChainsAreProgression(HadesIITestBase):
     must be progression-classified so AP's all-state reachability check
     sees it via state.has(...). Promoting happens in Items.create_items
     via the PROGRESSION_INCANTATION_ITEMS set."""
-    options = {"cauldronsanity": 1, "lock_surface_incantations": 1}
+    # unlock_broker off so "Summoning of Mercantile Fortune" stays in the pool.
+    options = {"cauldronsanity": 1, "lock_surface_incantations": 1, "unlock_broker": 0}
 
     def test_chain_heads_are_progression(self) -> None:
         from worlds.hades_ii.Items import PROGRESSION_INCANTATION_ITEMS

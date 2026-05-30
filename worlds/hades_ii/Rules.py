@@ -109,6 +109,12 @@ class HadesIILogic(LogicMixin):
     def _has_incantation(self, name: str, player: int, options) -> bool:
         if not options.cauldronsanity:
             return True
+        # The Broker is granted for free at game start when unlock_broker is on,
+        # so its incantation is removed from the pool — treat it as satisfied so
+        # the chains that depend on it (Deathly/Kinship/Earthly Fortune, Long Arm
+        # of the Unseen, Night's Craftwork → garden chain) stay reachable.
+        if name == "Summoning of Mercantile Fortune" and options.unlock_broker:
+            return True
         return self.has(name, player)  # type: ignore
 
     # Checks if the player has reached the end-game.

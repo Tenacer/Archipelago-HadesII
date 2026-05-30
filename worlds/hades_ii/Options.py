@@ -477,10 +477,20 @@ class IgnoreWinDeaths(Toggle):
 
 class CauldronGiveHints(DefaultOnToggle):
     """
-    If seeing an item on the Cauldron/Fated List of Prophecies 
+    If seeing an item on the Cauldron/Fated List of Prophecies
     should give a hint for it on the multiworld.
     """
     display_name = "Cauldron/FatedList Give Hints"
+
+
+class UnlockBroker(DefaultOnToggle):
+    """
+    Unlocks the Broker at the Crossroads from the start of the game.
+    When enabled, the Summoning of Mercantile Fortune incantation is removed from
+    the Cauldron Sanity pool (you no longer have to earn it), and any incantations
+    that normally require the Broker become brewable right away.
+    """
+    display_name = "Unlock Broker"
 
 
 class DeathLinkAmnesty(Range):
@@ -552,6 +562,7 @@ class HadesIIOptions(PerGameCommonOptions):
     reverse_order_rivals: ReverseOrderRivals
     ignore_win_deaths: IgnoreWinDeaths
     cauldron_give_hints: CauldronGiveHints
+    unlock_broker: UnlockBroker
     death_link: DeathLink
     death_link_amnesty: DeathLinkAmnesty
 
@@ -616,6 +627,7 @@ hades_ii_option_groups = [
         ReverseOrderRivals,
         IgnoreWinDeaths,
         CauldronGiveHints,
+        UnlockBroker,
     ])
 ]
 
@@ -660,6 +672,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "score_rewards_amount": 150,
         "hidden_aspectsanity": True,
         "fatesanity": True,
+        "unlock_broker": False,
         "fear_system": "reverse_fear",
         "initial_fear_level": 57,
         "ash_pack_value": 5,

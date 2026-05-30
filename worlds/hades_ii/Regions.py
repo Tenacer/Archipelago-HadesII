@@ -107,6 +107,9 @@ def create_regions(player, multiworld, location_database, options):
                 continue
             if name == "Rivals of Old and Rot" and options.true_ending:
                 continue
+            # Broker granted for free at game start — drop its check.
+            if name == "Summoning of Mercantile Fortune" and options.unlock_broker:
+                continue
             _add_location(regions["Crossroads"], name, loc_id)
 
     # Lock-surface toggle owns the two surface-unlock incantation locations,

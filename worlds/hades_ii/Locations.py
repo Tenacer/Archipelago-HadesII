@@ -141,6 +141,9 @@ def setup_location_table_with_settings(options) -> dict:
                 continue
             if name == "Rivals of Old and Rot" and options.true_ending.value == 1:
                 continue
+            # Broker granted for free at game start — drop its check.
+            if name == "Summoning of Mercantile Fortune" and options.unlock_broker.value == 1:
+                continue
             total[name] = code
 
     # Lock-surface toggle owns the two surface-unlock incantation locations,
