@@ -75,18 +75,17 @@ class HadesIILogic(LogicMixin):
 
         return can_win
 
-    # True Ending: both final bosses, ingredient counts, Gigaros, Entropy,
-    # both goal incantations, and a *final* Chronos kill performed after
-    # Dissolution of Time has been cast (represented by the
-    # `Chronos True Victory` event).
+    # True Ending: both final bosses, ingredient counts, Gigaros, Entropy, and a
+    # *final* Chronos kill performed after Dissolution of Time has been cast
+    # (represented by the `Chronos True Victory` event). The incantations
+    # themselves are brewed in-game (vanilla, not AP items); having the
+    # ingredients here is what makes them brewable, so they need no `has()` gate.
     def _has_true_ending_requirements(self, player: int, options) -> bool:
         return (
             self.has("Chronos True Victory", player)  # type: ignore
             and self.has("Typhon Victory", player)  # type: ignore
             and self.has("Gigaros", player)  # type: ignore
             and self.has("Entropy", player)  # type: ignore
-            and self.has("Dissolution of Time", player)  # type: ignore
-            and self.has("Disintegration of Monstrosity", player)  # type: ignore
             and self.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value  # type: ignore
             and self.count("Void Lens", player) >= options.void_lens_needed.value  # type: ignore
         )
@@ -194,7 +193,6 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
             world.get_location("Chronos True Victory", player),
             lambda state: (
                 state.has("Chronos Victory", player)
-                and state.has("Dissolution of Time", player)
                 and state.has("Gigaros", player)
                 and state.has("Entropy", player)
                 and state.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value

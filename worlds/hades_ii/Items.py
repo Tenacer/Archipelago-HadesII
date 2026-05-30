@@ -157,7 +157,6 @@ item_table_helpers     = _items_in_group("helpers")
 item_table_prophecies  = _items_in_group("prophecies")
 item_table_incantations = _items_in_group("incantations")
 item_table_true_ending_ingredients  = _items_in_group("true_ending_ingredients")
-item_table_true_ending_incantations = _items_in_group("true_ending_incantations")
 
 # Build item_name_groups by scanning every tag on every item.
 def _build_name_groups(items: Dict[str, ItemData]) -> Dict[str, Set[str]]:
@@ -254,8 +253,6 @@ def create_items(self) -> None:
             pool.append(self.create_item("Void Lens"))
         pool.append(self.create_item("Gigaros"))
         pool.append(self.create_item("Entropy"))
-        for name in item_table_true_ending_incantations:
-            pool.append(self.create_item(name))
 
     # Prophecies — 89 items paired 1:1 with Fated List check locations.
     # Promote to progression when the goal actually counts prophecies, OR

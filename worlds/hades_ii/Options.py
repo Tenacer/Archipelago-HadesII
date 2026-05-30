@@ -104,8 +104,10 @@ class FateSanity(DefaultOnToggle):
 class TrueEnding(Toggle):
     """
     When enabled, the goal is to complete the True Ending ritual: defeat both Chronos
-    and Typhon, and collect the required Zodiac Sand, Void Lenses, Gigaros, and both
-    goal incantations (Dissolution of Time, Disintegration of Monstrosity).
+    and Typhon, and collect the required Zodiac Sand, Void Lenses, Gigaros, and Entropy.
+    The goal incantations (Dissolution of Time, Disintegration of Monstrosity) are NOT
+    randomized — you brew them in-game once you have the ingredients; only their
+    Zodiac Sand / Void Lens costs are adjusted (ZodiacSandNeeded / VoidLensNeeded).
     When disabled, the goal follows BossDefeatsNeeded and the other count options.
     """
     display_name = "True Ending"
