@@ -65,10 +65,9 @@ Depending on the options selected, the following items can be shuffled into
 other players' worlds:
 
 - Keepsakes, weapons, hidden aspects
-- Incantations (including the two surface-unlock incantations and, in
-  True Ending mode, the two goal incantations)
+- Incantations (including the two surface-unlock incantations)
 - Prophecy rewards
-- True Ending progression items (Zodiac Sand, Void Lens, Gigaros, Entropy)
+- True Ending progression items 
 - Vow items (only in `reverse_fear` mode)
 - Filler resource packs (Ash, Bones, Psyche, Nectar, Ambrosia, Moon Dust,
   Nightmare, Fate Fabric) and helper packs

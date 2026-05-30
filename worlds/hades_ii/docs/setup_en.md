@@ -38,11 +38,11 @@ can play with different options.
 
 ### Where do I get a YAML file?
 
-Hades II is a **non-core** Archipelago game, so the Archipelago website
-does not yet have a player-options page that generates a YAML for you.
-Instead, the `hades_ii.apworld` GitHub release bundles four preset YAML
-templates — pick the one that matches the experience you want and edit
-it from there:
+Hades II is a **non-core** Archipelago game at the moment, so the 
+Archipelago website does not yet have a player-options page that 
+generates a YAML for you. Instead, the `hades_ii.apworld` GitHub release
+bundles four preset YAML templates — pick the one that matches the 
+experience you want and edit it from there:
 
 - **Easy** — friendlier filler values, no hidden aspects or fates,
   lighter fear floor. A good first run.
@@ -74,7 +74,7 @@ folder you use for any other game's YAML).
 ## Troubleshooting
 
 - **Game-side logs.** The mod writes to
-  `ReturnOfModding/plugins_data/Tenacer_AP-HadesII_AP/LogOutput.log` in
+  `ReturnOfModding/LogOutput.log` in
   your r2modman profile. Lines prefixed with `[HadesII_AP]` cover check
   sends, item receives, and goal status — start there if something seems
   out of sync.

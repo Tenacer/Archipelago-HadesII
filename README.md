@@ -16,11 +16,12 @@ already more options. Essentially, you select the number of necessary Underworld
 order to complete your goal. But, you can either combine the wins (so you could complete the goal just doing
 one route) or count them separately (and therefore set the number of wins in each route you'll need).
 
-- **True Ending**: With this, the two incantations needed to finish the game are required progression items you need 
-to get from the multiworld and the necessary resources to make the incantations (Zodiac Sand, Void Lenses and a 
-certain weapon) are also scattered in the multiworld. Once you're able to brew the incantation, another 
-multiworld location check fires to keep items/locations balanced. In order to make this work, I also decided to 
-change the rewards that you get from the final boss in each route to be multiworld items.
+- **True Ending**: With this, the two incantations needed to finish the game have altered requirements. Which means
+that the necessary resources to make the incantations (Zodiac Sand, Void Lenses and two mystery resources) are also 
+scattered in the multiworld. In practice, this means that the rewards for the final bosses of each route are 
+randomized, so you will need to acquire the necessary resources, cast the incanation and finish the game as you
+normally would. You can set how many Void Lenses and Zodiac Sands will be necessary and how many will be in the 
+multiworld (via setting how many final boss kills give rewards).
 
 ## Important options
 
@@ -31,21 +32,23 @@ they are summarized:
 additional requirement gated behind a multiworld item. So this will potentially impact both types of goal that
 you choose. This works in the same way that the True Ending incantations work.
 
-- Weapon sanity: Weapon unlocks are checks and you receive the unlocks from the multiworld.
+- Weapon sanity (default on): Weapon unlocks are checks and you receive the unlocks from the multiworld.
 
-- Hidden aspect sanity: Hidden aspects of each weapon are checks and you receive the unlocks form the 
+- Hidden aspect sanity (defaut on): Hidden aspects of each weapon are checks and you receive the unlocks form the 
 multiworld.
 
-- Cauldron sanity: All incantations from the cauldron are location checks and their rewards are randomized. 
-This is a time intensive setting, so be ready for a long game.
+- Cauldron sanity: All incantations from the cauldron are location checks and their rewards are randomized, 
+except for True Ending or post-True Ending incantations. This can be a time intensive setting, so be ready for a 
+long game.
 
-- Fatesanity: not for the faint of heart. All prophecies are checks and their items are randomized. Probably the
-most time intensive setting.
+- Fatesanity: not for the faint of heart. All prophecies are checks and their items are randomized, except (currently) 
+for Epilogue and post True Ending prophecies. Probably the most time intensive setting.
 
 ## Installation
 
-Installation should be relatively simple. Hades II uses r2modman to load mods, which makes things much easier compared 
-to how mods worked in Hades 1. Installation instructions are covered in the documentation.
+Installation should be relatively simple. Hades II uses r2modman (recommended) to load mods, which makes things 
+much easier compared to how mods worked in Hades 1. Installation instructions are covered in the 
+[documentation](https://github.com/Tenacer/Archipelago-HadesII/blob/main/worlds/hades_ii/docs/setup_en.md).
 
 ## Known issues
 
