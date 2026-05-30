@@ -269,14 +269,14 @@ class MinimalFearLevel(Range):
 #    value      = how much of the resource each pack grants
 #    percentage = share of the filler pool (treated as proportions if they don't sum to 100)
 FILLER_CONFIG = {
-    "ash":         {"value": 10,  "percentage": 30},
+    "ash":         {"value": 10,  "percentage": 24},
     "bones":       {"value": 50,  "percentage": 40},
     "psyche":      {"value": 30,  "percentage": 20},
     "nectar":      {"value": 1,   "percentage": 5},
-    "ambrosia":    {"value": 1,   "percentage": 1},
-    "moon_dust":   {"value": 1,   "percentage": 3},
+    "ambrosia":    {"value": 1,   "percentage": 2},
+    "moon_dust":   {"value": 1,   "percentage": 5},
     "nightmare":   {"value": 1,   "percentage": 1},
-    "fate_fabric": {"value": 1,   "percentage": 0},
+    "fate_fabric": {"value": 1,   "percentage": 3},
 }
 
 class AshPackValue(Range):
@@ -637,19 +637,20 @@ hades_ii_option_groups = [
 
 hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
     "Easy": {
+        "boss_defeats_mode": "combined",
         "score_rewards_amount": 100,
         "hidden_aspectsanity": False,
         "fatesanity": False,
         "fear_system": "reverse_fear",
-        "initial_fear_level": 11,
+        "initial_fear_level": 12,
         "ash_pack_value": 20,
         "bones_pack_value": 100,
         "psyche_pack_value": 50,
         "nectar_pack_value": 2,
         "ambrosia_pack_value": 2,
-        "moon_dust_pack_value": 1,
+        "moon_dust_pack_value": 2,
         "nightmare_pack_value": 1,
-        "fate_fabric_pack_value": 1,
+        "fate_fabric_pack_value": 3,
         "enable_traps": False,
         "filler_trap_percentage": 0,
     },
@@ -658,7 +659,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "hidden_aspectsanity": True,
         "fatesanity": False,
         "fear_system": "reverse_fear",
-        "initial_fear_level": 28,
+        "initial_fear_level": 32,
         "ash_pack_value": 10,
         "bones_pack_value": 50,
         "psyche_pack_value": 30,
@@ -666,7 +667,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "ambrosia_pack_value": 1,
         "moon_dust_pack_value": 1,
         "nightmare_pack_value": 1,
-        "fate_fabric_pack_value": 1,
+        "fate_fabric_pack_value": 2,
         "enable_traps": True,
         "filler_trap_percentage": 5,
     },
@@ -702,7 +703,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "hidden_aspectsanity": True,
         "fatesanity": False,
         "fear_system": "reverse_fear",
-        "initial_fear_level": 28,
+        "initial_fear_level": 32,
         "ash_pack_value": 10,
         "bones_pack_value": 50,
         "psyche_pack_value": 30,
@@ -710,7 +711,7 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "ambrosia_pack_value": 1,
         "moon_dust_pack_value": 1,
         "nightmare_pack_value": 1,
-        "fate_fabric_pack_value": 1,
+        "fate_fabric_pack_value": 2,
         "enable_traps": True,
         "filler_trap_percentage": 5,
     },
