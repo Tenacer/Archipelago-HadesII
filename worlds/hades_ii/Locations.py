@@ -117,8 +117,9 @@ def setup_location_table_with_settings(options) -> dict:
             name = f"Score Check {i}"
             total[name] = location_table_score_checks[name]
 
-    # Tools are always available at the shop
-    total.update(location_tools)
+    # Tool unlocks at Schelmy's shop, gated by toolsanity
+    if options.toolsanity.value == 1:
+        total.update(location_tools)
 
     if options.keepsakesanity.value == 1:
         total.update(location_keepsakes)

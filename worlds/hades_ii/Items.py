@@ -208,8 +208,9 @@ def create_items(self) -> None:
     if self.options.hidden_aspectsanity:
         pool.extend(self.create_item(name) for name in item_table_hidden_aspects)
 
-    # Tools — always available (no toolsanity option yet)
-    pool.extend(self.create_item(name) for name in item_table_tools)
+    # Tools — gated by toolsanity (otherwise tools stay vanilla)
+    if self.options.toolsanity:
+        pool.extend(self.create_item(name) for name in item_table_tools)
 
     # Surface-unlock incantations — owned exclusively by lock_surface_incantations
     # (independent of cauldronsanity). Always progression so Rules.py's

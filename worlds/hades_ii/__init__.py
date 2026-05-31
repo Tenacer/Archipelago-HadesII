@@ -142,6 +142,7 @@ class HadesIIWorld(World):
             # Sanities
             "keepsakesanity",
             "weaponsanity",
+            "toolsanity",
             "hidden_aspectsanity",
             "cauldronsanity",
             "lock_surface_incantations",

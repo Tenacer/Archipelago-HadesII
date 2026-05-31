@@ -60,9 +60,17 @@ class WeaponSanity(DefaultOnToggle):
     """
     display_name = "Weapon Sanity"
 
+class ToolSanity(DefaultOnToggle):
+    """
+    Shuffles the four gathering tools (Crescent Pickaxe, Silver Spade, Tablet of Peace,
+    Rod of Fishing) into the item pool, and makes unlocking each one at Schelmy's shop a check.
+    Need to be sent the tool item to actually gain the tool.
+    """
+    display_name = "Tool Sanity"
+
 class HiddenAspectSanity(DefaultOnToggle):
     """
-    Shuffles weapon aspects into the item pool, and makes obtaining each aspect a check 
+    Shuffles weapon aspects into the item pool, and makes obtaining each aspect a check
     (which needs to be unlocked before being able to be bought).
     """
     display_name = "Hidden Aspect Sanity"
@@ -517,6 +525,7 @@ class HadesIIOptions(PerGameCommonOptions):
 
     keepsakesanity: KeepsakeSanity
     weaponsanity: WeaponSanity
+    toolsanity: ToolSanity
     hidden_aspectsanity: HiddenAspectSanity
     cauldronsanity: CauldronSanity
     lock_surface_incantations: LockSurfaceIncantations
@@ -575,6 +584,7 @@ hades_ii_option_groups = [
         ScoreRewardsAmount,
         KeepsakeSanity,
         WeaponSanity,
+        ToolSanity,
         HiddenAspectSanity,
         CauldronSanity,
         LockSurfaceIncantations,

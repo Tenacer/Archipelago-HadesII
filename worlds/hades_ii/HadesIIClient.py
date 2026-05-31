@@ -54,10 +54,27 @@ _BOSS_REWARD_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "boss_reward" and d.code is not None
 }
+# Schelmy's WeaponShop entries (weapons / tools / hidden aspects) are scouted so
+# the Lua mod can show the placed AP item + owning player on the shop slot.
+_WEAPON_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "weapon" and d.code is not None
+}
+_TOOL_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "tool" and d.code is not None
+}
+_HIDDEN_ASPECT_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category == "hidden_aspect" and d.code is not None
+}
 _SCOUTABLE_LOCATION_IDS: dict = {
     **_INCANTATION_LOCATION_IDS,
     **_PROPHECY_LOCATION_IDS,
     **_BOSS_REWARD_LOCATION_IDS,
+    **_WEAPON_LOCATION_IDS,
+    **_TOOL_LOCATION_IDS,
+    **_HIDDEN_ASPECT_LOCATION_IDS,
 }
 
 
@@ -181,6 +198,18 @@ class HadesIIContext(CommonContext):
                         to_scout.append(loc_id)
                     elif name.startswith("Typhon") and idx <= typhon_n:
                         to_scout.append(loc_id)
+            # WeaponShop entries (weapons / tools / hidden aspects) so the mod can
+            # display the placed AP item + player on each shop slot.
+            if slot_data.get("weaponsanity") == 1:
+                to_scout.extend(_WEAPON_LOCATION_IDS.keys())
+            if slot_data.get("toolsanity") == 1:
+                to_scout.extend(_TOOL_LOCATION_IDS.keys())
+            if slot_data.get("hidden_aspectsanity") == 1:
+                to_scout.extend(_HIDDEN_ASPECT_LOCATION_IDS.keys())
+            # Only scout locations that exist in this slot. Weapon sanity omits the
+            # player's initial weapon location, so its id would be an invalid scout.
+            existing = self.missing_locations | self.checked_locations
+            to_scout = [loc_id for loc_id in to_scout if loc_id in existing]
             if to_scout:
                 Utils.async_start(self._scout_locations(to_scout))
         elif cmd == "LocationInfo":
@@ -389,7 +418,7 @@ class HadesIIContext(CommonContext):
 
         if new_locations:
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
-            logger.info(f"Sent {len(new_locations)} score check(s) (total: {checks_sent})")
+            logger.debug(f"Sent {len(new_locations)} score check(s) (total: {checks_sent})")
 
         self._last_checks_sent = checks_sent
 

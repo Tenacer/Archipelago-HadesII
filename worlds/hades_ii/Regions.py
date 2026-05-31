@@ -122,9 +122,10 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_table_prophecies.items():
             _add_location(regions["Crossroads"], name, loc_id)
 
-    # Tools are always available at the shop
-    for name, loc_id in location_tools.items():
-        _add_location(regions["Crossroads"], name, loc_id)
+    # Tool unlocks at Schelmy's shop, gated by toolsanity
+    if options.toolsanity:
+        for name, loc_id in location_tools.items():
+            _add_location(regions["Crossroads"], name, loc_id)
 
     # Wire up connections
     for source, targets in _region_connections.items():
