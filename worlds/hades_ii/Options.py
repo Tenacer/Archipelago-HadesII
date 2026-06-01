@@ -458,7 +458,7 @@ class InitialMoneyHelperPercentage(Range):
     """
     Choose the percentage of helper items that will boost your starting money by 25 each run.
     This is capped by the percentage left after MaxHealthHelpers.
-    What's left after both becomes Boon Boost helpers, each adding +1% to rare/epic/heroic/legendary
+    What's left after both becomes Boon Boost helpers, each adding +1% to rare and epic
     boon rolls.
     """
     display_name = "Initial Money Helper Percentage"
