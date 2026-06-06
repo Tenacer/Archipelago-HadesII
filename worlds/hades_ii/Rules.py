@@ -22,7 +22,11 @@ class HadesIILogic(LogicMixin):
     def _has_enough_of_item(self, player: int, amount: int, item: str) -> bool:
         return self.count(item, player) >= amount  # type: ignore
     
-    # Checks if the player has enough weapons for defeat boss with N individual weapons
+    # Generation-time reachability approximation for the weapon-clears goal:
+    # owning N weapons + reaching the endgame proves N distinct clears are
+    # POSSIBLE. The actual distinct-clear count is tracked in-game by the mod
+    # and enforced client-side via the victory signal (see HadesIIClient
+    # _process_victory + the per-weapon "<W> Clear" trackable checks).
     def _has_enough_weapons(self, player: int, options, amount: int) -> bool:
         if not options.weaponsanity:
             return True
@@ -172,9 +176,33 @@ def _restrict_score_check_progression(world, player: int, options) -> None:
             add_item_rule(loc, lambda item: not item.advancement)
 
 
+def _set_weapon_clear_rules(world, player: int, options) -> None:
+    """Per-weapon final-boss clears: trackable filler checks.
+
+    The mod fires "<Weapon> Clear" the first time a final boss is defeated
+    with that weapon, so each is logically reachable once the endgame is
+    reachable AND the weapon is owned. They carry filler/useful only — the
+    weapon-clears GOAL is enforced client-side, not by these checks.
+    """
+    if not options.weaponsanity:
+        return
+    for weapon in weapons:
+        name = f"{weapon} Clear"
+        try:
+            loc = world.get_location(name, player)
+        except KeyError:
+            continue
+        add_rule(loc, lambda state, w=weapon: (
+            state._has_weapon(w, player, options)
+            and state._can_reach_endgame(player, options)
+        ))
+        add_item_rule(loc, lambda item: not item.advancement)
+
+
 def set_rules(world, player: int, location_table: dict, options) -> None:
     handle_area_logic(world, player, options)
     _restrict_score_check_progression(world, player, options)
+    _set_weapon_clear_rules(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
     # Each sanity gets one unified handler. Surface gating is folded into each

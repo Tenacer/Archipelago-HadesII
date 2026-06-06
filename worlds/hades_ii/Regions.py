@@ -6,6 +6,7 @@ from .Locations import (
     location_table_boss_rewards,
     location_keepsakes,
     location_weapons,
+    location_weapon_clears,
     location_hidden_aspects,
     location_tools,
     location_incantations,
@@ -92,6 +93,9 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_weapons.items():
             if not should_ignore_weapon_location(name, options):
                 _add_location(regions["Crossroads"], name, loc_id)
+        # Per-weapon final-boss clears — access rules set in Rules.set_rules.
+        for name, loc_id in location_weapon_clears.items():
+            _add_location(regions["Crossroads"], name, loc_id)
 
     if options.hidden_aspectsanity:
         for name, loc_id in location_hidden_aspects.items():

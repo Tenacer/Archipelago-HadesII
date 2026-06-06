@@ -24,12 +24,31 @@ def _assert_score_checks_block_progression(test_case) -> None:
             f"{loc.name} should accept filler items")
 
 
+_WEAPON_CLEAR_NAMES = (
+    "Staff Weapon Clear", "Daggers Weapon Clear", "Torches Weapon Clear",
+    "Axe Weapon Clear", "Skull Weapon Clear", "Coat Weapon Clear",
+)
+
+
 class TestDefaultGeneration(HadesIITestBase):
     """Default options: score_based system, all sanities enabled, normal fear."""
     options = {}
 
     def test_score_checks_block_progression(self) -> None:
         _assert_score_checks_block_progression(self)
+
+    def test_weapon_clears_present_and_filler_only(self) -> None:
+        # Weaponsanity is on by default: the 6 per-weapon "<W> Clear" checks
+        # exist, are gated (have an access rule), and reject progression items.
+        fake_progression = Item("test", ItemClassification.progression, None, self.player)
+        fake_filler = Item("test", ItemClassification.filler, None, self.player)
+        for name in _WEAPON_CLEAR_NAMES:
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertIsNotNone(loc.access_rule, f"{name} must have an access rule")
+            self.assertFalse(loc.item_rule(fake_progression),
+                f"{name} should reject progression items")
+            self.assertTrue(loc.item_rule(fake_filler),
+                f"{name} should accept filler items")
 
     def test_no_boss_rewards_when_not_true_ending(self) -> None:
         # BossDefeats mode counts run completions; no per-kill reward locations.
@@ -174,6 +193,10 @@ class TestAllSanitiesOff(HadesIITestBase):
         "lock_surface_incantations": 0,
         "fatesanity": 0,
     }
+
+    def test_no_weapon_clears_without_weaponsanity(self) -> None:
+        for name in _WEAPON_CLEAR_NAMES:
+            self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
 
 
 _SURFACE_LOCK_NAMES = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")

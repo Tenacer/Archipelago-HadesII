@@ -147,6 +147,8 @@ class HadesIIContext(CommonContext):
         self._sent_hint_location_ids: set = set()
         self._last_death_count = 0
         self._sent_goal = False
+        self._weaponsanity = False
+        self._weapons_clears_needed = 0
 
     def _ipc_file(self, name: str) -> Path:
         """Return the world-specific path for an IPC file (e.g. ap_in_seed_1.json)."""
@@ -172,6 +174,8 @@ class HadesIIContext(CommonContext):
             world_id = re.sub(r'[^a-zA-Z0-9_-]', '_', f"{self.seed_name}_{self.slot}")
             self._world_id = world_id
             logger.info(f"World ID: {world_id}")
+            self._weaponsanity = slot_data.get("weaponsanity") == 1
+            self._weapons_clears_needed = slot_data.get("weapons_clears_needed", 0)
             self._write_settings(slot_data)
             self._write_inbox()
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
@@ -476,12 +480,25 @@ class HadesIIContext(CommonContext):
         logger.debug(f"Hinted {len(new_ids)} location(s)")
 
     async def _process_victory(self, data: dict):
-        """Send goal status when the game signals the run is complete."""
+        """Send goal status when the game signals the run is complete.
+
+        Weaponsanity adds a distinct-weapon-clears requirement on top of the
+        mod's run-completion signal: the goal only fires once the player has
+        cleared a final boss with at least `weapons_clears_needed` different
+        weapons (reported as `weapon_clears` in the outbox).
+        """
         if self._sent_goal:
             return
-        if data.get("victory"):
-            await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-            self._sent_goal = True
+        if not data.get("victory"):
+            return
+        if self._weaponsanity and data.get("weapon_clears", 0) < self._weapons_clears_needed:
+            logger.info(
+                "Run complete but %d/%d distinct weapon clears — goal withheld.",
+                data.get("weapon_clears", 0), self._weapons_clears_needed,
+            )
+            return
+        await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+        self._sent_goal = True
             logger.debug("Goal complete — victory sent to server!")
 
     async def _process_deathlink(self, data: dict):

@@ -63,6 +63,9 @@ location_table_summit   = _by_region("Summit",   "biome_victory")
 # Crossroads (option-gated) tables
 location_keepsakes          = _by_category("keepsake")
 location_weapons            = _by_category("weapon")
+# Per-weapon final-boss clears — trackable filler checks fired by the mod the
+# first time a final boss is defeated with each weapon. Gated by weaponsanity.
+location_weapon_clears      = _by_category("weapon_clear")
 location_hidden_aspects     = _by_category("hidden_aspect")
 location_tools              = _by_category("tool")
 location_incantations       = _by_category("incantation")
@@ -128,6 +131,7 @@ def setup_location_table_with_settings(options) -> dict:
         for name, code in location_weapons.items():
             if not should_ignore_weapon_location(name, options):
                 total[name] = code
+        total.update(location_weapon_clears)
 
     if options.hidden_aspectsanity.value == 1:
         total.update(location_hidden_aspects)
