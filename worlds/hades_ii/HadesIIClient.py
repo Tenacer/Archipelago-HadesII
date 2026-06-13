@@ -31,8 +31,19 @@ from .Locations import (
     hades_ii_base_location_id,
     location_table,
 )
+from .Items import item_table_keepsakes, item_table_prophecies
 
 POLL_INTERVAL = 0.5
+
+# Item codes that count toward the keepsakes/fates goal thresholds. Mirrors the
+# generation-time reachability logic in Rules._has_enough_keepsakes /
+# _has_enough_prophecies_done, which count RECEIVED items (item_table_keepsakes /
+# item_table_prophecies). Counting received items here — rather than checked
+# locations — keeps the runtime goal gate consistent with what generation
+# guarantees collectible (in a multiworld the prophecy/keepsake items may be
+# placed in other players' worlds).
+_KEEPSAKE_ITEM_IDS = {d.code for d in item_table_keepsakes.values() if d.code is not None}
+_PROPHECY_ITEM_IDS = {d.code for d in item_table_prophecies.values() if d.code is not None}
 
 # name→id for every non-event location; used to resolve names from the outbox
 _LOCATION_NAME_TO_ID = {name: d.code for name, d in location_table.items() if d.code is not None}
@@ -117,6 +128,32 @@ class HadesIIClientCommandProcessor(ClientCommandProcessor):
         except (json.JSONDecodeError, OSError) as e:
             logger.warning(f"Could not read outbox: {e}")
 
+    def _cmd_goal(self):
+        """Show progress toward the active goal 'needed' thresholds."""
+        ctx = self.ctx
+        if not isinstance(ctx, HadesIIContext):
+            return
+        lines = []
+        if ctx._weaponsanity:
+            # Distinct weapon clears are in-game data, reported via the outbox.
+            clears = 0
+            outbox = ctx._ipc_file("ap_out.json")
+            if outbox.exists():
+                try:
+                    with open(outbox) as f:
+                        clears = json.load(f).get("weapon_clears", 0)
+                except (json.JSONDecodeError, OSError):
+                    pass
+            lines.append(f"Weapon clears: {clears}/{ctx._weapons_clears_needed}")
+        if ctx._keepsakesanity and ctx._keepsakes_needed > 0:
+            lines.append(f"Keepsakes: {ctx.keepsakes_collected()}/{ctx._keepsakes_needed}")
+        if ctx._fatesanity and ctx._fates_needed > 0:
+            lines.append(f"Fates: {ctx.fates_collected()}/{ctx._fates_needed}")
+        if lines:
+            logger.info("Goal progress — " + " | ".join(lines))
+        else:
+            logger.info("No keepsake/fate/weapon-clear thresholds are active for this slot.")
+
     def _cmd_resync(self):
         """Re-read the outbox and re-send all pending checks to the server."""
         if isinstance(self.ctx, HadesIIContext):
@@ -149,6 +186,10 @@ class HadesIIContext(CommonContext):
         self._sent_goal = False
         self._weaponsanity = False
         self._weapons_clears_needed = 0
+        self._keepsakesanity = False
+        self._keepsakes_needed = 0
+        self._fatesanity = False
+        self._fates_needed = 0
 
     def _ipc_file(self, name: str) -> Path:
         """Return the world-specific path for an IPC file (e.g. ap_in_seed_1.json)."""
@@ -176,6 +217,10 @@ class HadesIIContext(CommonContext):
             logger.info(f"World ID: {world_id}")
             self._weaponsanity = slot_data.get("weaponsanity") == 1
             self._weapons_clears_needed = slot_data.get("weapons_clears_needed", 0)
+            self._keepsakesanity = slot_data.get("keepsakesanity") == 1
+            self._keepsakes_needed = slot_data.get("keepsakes_needed", 0)
+            self._fatesanity = slot_data.get("fatesanity") == 1
+            self._fates_needed = slot_data.get("fates_needed", 0)
             self._write_settings(slot_data)
             self._write_inbox()
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
@@ -479,13 +524,34 @@ class HadesIIContext(CommonContext):
         }])
         logger.debug(f"Hinted {len(new_ids)} location(s)")
 
+    def keepsakes_collected(self) -> int:
+        """Distinct keepsake items received (counts toward the keepsakes_needed goal)."""
+        return sum(1 for ni in self.items_received if ni.item in _KEEPSAKE_ITEM_IDS)
+
+    def fates_collected(self) -> int:
+        """Prophecy reward items received (counts toward the fates_needed goal)."""
+        return sum(1 for ni in self.items_received if ni.item in _PROPHECY_ITEM_IDS)
+
     async def _process_victory(self, data: dict):
         """Send goal status when the game signals the run is complete.
 
-        Weaponsanity adds a distinct-weapon-clears requirement on top of the
-        mod's run-completion signal: the goal only fires once the player has
-        cleared a final boss with at least `weapons_clears_needed` different
-        weapons (reported as `weapon_clears` in the outbox).
+        The mod's run-completion signal (`victory`) is necessary but not always
+        sufficient. Each "needed" goal option layers an extra threshold on top,
+        all enforced here client-side (mirroring the generation-time logic in
+        Rules._can_get_victory):
+
+        - Weaponsanity: at least `weapons_clears_needed` distinct weapons must
+          have cleared a final boss (reported as `weapon_clears` in the outbox;
+          this is in-game data AP can't see on its own).
+        - Keepsakesanity: at least `keepsakes_needed` distinct keepsake items
+          received.
+        - Fatesanity: at least `fates_needed` prophecy reward items received.
+
+        Keepsake/fate counts come from `items_received` (not the outbox) because
+        AP is the source of truth for collected items — the items may even be
+        delivered by other players in a multiworld. `_process_victory` runs every
+        outbox poll, so once enough items arrive after the run is won the goal
+        fires on the next tick.
         """
         if self._sent_goal:
             return
@@ -497,9 +563,25 @@ class HadesIIContext(CommonContext):
                 data.get("weapon_clears", 0), self._weapons_clears_needed,
             )
             return
+        if self._keepsakesanity and self._keepsakes_needed > 0:
+            have = self.keepsakes_collected()
+            if have < self._keepsakes_needed:
+                logger.info(
+                    "Run complete but %d/%d keepsakes collected — goal withheld.",
+                    have, self._keepsakes_needed,
+                )
+                return
+        if self._fatesanity and self._fates_needed > 0:
+            have = self.fates_collected()
+            if have < self._fates_needed:
+                logger.info(
+                    "Run complete but %d/%d fates collected — goal withheld.",
+                    have, self._fates_needed,
+                )
+                return
         await self.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
         self._sent_goal = True
-            logger.debug("Goal complete — victory sent to server!")
+        logger.debug("Goal complete — victory sent to server!")
 
     async def _process_deathlink(self, data: dict):
         """Forward deaths from the game to other AP players via DeathLink bounce."""

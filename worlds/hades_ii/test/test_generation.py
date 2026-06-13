@@ -390,6 +390,56 @@ class TestKeepsakeGoal(HadesIITestBase):
                     f"Keepsake {name!r} should be progression when keepsakes_needed > 0")
 
 
+def _assert_count_goal_gated(test, item_names, needed: int) -> None:
+    """Shared gate check for a count-based goal (keepsakes / fates).
+
+    Starts from all-state (endgame reachable, every relevant item collected),
+    zeroes the counted items, then re-adds them one at a time. The goal must
+    stay unmet at `needed - 1` and flip to met at `needed`. Mutates prog_items
+    directly (add_item / remove_item) — the count goals read prog_items via
+    `state.count`, and that is also what the AP client mirrors at runtime, so
+    a fresh `create_item` (which keeps the CSV `useful` class) is deliberately
+    avoided here.
+    """
+    player = test.player
+    completion = test.multiworld.completion_condition[player]
+    state = test.multiworld.get_all_state(False)
+    test.assertTrue(completion(state),
+        "all-state (every relevant item collected) should meet the goal")
+
+    names = list(item_names)
+    for name in names:
+        have = state.count(name, player)
+        if have:
+            state.remove_item(name, player, have)
+    for name in names[: needed - 1]:
+        state.add_item(name, player)
+    test.assertFalse(completion(state),
+        f"goal must NOT be met with {needed - 1} of the counted items")
+
+    state.add_item(names[needed - 1], player)
+    test.assertTrue(completion(state),
+        f"goal must be met once {needed} counted items are collected")
+
+
+class TestKeepsakesGateCompletion(HadesIITestBase):
+    """The keepsakes_needed threshold must actually gate the goal."""
+    options = {"keepsakesanity": 1, "keepsakes_needed": 5}
+
+    def test_completion_requires_enough_keepsakes(self) -> None:
+        from worlds.hades_ii.Items import item_table_keepsakes
+        _assert_count_goal_gated(self, item_table_keepsakes, self.options["keepsakes_needed"])
+
+
+class TestFatesGateCompletion(HadesIITestBase):
+    """Same gating check as keepsakes, for fates_needed / prophecy items."""
+    options = {"fatesanity": 1, "fates_needed": 5}
+
+    def test_completion_requires_enough_fates(self) -> None:
+        from worlds.hades_ii.Items import item_table_prophecies
+        _assert_count_goal_gated(self, item_table_prophecies, self.options["fates_needed"])
+
+
 class TestScoreRewards72(HadesIITestBase):
     """Minimum valid score_rewards_amount."""
     options = {"location_system": 0, "score_rewards_amount": 72}

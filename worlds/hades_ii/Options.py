@@ -226,7 +226,7 @@ class FatesNeeded(Range):
     """
     display_name = "Fates Needed"
     range_start = 0
-    range_end = 89
+    range_end = 84  # one per randomizable prophecy (Fated List check)
     default = 0
     
 # -- Fear 
