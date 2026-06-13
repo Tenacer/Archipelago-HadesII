@@ -2,7 +2,7 @@ from typing import ClassVar, Dict, List
 import settings
 from Options import OptionError
 from worlds.AutoWorld import World
-from worlds.LauncherComponents import Component, Type, components
+from worlds.LauncherComponents import Component, Type, components, icon_paths
 from . import web_world
 from .Options import HadesIIOptions
 from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings
@@ -47,10 +47,13 @@ def _launch_client(*args):
     launch()
 
 
+icon_paths["hades_ii"] = f"ap:{__name__}/data/hadesii_apclient_logo.png"
+
 components.append(Component(
     "Hades II Client",
     func=_launch_client,
     component_type=Type.CLIENT,
+    icon="hades_ii",
 ))
 
 
