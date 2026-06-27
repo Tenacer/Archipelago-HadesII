@@ -102,10 +102,12 @@ for each of the two goal modes:
 - **Boss Defeats Easy / Normal / Hard**
 
 The difficulty tier sets resource generosity, starting Fear, trap share,
-and scope (e.g. Easy turns off hidden aspects and traps; Hard turns on
-fatesanity and is the stingiest). The goal tier sets the win condition and
-its thresholds (Boss Defeats scales the required kill count; True Ending
-scales the ingredient costs and per-boss kill counts).
+score-check count (Hard offers the most, 250), and scope (e.g. Easy turns
+off hidden aspects and traps; Hard turns on fatesanity and is the
+stingiest). The goal tier sets the win condition and its thresholds: Boss
+Defeats scales the required kill count (Easy counts both bosses together;
+Normal and Hard count Chronos and Typhon separately), and True Ending
+scales the ingredient costs and per-boss kill counts.
 
 The **default** (a bare YAML with no preset chosen) is **True Ending
 Normal** — the recommended starting point. From there, every "sanity"

@@ -734,7 +734,7 @@ _DIFFICULTY: Dict[str, Dict[str, Any]] = {
         "filler_trap_percentage": 5,
     },
     "Hard": {
-        "score_rewards_amount": 150,
+        "score_rewards_amount": 250,
         "hidden_aspectsanity": True,
         "fatesanity": True,
         "unlock_broker": False,
@@ -753,11 +753,14 @@ _DIFFICULTY: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# Boss Defeats goal: combined kills, scaling the required count by difficulty.
+# Boss Defeats goal. Easy counts combined kills; Normal and Hard count each boss
+# separately (Chronos and Typhon thresholds tracked independently).
 _BOSS_GOAL: Dict[str, Dict[str, Any]] = {
     "Easy":   {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 3},
-    "Normal": {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 5},
-    "Hard":   {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 8},
+    "Normal": {"true_ending": False, "boss_defeats_mode": "separate",
+               "chronos_kills_needed": 3, "typhon_kills_needed": 2},
+    "Hard":   {"true_ending": False, "boss_defeats_mode": "separate",
+               "chronos_kills_needed": 5, "typhon_kills_needed": 3},
 }
 
 # True Ending goal: scale ingredient costs and per-boss kill counts by difficulty.
