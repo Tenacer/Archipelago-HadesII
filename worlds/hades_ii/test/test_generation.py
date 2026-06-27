@@ -1,5 +1,6 @@
 from BaseClasses import Item, ItemClassification, LocationProgressType
 from .bases import HadesIITestBase
+from ..Options import hades_ii_option_presets
 
 
 def _assert_score_checks_block_progression(test_case) -> None:
@@ -31,7 +32,9 @@ _WEAPON_CLEAR_NAMES = (
 
 
 class TestDefaultGeneration(HadesIITestBase):
-    """Default options: score_based system, all sanities enabled, normal fear."""
+    """Default options: True Ending goal at Normal difficulty (the bare defaults
+    mirror the recommended 'True Ending Normal' preset), score_based system,
+    default sanities, normal fear."""
     options = {}
 
     def test_score_checks_block_progression(self) -> None:
@@ -50,8 +53,19 @@ class TestDefaultGeneration(HadesIITestBase):
             self.assertTrue(loc.item_rule(fake_filler),
                 f"{name} should accept filler items")
 
-    def test_no_boss_rewards_when_not_true_ending(self) -> None:
-        # BossDefeats mode counts run completions; no per-kill reward locations.
+    def test_boss_rewards_present_by_default(self) -> None:
+        # True Ending is the default goal: per-kill reward locations exist up to
+        # chronos_kills_needed (7) and typhon_kills_needed (5).
+        for name in ("Chronos Kill Reward 1", "Chronos Kill Reward 7",
+                     "Typhon Kill Reward 1", "Typhon Kill Reward 5"):
+            self.assertIsNotNone(self.multiworld.get_location(name, self.player))
+
+
+class TestBossDefeatsHasNoBossRewards(HadesIITestBase):
+    """BossDefeats goal counts run completions — no per-kill reward locations."""
+    options = {"true_ending": 0}
+
+    def test_no_boss_rewards(self) -> None:
         for name in ("Chronos Kill Reward 1", "Typhon Kill Reward 1"):
             self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
 
@@ -186,7 +200,12 @@ class TestTrueEndingAllSanities(HadesIITestBase):
 
 
 class TestAllSanitiesOff(HadesIITestBase):
+    # true_ending off: with every sanity off there are no item locations beyond
+    # the (progression-rejecting) score checks, so the True Ending default would
+    # have nowhere to place its progression items. This class tests sanity-off
+    # location absence under the simple BossDefeats goal.
     options = {
+        "true_ending": 0,
         "keepsakesanity": 0,
         "weaponsanity": 0,
         "hidden_aspectsanity": 0,
@@ -278,8 +297,10 @@ class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
     """lock_surface_incantations off, cauldronsanity on — the surface 2 are NOT
     AP items/locations. The cauldronsanity pool covers every non-surface incantation."""
     # unlock_broker off so the Broker incantation stays in the cauldronsanity pool
-    # (this test asserts full non-surface coverage).
-    options = {"lock_surface_incantations": 0, "cauldronsanity": 1, "unlock_broker": 0}
+    # (this test asserts full non-surface coverage). true_ending off so the
+    # true-ending-excluded "Rivals of Old and Rot" stays in the pool.
+    options = {"lock_surface_incantations": 0, "cauldronsanity": 1, "unlock_broker": 0,
+               "true_ending": 0}
 
     def test_surface_items_absent(self) -> None:
         for name in _SURFACE_LOCK_NAMES:
@@ -314,6 +335,8 @@ class TestLockSurfaceAndCauldronsanity(HadesIITestBase):
         "keepsakesanity": 1,
         # unlock_broker off so every incantation location is present.
         "unlock_broker": 0,
+        # true_ending off so "Rivals of Old and Rot" stays in the pool.
+        "true_ending": 0,
     }
 
     def test_no_duplicate_surface_items(self) -> None:
@@ -733,3 +756,22 @@ class TestScoreSplitCombined(HadesIITestBase):
     def test_all_checks_reachable_from_start(self) -> None:
         self.assertTrue(self.can_reach_location("Score Check 1"))
         self.assertTrue(self.can_reach_location("Score Check 100"))
+
+
+# ── Preset smoke tests ────────────────────────────────────────────────────────
+# Generate every shipped preset and run the inherited base checks (fill +
+# all-state reachability), so a preset can never ship an ungeneratable combo.
+
+def _make_preset_test(preset_name, preset_opts):
+    class _PresetTest(HadesIITestBase):
+        options = dict(preset_opts)
+    _PresetTest.__doc__ = f"Smoke test: preset {preset_name!r} generates a completable world."
+    return _PresetTest
+
+
+for _preset_name, _preset_opts in hades_ii_option_presets.items():
+    _cls_name = "TestPreset" + _preset_name.title().replace(" ", "")
+    globals()[_cls_name] = _make_preset_test(_preset_name, _preset_opts)
+    globals()[_cls_name].__name__ = _cls_name
+    globals()[_cls_name].__qualname__ = _cls_name
+del _preset_name, _preset_opts, _cls_name

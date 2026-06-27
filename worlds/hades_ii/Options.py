@@ -137,22 +137,23 @@ class LockSurfaceIncantations(DefaultOnToggle):
     """
     display_name = "Lock Surface Incantations"
 
-class FateSanity(DefaultOnToggle):
+class FateSanity(Toggle):
     """
-    Shuffles most rewards from the Fated List of Prophecies into the item pool, 
-    and makes the corresponding items from the list a check. 
+    Shuffles most rewards from the Fated List of Prophecies into the item pool,
+    and makes the corresponding items from the list a check.
     Can make the games significantly longer.
+    Off by default (matches the Normal presets); the Hard presets turn it on.
     """
     display_name = "Fate Sanity"
 
 # -- Completion
 
-class TrueEnding(Toggle):
+class TrueEnding(DefaultOnToggle):
     """
-    When enabled, the goal is to complete the True Ending ritual: defeat both Chronos
-    and Typhon, and collect the required Zodiac Sand, Void Lenses, Gigaros, and Entropy.
-    The goal incantations (Dissolution of Time, Disintegration of Monstrosity) are NOT
-    randomized — you brew them in-game once you have the ingredients; only their
+    When enabled (the default), the goal is to complete the True Ending ritual: defeat
+    both Chronos and Typhon, and collect the required Zodiac Sand, Void Lenses, Gigaros,
+    and Entropy. The goal incantations (Dissolution of Time, Disintegration of Monstrosity)
+    are NOT randomized — you brew them in-game once you have the ingredients; only their
     Zodiac Sand / Void Lens costs are adjusted (ZodiacSandNeeded / VoidLensNeeded).
     When disabled, the goal follows BossDefeatsNeeded and the other count options.
     """
@@ -296,7 +297,7 @@ class InitialFearLevel(Range):
     display_name = "Initial Fear Level"
     range_start = 0
     range_end = 67
-    default = 11
+    default = 32
 
 
 class MinimalFearLevel(Range):
@@ -322,7 +323,7 @@ FILLER_CONFIG = {
     "ambrosia":    {"value": 1,   "percentage": 2},
     "moon_dust":   {"value": 1,   "percentage": 5},
     "nightmare":   {"value": 1,   "percentage": 1},
-    "fate_fabric": {"value": 1,   "percentage": 3},
+    "fate_fabric": {"value": 2,   "percentage": 3},
 }
 
 class AshPackValue(Range):
@@ -439,11 +440,12 @@ class NightmarePackPercentage(Range):
 
 # -- Traps
 
-class EnableTraps(Toggle):
+class EnableTraps(DefaultOnToggle):
     """
-    When enabled, the filler pool contains trap items (Money Punishment,
-    Health Punishment). The share is set by FillerTrapPercentage; this
-    toggle simply gates whether traps are included at all.
+    When enabled (the default), the filler pool contains trap items (Money
+    Punishment, Health Punishment). The share is set by FillerTrapPercentage;
+    this toggle simply gates whether traps are included at all. The Easy presets
+    turn it off.
     """
     display_name = "Enable Traps"
 
@@ -688,10 +690,16 @@ hades_ii_option_groups = [
 ]
 
 # ------------------------------ Presets
+#
+# Six presets: Easy / Normal / Hard for each goal mode (Boss Defeats and True
+# Ending). Each preset is the difficulty knobs (resource generosity, fear,
+# traps, scope — shared across goal modes) merged with the goal configuration.
+# "True Ending Normal" is the recommended default and mirrors the bare option
+# defaults, so loading it is a no-op.
 
-hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
+# Shared difficulty knobs — identical regardless of goal mode.
+_DIFFICULTY: Dict[str, Dict[str, Any]] = {
     "Easy": {
-        "boss_defeats_mode": "combined",
         "score_rewards_amount": 100,
         "hidden_aspectsanity": False,
         "fatesanity": False,
@@ -743,30 +751,48 @@ hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
         "enable_traps": True,
         "filler_trap_percentage": 10,
     },
-    "True Ending": {
-        "true_ending": True,
-        "boss_defeats_mode": "combined",
-        "zodiac_sand_needed": 4,
-        "void_lens_needed": 2,
-        "chronos_kills_needed": 7,
-        "typhon_kills_needed": 5,
-        "weapons_clears_needed": 1,
-        "keepsakes_needed": 0,
-        "fates_needed": 0,
-        "score_rewards_amount": 150,
-        "hidden_aspectsanity": True,
-        "fatesanity": False,
-        "fear_system": "reverse_fear",
-        "initial_fear_level": 32,
-        "ash_pack_value": 10,
-        "bones_pack_value": 50,
-        "psyche_pack_value": 30,
-        "nectar_pack_value": 1,
-        "ambrosia_pack_value": 1,
-        "moon_dust_pack_value": 1,
-        "nightmare_pack_value": 1,
-        "fate_fabric_pack_value": 2,
-        "enable_traps": True,
-        "filler_trap_percentage": 5,
+}
+
+# Boss Defeats goal: combined kills, scaling the required count by difficulty.
+_BOSS_GOAL: Dict[str, Dict[str, Any]] = {
+    "Easy":   {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 3},
+    "Normal": {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 5},
+    "Hard":   {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 8},
+}
+
+# True Ending goal: scale ingredient costs and per-boss kill counts by difficulty.
+_TRUE_ENDING_GOAL: Dict[str, Dict[str, Any]] = {
+    "Easy": {
+        "true_ending": True, "boss_defeats_mode": "combined",
+        "zodiac_sand_needed": 2, "void_lens_needed": 1,
+        "chronos_kills_needed": 4, "typhon_kills_needed": 3,
+        "weapons_clears_needed": 1, "keepsakes_needed": 0, "fates_needed": 0,
     },
+    "Normal": {
+        "true_ending": True, "boss_defeats_mode": "combined",
+        "zodiac_sand_needed": 4, "void_lens_needed": 2,
+        "chronos_kills_needed": 7, "typhon_kills_needed": 5,
+        "weapons_clears_needed": 1, "keepsakes_needed": 0, "fates_needed": 0,
+    },
+    "Hard": {
+        "true_ending": True, "boss_defeats_mode": "combined",
+        "zodiac_sand_needed": 6, "void_lens_needed": 3,
+        "chronos_kills_needed": 9, "typhon_kills_needed": 7,
+        "weapons_clears_needed": 3, "keepsakes_needed": 0, "fates_needed": 0,
+    },
+}
+
+
+def _make_preset(difficulty: str, goal: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    return {**_DIFFICULTY[difficulty], **goal[difficulty]}
+
+
+# Recommended default (True Ending Normal) listed first.
+hades_ii_option_presets: Dict[str, Dict[str, Any]] = {
+    "True Ending Normal": _make_preset("Normal", _TRUE_ENDING_GOAL),
+    "True Ending Easy":   _make_preset("Easy",   _TRUE_ENDING_GOAL),
+    "True Ending Hard":   _make_preset("Hard",   _TRUE_ENDING_GOAL),
+    "Boss Defeats Easy":   _make_preset("Easy",   _BOSS_GOAL),
+    "Boss Defeats Normal": _make_preset("Normal", _BOSS_GOAL),
+    "Boss Defeats Hard":   _make_preset("Hard",   _BOSS_GOAL),
 }

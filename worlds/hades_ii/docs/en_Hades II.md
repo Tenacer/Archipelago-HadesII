@@ -31,7 +31,14 @@ shuffled into the Archipelago item pool, each behind its own option:
 
 Rooms also count toward a **score system**: every cleared room earns
 points, and reaching a score milestone fires a filler-item check
-(configurable with `score_rewards_amount`).
+(configurable with `score_rewards_amount`). By default the score is
+**split per route** (`score_split_mode`): the underworld route (Erebus →
+Tartarus, the Chronos path) and the surface route (Ephyra → Summit, the
+Typhon path) each accumulate their own score and can only earn their own
+share of the checks (`surface_score_ratio`, default 40% to the surface),
+so earning every score check means playing both routes. Set
+`score_split_mode` to *combined* for a single pool where either route can
+earn all of them.
 
 In **True Ending** mode, the rewards normally dropped after each Chronos
 and Typhon kill are replaced with AP location checks (one per kill, up to
@@ -39,7 +46,8 @@ and Typhon kill are replaced with AP location checks (one per kill, up to
 
 ## What is the goal of the game?
 
-Two goal modes are available:
+Two goal modes are available (selected with `true_ending`, which is **on by
+default** — the default goal is True Ending):
 
 - **Boss Defeats** — clear Chronos and/or Typhon a configurable number of
   times. `boss_defeats_mode` switches between *combined* (either boss
@@ -53,11 +61,7 @@ Two goal modes are available:
 
 ## Do I need to start from a fresh file or a completed one?
 
-A **fresh save** is strongly recommended. The mod injects story flags into
-`GameState.TextLinesRecord` as it delivers progression items (e.g.
-ZagreusPastMeeting flags when Zodiac Sand arrives) so that the vanilla
-story gating lines up with AP item flow. On a completed save those flags
-are already set, which can confuse some intermediate cutscenes.
+A **fresh save** is needed.
 
 ## Which items can be in another player's world?
 
@@ -91,8 +95,20 @@ incantations appear in the cauldron once their gate flag flips.
 
 ## What settings can I change in the YAML?
 
-The world ships with four presets — **Easy**, **Normal**, **Hard**, and
-**True Ending** — covering common difficulty/scope combinations. From
-there, every "sanity" toggle, score amount, fear-system mode, per-resource
-pack values, and goal threshold can be adjusted individually. See the
-preset YAMLs in the release for a starting point.
+The world ships with **six presets** — **Easy**, **Normal**, and **Hard**
+for each of the two goal modes:
+
+- **True Ending Easy / Normal / Hard**
+- **Boss Defeats Easy / Normal / Hard**
+
+The difficulty tier sets resource generosity, starting Fear, trap share,
+and scope (e.g. Easy turns off hidden aspects and traps; Hard turns on
+fatesanity and is the stingiest). The goal tier sets the win condition and
+its thresholds (Boss Defeats scales the required kill count; True Ending
+scales the ingredient costs and per-boss kill counts).
+
+The **default** (a bare YAML with no preset chosen) is **True Ending
+Normal** — the recommended starting point. From there, every "sanity"
+toggle, score amount, score-split mode, fear-system mode, per-resource pack
+value, and goal threshold can be adjusted individually. See the preset
+YAMLs in the release for a starting point.
