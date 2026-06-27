@@ -678,3 +678,58 @@ class TestIncantationChainsAreProgression(HadesIITestBase):
             self.assertEqual(len(matching), 1, f"missing {name}")
             self.assertTrue(matching[0].advancement,
                 f"{name} must be progression (used in _has_incantation gates)")
+
+
+class TestScoreSplitSeparate(HadesIITestBase):
+    """Separate score split (default): underworld score checks live in Erebus
+    (reachable from start) and surface ones in Ephyra (gated by surface access).
+    lock_surface_incantations on so the surface gate has teeth."""
+    options = {
+        "score_split_mode": "separate",
+        "score_rewards_amount": 100,
+        "surface_score_ratio": 40,
+        "lock_surface_incantations": 1,
+    }
+
+    def test_split_boundary(self) -> None:
+        from worlds.hades_ii.Locations import score_check_split
+        under, surf = score_check_split(100, 40)
+        self.assertEqual((under, surf), (60, 40))
+
+    def test_underworld_checks_in_erebus(self) -> None:
+        # The first `underworld_budget` checks are placed in Erebus.
+        loc = self.multiworld.get_location("Score Check 1", self.player)
+        self.assertEqual(loc.parent_region.name, "Erebus")
+        loc = self.multiworld.get_location("Score Check 60", self.player)
+        self.assertEqual(loc.parent_region.name, "Erebus")
+
+    def test_surface_checks_in_ephyra(self) -> None:
+        loc = self.multiworld.get_location("Score Check 61", self.player)
+        self.assertEqual(loc.parent_region.name, "Ephyra")
+        loc = self.multiworld.get_location("Score Check 100", self.player)
+        self.assertEqual(loc.parent_region.name, "Ephyra")
+
+    def test_surface_checks_need_surface_access(self) -> None:
+        # With no items collected the surface unlock incantations are missing,
+        # so surface score checks are unreachable while underworld ones are not.
+        self.assertTrue(self.can_reach_location("Score Check 1"))
+        self.assertFalse(self.can_reach_location("Score Check 100"))
+
+
+class TestScoreSplitCombined(HadesIITestBase):
+    """Combined score split: all checks live in Menu and are reachable from the
+    start regardless of surface access."""
+    options = {
+        "score_split_mode": "combined",
+        "score_rewards_amount": 100,
+        "lock_surface_incantations": 1,
+    }
+
+    def test_all_checks_in_menu(self) -> None:
+        for name in ("Score Check 1", "Score Check 100"):
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertEqual(loc.parent_region.name, "Menu")
+
+    def test_all_checks_reachable_from_start(self) -> None:
+        self.assertTrue(self.can_reach_location("Score Check 1"))
+        self.assertTrue(self.can_reach_location("Score Check 100"))

@@ -30,6 +30,7 @@ from .Locations import (
     SCORE_LOCATION_COUNT,
     hades_ii_base_location_id,
     location_table,
+    score_check_split,
 )
 from .Items import item_table_keepsakes, item_table_prophecies
 
@@ -182,6 +183,11 @@ class HadesIIContext(CommonContext):
         self.deathlink_client_override = False
         self._world_id: Optional[str] = None
         self._last_checks_sent = 0
+        # Separate-split score tracking (set from slot_data on Connected).
+        self._score_split = False
+        self._underworld_budget = 0
+        self._last_under_checks = 0
+        self._last_surface_checks = 0
         self._sent_named_location_ids: set = set()
         self._sent_hint_location_ids: set = set()
         self._last_death_count = 0
@@ -223,6 +229,16 @@ class HadesIIContext(CommonContext):
             self._keepsakes_needed = slot_data.get("keepsakes_needed", 0)
             self._fatesanity = slot_data.get("fatesanity") == 1
             self._fates_needed = slot_data.get("fates_needed", 0)
+            # Score split: in separate mode the underworld route's checks map to
+            # the low location-id range and the surface route's to the high range,
+            # split at `underworld_budget` (must match Locations.score_check_split
+            # and the Lua mod). In combined mode the single counter lights ids
+            # consecutively (see _process_score_checks).
+            self._score_split = slot_data.get("score_split_mode") == 1
+            self._underworld_budget, _ = score_check_split(
+                slot_data.get("score_rewards_amount", 150),
+                slot_data.get("surface_score_ratio", 40),
+            )
             self._write_settings(slot_data)
             self._write_inbox()
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
@@ -422,6 +438,8 @@ class HadesIIContext(CommonContext):
     async def resync(self):
         """Reset client-side counters and reprocess the outbox from scratch."""
         self._last_checks_sent = 0
+        self._last_under_checks = 0
+        self._last_surface_checks = 0
         self._sent_named_location_ids.clear()
         self._sent_hint_location_ids.clear()
         self._last_death_count = 0
@@ -455,23 +473,51 @@ class HadesIIContext(CommonContext):
         await self._process_deathlink(data)
 
     async def _process_score_checks(self, data: dict):
-        """Convert the Lua mod's checks_sent counter into AP LocationChecks."""
-        checks_sent = data.get("checks_sent", 0)
-        if checks_sent <= self._last_checks_sent:
+        """Convert the Lua mod's score-check counters into AP LocationChecks.
+
+        Separate split mode: the underworld and surface routes carry their own
+        counters, mapped to disjoint location-id ranges — underworld to the first
+        `underworld_budget` ids (Erebus), surface to the ids above it (Ephyra).
+        Combined mode: a single counter lights ids consecutively.
+        """
+        if self._score_split:
+            await self._send_score_range(
+                data.get("checks_sent_underworld", 0),
+                offset=0,
+                last_attr="_last_under_checks",
+            )
+            await self._send_score_range(
+                data.get("checks_sent_surface", 0),
+                offset=self._underworld_budget,
+                last_attr="_last_surface_checks",
+            )
+            return
+
+        await self._send_score_range(
+            data.get("checks_sent", 0),
+            offset=0,
+            last_attr="_last_checks_sent",
+        )
+
+    async def _send_score_range(self, count: int, offset: int, last_attr: str):
+        """Light score-check location ids [offset+last, offset+count) for one pool."""
+        last = getattr(self, last_attr)
+        if count <= last:
             return
 
         new_locations = set()
-        for i in range(self._last_checks_sent, checks_sent):
-            if i < SCORE_LOCATION_COUNT:
-                loc_id = hades_ii_base_location_id + i
+        for i in range(last, count):
+            idx = offset + i
+            if idx < SCORE_LOCATION_COUNT:
+                loc_id = hades_ii_base_location_id + idx
                 if loc_id not in self.checked_locations:
                     new_locations.add(loc_id)
 
         if new_locations:
             await self.send_msgs([{"cmd": "LocationChecks", "locations": list(new_locations)}])
-            logger.debug(f"Sent {len(new_locations)} score check(s) (total: {checks_sent})")
+            logger.debug(f"Sent {len(new_locations)} score check(s) at offset {offset} (total: {count})")
 
-        self._last_checks_sent = checks_sent
+        setattr(self, last_attr, count)
 
     async def _process_named_checks(self, data: dict):
         """

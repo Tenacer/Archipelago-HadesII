@@ -3,6 +3,7 @@ from .Locations import (
     HadesIILocation,
     SURFACE_LOCK_LOCATIONS,
     location_table_score_checks,
+    score_check_split,
     location_table_boss_rewards,
     location_keepsakes,
     location_weapons,
@@ -59,13 +60,30 @@ def _add_location(region: Region, name: str, address):
 def create_regions(player, multiworld, location_database, options):
     regions = {name: Region(name, player, multiworld) for name in _region_connections}
 
-    # Score checks — live in Menu, only populated under score_based location
-    # system and limited to the first N per ScoreRewardsAmount.
+    # Score checks — only populated under the score_based location system and
+    # limited to the first N per ScoreRewardsAmount.
+    # Combined split mode: all live in Menu (always accessible — any route can
+    #   earn every check).
+    # Separate split mode: the underworld route can only earn its budget share
+    #   and the surface route only earns the rest, so the checks are placed in
+    #   the region whose access they actually require — the first
+    #   `underworld_budget` in Erebus (reachable from start), the remaining
+    #   surface ones in Ephyra (gated by the Crossroads -> Ephyra surface rule).
+    #   This keeps multiworld fill from treating surface checks as reachable
+    #   before surface access is unlocked.
     # Progress types are set later in set_rules once the item pool is known.
     if options.location_system == "score_based":
-        for i in range(1, options.score_rewards_amount.value + 1):
-            name = f"Score Check {i}"
-            _add_location(regions["Menu"], name, location_table_score_checks[name])
+        n = options.score_rewards_amount.value
+        if options.score_split_mode == 1:  # separate
+            underworld_budget, _ = score_check_split(n, options.surface_score_ratio.value)
+            for i in range(1, n + 1):
+                name = f"Score Check {i}"
+                region = regions["Erebus"] if i <= underworld_budget else regions["Ephyra"]
+                _add_location(region, name, location_table_score_checks[name])
+        else:  # combined
+            for i in range(1, n + 1):
+                name = f"Score Check {i}"
+                _add_location(regions["Menu"], name, location_table_score_checks[name])
 
     # Biome victory events + boss reward checks.
     # `Chronos True Victory` is the True-Ending-only sentinel — the second Chronos

@@ -46,9 +46,25 @@ def _by_region(region: str, category: Optional[str] = None) -> Dict[str, Optiona
 
 # -- Exports consumed by Regions.py / HadesIIClient.py / Rules.py ---------------
 
-# Score checks live in Menu and are always accessible.
+# Score checks. In combined split mode they all live in Menu (always accessible).
+# In separate mode the first `underworld_budget` go to Erebus (underworld route,
+# reachable from start) and the rest to Ephyra (surface route, gated by surface
+# access) — see score_check_split and Regions.create_regions.
 location_table_score_checks: Dict[str, int] = _by_category("score")  # values are all int
 SCORE_LOCATION_COUNT = len(location_table_score_checks)
+
+
+def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
+    """Return (underworld_budget, surface_budget) for the score-check pool.
+
+    The surface route gets `surface_score_ratio`% of the total checks; the
+    underworld route gets the remainder. Shared boundary used by Regions.py
+    (location placement), HadesIIClient.py (counter→location-id mapping) and
+    mirrored in the Lua mod's H2AP_ScoreChecksSent — all three MUST agree.
+    """
+    surface_budget = score_rewards_amount * surface_score_ratio // 100
+    underworld_budget = score_rewards_amount - surface_budget
+    return underworld_budget, surface_budget
 
 # Per-biome event tables (victory events, no address).
 location_table_erebus   = _by_region("Erebus",   "biome_victory")
