@@ -121,7 +121,9 @@ class HadesIIClientCommandProcessor(ClientCommandProcessor):
             with open(outbox) as f:
                 data = json.load(f)
             logger.info(
-                f"Score: {data.get('score', 0)} | "
+                f"Score: {data.get('score', 0)} "
+                f"(underworld {data.get('score_underworld', 0)}, "
+                f"surface {data.get('score_surface', 0)}) | "
                 f"Checks sent: {data.get('checks_sent', 0)} | "
                 f"Items received: {data.get('items_index', 0)}"
             )

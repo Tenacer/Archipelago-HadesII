@@ -44,6 +44,36 @@ class ScoreRewardsAmount(Range):
     default = 150
 
 
+class ScoreSplitMode(Choice):
+    """
+    Choose how room-clear score earns score checks.
+    Combined: a single score pool — every room feeds the same budget (any route
+    can earn all of the score checks on its own).
+    Separate: the underworld route (Erebus, Oceanus, Mourning Fields, Tartarus —
+    the Chronos path) and the surface route (Ephyra, Thessaly, Olympus, Summit —
+    the Typhon path) accumulate score independently, each capped at its own share
+    of the total Score Rewards Amount (see Surface Score Ratio), so clearing all
+    score checks requires playing both routes.
+    """
+    display_name = "Score Split Mode"
+    option_combined = 0
+    option_separate = 1
+    default = 1
+
+
+class SurfaceScoreRatio(Range):
+    """
+    Only used when Score Split Mode is "separate". Percentage of the score-check
+    budget allocated to the surface route (the Typhon path); the remainder goes
+    to the underworld route (the Chronos path). The surface is accessed later in
+    the game, so a lower value (fewer surface checks) is the intended default.
+    """
+    display_name = "Surface Score Ratio"
+    range_start = 0
+    range_end = 100
+    default = 40
+
+
 class KeepsakeSanity(DefaultOnToggle):
     """
     Shuffles NPCs' keepsakes into the item pool, and makes each keepsake location a check. 
@@ -530,6 +560,8 @@ class HadesIIOptions(PerGameCommonOptions):
     initial_weapon: InitialWeapon
     location_system: LocationSystem
     score_rewards_amount: ScoreRewardsAmount
+    score_split_mode: ScoreSplitMode
+    surface_score_ratio: SurfaceScoreRatio
 
     keepsakesanity: KeepsakeSanity
     weaponsanity: WeaponSanity
@@ -591,6 +623,8 @@ hades_ii_option_groups = [
         InitialWeapon,
         LocationSystem,
         ScoreRewardsAmount,
+        ScoreSplitMode,
+        SurfaceScoreRatio,
         KeepsakeSanity,
         WeaponSanity,
         ToolSanity,

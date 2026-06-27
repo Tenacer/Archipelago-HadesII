@@ -140,6 +140,8 @@ class HadesIIWorld(World):
             "initial_weapon",
             "location_system",
             "score_rewards_amount",
+            "score_split_mode",
+            "surface_score_ratio",
             # Sanities
             "keepsakesanity",
             "weaponsanity",
