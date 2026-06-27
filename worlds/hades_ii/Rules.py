@@ -132,13 +132,21 @@ class HadesIILogic(LogicMixin):
             return False
         if not self._has_incantation("Faith of Familiar Spirits", player, options):
             return False
-        if options.toolsanity:
-            return (
-                self.has("Tablet of Peace Tool Unlock", player)  # type: ignore
-                and self.has("Crescent Pickaxe Tool Unlock", player)  # type: ignore
-                and self.has("Silver Spade Tool Unlock", player)  # type: ignore
-            )
-        return True
+        return self._has_familiar_tools(player, options)
+
+    # The Tablet of Peace, Crescent Pickaxe and Silver Spade must be available
+    # before the HecateBossGrantsFamiliarSystem01 conversation fires (which is
+    # what unlocks brewing the WorldUpgradeFamiliarSystem incantation). Only a
+    # logic constraint when toolsanity makes the tools into items; otherwise
+    # they unlock through vanilla play.
+    def _has_familiar_tools(self, player: int, options) -> bool:
+        if not options.toolsanity:
+            return True
+        return (
+            self.has("Tablet of Peace Tool Unlock", player)  # type: ignore
+            and self.has("Crescent Pickaxe Tool Unlock", player)  # type: ignore
+            and self.has("Silver Spade Tool Unlock", player)  # type: ignore
+        )
 
     # Checks if the player has reached the end-game.
     # Combined mode: either Chronos or Typhon cleared (kill counts enforced
@@ -443,7 +451,9 @@ _INCANTATION_CHAIN_RULES = (
 _INCANTATION_BOSS_RULES = (
     ("Necromantic Influence",   "Hecate"),
     ("Abyssal Insight",         "Hecate"),
-    ("Faith of Familiar Spirits", "Hecate"),
+    # "Faith of Familiar Spirits" (WorldUpgradeFamiliarSystem) is handled
+    # separately in handle_incantations: it needs Hecate AND the three tools,
+    # because HecateBossGrantsFamiliarSystem01 only fires once they're available.
 )
 
 # Cauldronsanity entries gated purely on surface access (no intra-cauldron
@@ -529,6 +539,16 @@ def handle_incantations(world, player, options):
             world.get_location(loc_name, player),
             lambda state, b=boss: state._has_boss(b, player),  # type: ignore
         )
+
+    # Familiar-system incantation: Hecate AND the three tools (Tablet, Pickaxe,
+    # Spade), since HecateBossGrantsFamiliarSystem01 gates brewing it.
+    add_rule(
+        world.get_location("Faith of Familiar Spirits", player),
+        lambda state: (
+            state._has_boss("Hecate", player)  # type: ignore
+            and state._has_familiar_tools(player, options)  # type: ignore
+        ),
+    )
 
     # Surface-access-only gates.
     for loc_name in _INCANTATION_SURFACE_ACCESS:
