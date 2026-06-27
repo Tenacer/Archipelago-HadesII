@@ -9,6 +9,7 @@ from .Locations import (
     location_weapon_clears,
     location_hidden_aspects,
     location_tools,
+    location_familiars_by_region,
     location_incantations,
     location_table_prophecies,
     location_table_erebus,
@@ -130,6 +131,14 @@ def create_regions(player, multiworld, location_database, options):
     if options.toolsanity:
         for name, loc_id in location_tools.items():
             _add_location(regions["Crossroads"], name, loc_id)
+
+    # Familiar recruits, gated by familiarsanity — placed in the biome where each
+    # wild familiar appears (Frinos in the Crossroads hub). Access rules are set in
+    # Rules.handle_familiars; biome reachability is enforced by region connectivity.
+    if options.familiarsanity:
+        for region_name, table in location_familiars_by_region.items():
+            for name, loc_id in table.items():
+                _add_location(regions[region_name], name, loc_id)
 
     # Wire up connections
     for source, targets in _region_connections.items():

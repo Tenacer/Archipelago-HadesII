@@ -152,6 +152,7 @@ item_table_post_ending_keepsakes = _items_in_group("post_ending_keepsakes")
 item_table_weapons     = _items_in_group("weapons")
 item_table_tools       = _items_in_group("tools")
 item_table_hidden_aspects = _items_in_group("hidden_aspects")
+item_table_familiars   = _items_in_group("familiars")
 item_table_traps       = _items_in_group("traps")
 item_table_helpers     = _items_in_group("helpers")
 item_table_prophecies  = _items_in_group("prophecies")
@@ -211,6 +212,11 @@ def create_items(self) -> None:
     # Tools — gated by toolsanity (otherwise tools stay vanilla)
     if self.options.toolsanity:
         pool.extend(self.create_item(name) for name in item_table_tools)
+
+    # Familiars — gated by familiarsanity (otherwise familiars stay vanilla).
+    # No goal counts them, so the CSV's `useful` classification stands.
+    if self.options.familiarsanity:
+        pool.extend(self.create_item(name) for name in item_table_familiars)
 
     # Surface-unlock incantations — owned exclusively by lock_surface_incantations
     # (independent of cauldronsanity). Always progression so Rules.py's

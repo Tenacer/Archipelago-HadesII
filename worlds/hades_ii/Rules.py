@@ -120,6 +120,26 @@ class HadesIILogic(LogicMixin):
             return True
         return self.has(name, player)  # type: ignore
 
+    # Every familiar recruit sits behind the familiar-system unlock. The system is
+    # granted by Hecate (post-Hecate gate) via the WorldUpgradeFamiliarSystem
+    # incantation ("Faith of Familiar Spirits"), reached through a chain that needs
+    # the Tablet of Peace, Crescent Pickaxe and Silver Spade. Those extra
+    # dependencies only constrain logic when the matching sanity is on:
+    # cauldronsanity keys the incantation (via _has_incantation), toolsanity makes
+    # the three tools into items.
+    def _has_familiar_system(self, player: int, options) -> bool:
+        if not self._has_boss("Hecate", player):
+            return False
+        if not self._has_incantation("Faith of Familiar Spirits", player, options):
+            return False
+        if options.toolsanity:
+            return (
+                self.has("Tablet of Peace Tool Unlock", player)  # type: ignore
+                and self.has("Crescent Pickaxe Tool Unlock", player)  # type: ignore
+                and self.has("Silver Spade Tool Unlock", player)  # type: ignore
+            )
+        return True
+
     # Checks if the player has reached the end-game.
     # Combined mode: either Chronos or Typhon cleared (kill counts enforced
     # client-side via the BossDefeatsNeeded victory signal).
@@ -209,6 +229,7 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     # handler per the per-entry tables, not a separate pass.
     handle_keepsakes(world, player, options)
     handle_hidden_aspects(world, player, options)
+    handle_familiars(world, player, options)
     handle_incantations(world, player, options)
     handle_prophecies(world, player, options)
 
@@ -276,6 +297,27 @@ def handle_hidden_aspects(world, player, options):
         add_rule(
             world.get_location(location_name, player),
             lambda state, w=weapon_name: state._has_weapon(w, player, options),
+        )
+
+
+# Each familiar recruit is gated on the familiar-system unlock. Biome reachability
+# (Toula→Oceanus, Hecuba→Fields, Gale→Olympus) is already enforced by region
+# connectivity, so the only extra rule each location needs is _has_familiar_system,
+# which folds in the post-Hecate gate plus the tool/incantation dependencies.
+def handle_familiars(world, player, options):
+    if not options.familiarsanity:
+        return
+    familiar_locations = (
+        "Frinos Familiar Unlock Location",
+        "Raki Familiar Unlock Location",
+        "Toula Familiar Unlock Location",
+        "Hecuba Familiar Unlock Location",
+        "Gale Familiar Unlock Location",
+    )
+    for loc_name in familiar_locations:
+        add_rule(
+            world.get_location(loc_name, player),
+            lambda state: state._has_familiar_system(player, options),  # type: ignore
         )
 
 

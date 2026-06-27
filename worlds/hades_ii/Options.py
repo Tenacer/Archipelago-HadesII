@@ -75,6 +75,15 @@ class HiddenAspectSanity(DefaultOnToggle):
     """
     display_name = "Hidden Aspect Sanity"
 
+class FamiliarSanity(DefaultOnToggle):
+    """
+    Shuffles the five animal familiars (Frinos, Raki, Toula, Hecuba, Gale) into the item
+    pool, and makes recruiting each one a check. Need to be sent the familiar item to
+    actually gain the companion. Every familiar check sits behind the familiar-system
+    unlock, which requires the Tablet of Peace, Crescent Pickaxe and Silver Spade.
+    """
+    display_name = "Familiar Sanity"
+
 class CauldronSanity(DefaultOnToggle):
     """
     Shuffles incantations from the Cauldron in the item pool.
@@ -527,6 +536,7 @@ class HadesIIOptions(PerGameCommonOptions):
     weaponsanity: WeaponSanity
     toolsanity: ToolSanity
     hidden_aspectsanity: HiddenAspectSanity
+    familiarsanity: FamiliarSanity
     cauldronsanity: CauldronSanity
     lock_surface_incantations: LockSurfaceIncantations
     fatesanity: FateSanity
@@ -586,6 +596,7 @@ hades_ii_option_groups = [
         WeaponSanity,
         ToolSanity,
         HiddenAspectSanity,
+        FamiliarSanity,
         CauldronSanity,
         LockSurfaceIncantations,
         FateSanity,

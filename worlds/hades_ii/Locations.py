@@ -68,6 +68,13 @@ location_weapons            = _by_category("weapon")
 location_weapon_clears      = _by_category("weapon_clear")
 location_hidden_aspects     = _by_category("hidden_aspect")
 location_tools              = _by_category("tool")
+location_familiars          = _by_category("familiar")
+# Familiar recruits live in the biome where the wild familiar appears (Frinos in
+# the Crossroads hub), so they're placed per-region rather than all in Crossroads.
+location_familiars_by_region = {
+    region: _by_region(region, "familiar")
+    for region in ("Crossroads", "Erebus", "Oceanus", "Fields", "Olympus")
+}
 location_incantations       = _by_category("incantation")
 location_table_prophecies   = _by_category("prophecy")
 
@@ -88,6 +95,7 @@ location_name_groups = {
     "keepsakes":    set(location_keepsakes),
     "weapons":      set(location_weapons),
     "tools":        set(location_tools),
+    "familiars":    set(location_familiars),
     "prophecies":   set(location_table_prophecies),
     "incantations": set(location_incantations),
 }
@@ -123,6 +131,10 @@ def setup_location_table_with_settings(options) -> dict:
     # Tool unlocks at Schelmy's shop, gated by toolsanity
     if options.toolsanity.value == 1:
         total.update(location_tools)
+
+    # Familiar recruits, gated by familiarsanity
+    if options.familiarsanity.value == 1:
+        total.update(location_familiars)
 
     if options.keepsakesanity.value == 1:
         total.update(location_keepsakes)

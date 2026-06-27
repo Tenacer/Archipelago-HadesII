@@ -176,6 +176,7 @@ class TestTrueEndingAllSanities(HadesIITestBase):
         "keepsakesanity": 1,
         "weaponsanity": 1,
         "hidden_aspectsanity": 1,
+        "familiarsanity": 1,
         "cauldronsanity": 1,
         "fatesanity": 1,
     }
@@ -189,6 +190,7 @@ class TestAllSanitiesOff(HadesIITestBase):
         "keepsakesanity": 0,
         "weaponsanity": 0,
         "hidden_aspectsanity": 0,
+        "familiarsanity": 0,
         "cauldronsanity": 0,
         "lock_surface_incantations": 0,
         "fatesanity": 0,
@@ -197,6 +199,47 @@ class TestAllSanitiesOff(HadesIITestBase):
     def test_no_weapon_clears_without_weaponsanity(self) -> None:
         for name in _WEAPON_CLEAR_NAMES:
             self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
+
+    def test_no_familiar_locations_without_familiarsanity(self) -> None:
+        for name in _FAMILIAR_LOCATION_NAMES:
+            self.assertRaises(KeyError, self.multiworld.get_location, name, self.player)
+
+
+_FAMILIAR_LOCATION_NAMES = (
+    "Frinos Familiar Unlock Location",
+    "Raki Familiar Unlock Location",
+    "Toula Familiar Unlock Location",
+    "Hecuba Familiar Unlock Location",
+    "Gale Familiar Unlock Location",
+)
+_FAMILIAR_ITEM_NAMES = (
+    "Frinos Familiar",
+    "Raki Familiar",
+    "Toula Familiar",
+    "Hecuba Familiar",
+    "Gale Familiar",
+)
+
+
+class TestFamiliarSanity(HadesIITestBase):
+    """familiarsanity on: the five recruit locations and familiar items exist, and
+    every recruit is gated behind the familiar-system unlock (post-Hecate)."""
+    options = {"familiarsanity": 1, "toolsanity": 0, "cauldronsanity": 0}
+
+    def test_familiar_locations_exist(self) -> None:
+        for name in _FAMILIAR_LOCATION_NAMES:
+            self.assertIsNotNone(self.multiworld.get_location(name, self.player))
+
+    def test_familiar_items_in_pool(self) -> None:
+        pool = {item.name for item in self.multiworld.itempool}
+        for name in _FAMILIAR_ITEM_NAMES:
+            self.assertIn(name, pool)
+
+    def test_familiars_unreachable_before_hecate(self) -> None:
+        # No items collected: the familiar-system unlock (post-Hecate) is missing,
+        # so none of the recruit locations are reachable.
+        for name in _FAMILIAR_LOCATION_NAMES:
+            self.assertFalse(self.can_reach_location(name))
 
 
 _SURFACE_LOCK_NAMES = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
