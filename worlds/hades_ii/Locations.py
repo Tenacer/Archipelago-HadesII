@@ -66,6 +66,76 @@ def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
     underworld_budget = score_rewards_amount - surface_budget
     return underworld_budget, surface_budget
 
+
+# -- Room-based location systems (room_based / room_weapon_based) --------------
+# A check the first time the player reaches each run depth, keyed per route
+# ("Clear Underworld Room NN" / "Clear Surface Room NN", optionally suffixed with
+# the equipped weapon for room_weapon_based). Mirrors Polycosmos' room_based /
+# room_weapon_based, adapted to Hades II's two routes.
+#
+# Per-route biome depth ranges: ordered (region, last_run_depth) pairs. Each room
+# check is placed in the biome region that owns its run depth, so the existing
+# boss-victory entrance rules (handle_area_logic) gate it exactly as in-game:
+# "Clear Underworld Room 35" lands in Tartarus → needs Hecate+Scylla+Cerberus.
+# These are GAME-STRUCTURE constants (not player options) and the route maxima
+# below derive from the last entry. The mod logs both the observed max run depth
+# AND each biome-transition depth per route ("[HadesII_AP] biome <X> starts at
+# run depth N") so these can be confirmed/tightened from a real run.
+# TODO(confirm): boundaries are estimates — update after one full run of each
+# route, then regenerate the room rows (scripts/gen_room_locations.py).
+UNDERWORLD_BIOME_BOUNDS = [("Erebus", 11), ("Oceanus", 20), ("Fields", 25), ("Tartarus", 40)]
+SURFACE_BIOME_BOUNDS    = [("Ephyra", 11), ("Thessaly", 19), ("Olympus", 29), ("Summit", 36)]
+
+UNDERWORLD_ROOM_MAX = UNDERWORLD_BIOME_BOUNDS[-1][1]
+SURFACE_ROOM_MAX    = SURFACE_BIOME_BOUNDS[-1][1]
+# Run depth where Tartarus (the variable final underworld biome, optional rooms
+# like Hades 1's Styx) begins. The Chronos-kill auto-grant covers
+# [UNDERWORLD_AUTOGRANT_FROM .. UNDERWORLD_ROOM_MAX] so players who took a short
+# path through Tartarus still complete those checks. Defaults to the start of the
+# last underworld biome.
+UNDERWORLD_AUTOGRANT_FROM = UNDERWORLD_BIOME_BOUNDS[-2][1] + 1
+
+
+def room_region_for(bounds, depth: int) -> str:
+    """Return the biome region that owns `depth` for a route's bounds list."""
+    for region, last in bounds:
+        if depth <= last:
+            return region
+    return bounds[-1][0]  # clamp into the final biome
+
+# AP-facing weapon tokens for room_weapon_based suffixes. Order matches the
+# InitialWeapon option (Staff=0 … Coat=5); the Lua mod maps GetEquippedWeapon()'s
+# internal names to these (see WEAPON_SHORT in lib/weapons.lua).
+ROOM_WEAPON_TOKENS = ["Staff", "Daggers", "Torches", "Axe", "Skull", "Coat"]
+
+
+def room_location_name(route: str, depth: int, weapon: str = None) -> str:
+    """Canonical room-check location name. `route` is 'Underworld' or 'Surface'.
+    MUST match the Lua mod's name construction in H2AP_OnRoomCleared."""
+    base = f"Clear {route} Room {depth:02d}"
+    return f"{base} {weapon}" if weapon else base
+
+
+location_room_clears        = _by_category("room_clear")
+location_room_weapon_clears = _by_category("room_weapon_clear")
+
+
+def _room_clears_by_region(category: str) -> Dict[str, Dict[str, Optional[int]]]:
+    """Group a room category's locations by the biome region in their CSV row, so
+    each depth's check sits behind that biome's boss-victory gate (and the surface
+    biomes behind the surface-access gate). The CSV regions are materialized by
+    scripts/gen_room_locations.py from {UNDERWORLD,SURFACE}_BIOME_BOUNDS."""
+    grouped: Dict[str, Dict[str, Optional[int]]] = {}
+    for name, d in location_table.items():
+        if d.category == category:
+            grouped.setdefault(d.region, {})[name] = d.code
+    return grouped
+
+
+location_room_clears_by_region        = _room_clears_by_region("room_clear")
+location_room_weapon_clears_by_region = _room_clears_by_region("room_weapon_clear")
+
+
 # Per-biome event tables (victory events, no address).
 location_table_erebus   = _by_region("Erebus",   "biome_victory")
 location_table_oceanus  = _by_region("Oceanus",  "biome_victory")
@@ -143,6 +213,13 @@ def setup_location_table_with_settings(options) -> dict:
         for i in range(1, options.score_rewards_amount.value + 1):
             name = f"Score Check {i}"
             total[name] = location_table_score_checks[name]
+
+    # Room-based systems: per-route depth checks (and per-weapon for the weapon
+    # variant). Mirrors the Regions.create_regions placement.
+    elif options.location_system == "room_based":
+        total.update(location_room_clears)
+    elif options.location_system == "room_weapon_based":
+        total.update(location_room_weapon_clears)
 
     # Tool unlocks at Schelmy's shop, gated by toolsanity
     if options.toolsanity.value == 1:

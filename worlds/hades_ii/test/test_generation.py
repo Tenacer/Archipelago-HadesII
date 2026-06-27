@@ -758,6 +758,92 @@ class TestScoreSplitCombined(HadesIITestBase):
         self.assertTrue(self.can_reach_location("Score Check 100"))
 
 
+# ── Room-based location systems ───────────────────────────────────────────────
+
+def _assert_room_checks_block_progression(test_case) -> None:
+    fake_progression = Item("test", ItemClassification.progression, None, test_case.player)
+    fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
+    room_locs = [
+        loc for loc in test_case.multiworld.get_locations(test_case.player)
+        if loc.name.startswith("Clear ")
+    ]
+    test_case.assertGreater(len(room_locs), 0, "no room checks found")
+    for loc in room_locs:
+        test_case.assertFalse(loc.item_rule(fake_progression),
+            f"{loc.name} should reject progression items")
+        test_case.assertTrue(loc.item_rule(fake_filler),
+            f"{loc.name} should accept filler items")
+
+
+class TestRoomBased(HadesIITestBase):
+    """room_based: per-route depth checks, no score checks. lock_surface on so the
+    surface gate has teeth."""
+    options = {"location_system": "room_based", "lock_surface_incantations": 1}
+
+    def test_no_score_checks(self) -> None:
+        score = [loc for loc in self.multiworld.get_locations(self.player)
+                 if loc.name.startswith("Score Check ")]
+        self.assertEqual(score, [])
+
+    def test_room_counts_match_constants(self) -> None:
+        from worlds.hades_ii.Locations import UNDERWORLD_ROOM_MAX, SURFACE_ROOM_MAX
+        under = [loc for loc in self.multiworld.get_locations(self.player)
+                 if loc.name.startswith("Clear Underworld Room ")]
+        surf = [loc for loc in self.multiworld.get_locations(self.player)
+                if loc.name.startswith("Clear Surface Room ")]
+        self.assertEqual(len(under), UNDERWORLD_ROOM_MAX)
+        self.assertEqual(len(surf), SURFACE_ROOM_MAX)
+
+    def test_room_region_placement(self) -> None:
+        # Each depth lands in the biome region that owns its run depth, so the
+        # boss-victory gates apply. (Boundaries from {UNDERWORLD,SURFACE}_BIOME_BOUNDS.)
+        from worlds.hades_ii.Locations import (
+            UNDERWORLD_BIOME_BOUNDS, SURFACE_BIOME_BOUNDS, room_region_for)
+        for depth in (1, 12, 21, 26, 40):
+            self.assertEqual(
+                self.multiworld.get_location(f"Clear Underworld Room {depth:02d}", self.player)
+                    .parent_region.name, room_region_for(UNDERWORLD_BIOME_BOUNDS, depth))
+        for depth in (1, 30):
+            self.assertEqual(
+                self.multiworld.get_location(f"Clear Surface Room {depth:02d}", self.player)
+                    .parent_region.name, room_region_for(SURFACE_BIOME_BOUNDS, depth))
+
+    def test_shallow_underworld_room_reachable_from_start(self) -> None:
+        # Erebus is reachable from the Crossroads with no items.
+        self.assertTrue(self.can_reach_location("Clear Underworld Room 01"))
+
+    def test_deep_underworld_room_needs_biome_bosses(self) -> None:
+        # A Tartarus-depth room requires Hecate+Scylla+Cerberus victories, so it
+        # is NOT reachable from an empty state.
+        self.assertFalse(self.can_reach_location("Clear Underworld Room 40"))
+
+    def test_surface_rooms_need_surface_access(self) -> None:
+        self.assertFalse(self.can_reach_location("Clear Surface Room 01"))
+
+    def test_room_checks_block_progression(self) -> None:
+        _assert_room_checks_block_progression(self)
+
+
+class TestRoomWeaponBased(HadesIITestBase):
+    """room_weapon_based: room_based set x 6 weapons."""
+    options = {"location_system": "room_weapon_based"}
+
+    def test_room_weapon_count(self) -> None:
+        from worlds.hades_ii.Locations import (
+            UNDERWORLD_ROOM_MAX, SURFACE_ROOM_MAX, ROOM_WEAPON_TOKENS)
+        room_locs = [loc for loc in self.multiworld.get_locations(self.player)
+                     if loc.name.startswith("Clear ")]
+        expected = (UNDERWORLD_ROOM_MAX + SURFACE_ROOM_MAX) * len(ROOM_WEAPON_TOKENS)
+        self.assertEqual(len(room_locs), expected)
+
+    def test_weapon_suffixed_names_exist(self) -> None:
+        for name in ("Clear Underworld Room 01 Staff", "Clear Surface Room 01 Coat"):
+            self.assertIsNotNone(self.multiworld.get_location(name, self.player))
+
+    def test_room_checks_block_progression(self) -> None:
+        _assert_room_checks_block_progression(self)
+
+
 # ── Preset smoke tests ────────────────────────────────────────────────────────
 # Generate every shipped preset and run the inherited base checks (fill +
 # all-state reachability), so a preset can never ship an ungeneratable combo.

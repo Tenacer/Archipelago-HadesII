@@ -23,11 +23,20 @@ class InitialWeapon(Choice):
 
 class LocationSystem(Choice):
     """
-    Chooses how the game gives you items. Currently only score_based is supported.
-    Room-based modes are reserved for a future update.
+    Chooses how the game turns cleared rooms into checks.
+    - score_based: rooms award score by biome depth; crossing cumulative
+      thresholds unlocks score checks (see Score Rewards Amount / Score Split Mode).
+    - room_based: a check the first time you reach each run depth, separately per
+      route ("Clear Underworld Room NN" / "Clear Surface Room NN"). You progress by
+      getting deeper across runs.
+    - room_weapon_based: like room_based, but the check is per equipped weapon
+      ("Clear Underworld Room NN <Weapon>") — far more checks.
+    Mirrors Polycosmos' three location systems (adapted to Hades II's two routes).
     """
     display_name = "Location System"
     option_score_based = 0
+    option_room_based = 1
+    option_room_weapon_based = 2
     default = 0
     
 

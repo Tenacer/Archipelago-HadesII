@@ -4,6 +4,8 @@ from .Locations import (
     SURFACE_LOCK_LOCATIONS,
     location_table_score_checks,
     score_check_split,
+    location_room_clears_by_region,
+    location_room_weapon_clears_by_region,
     location_table_boss_rewards,
     location_keepsakes,
     location_weapons,
@@ -84,6 +86,22 @@ def create_regions(player, multiworld, location_database, options):
             for i in range(1, n + 1):
                 name = f"Score Check {i}"
                 _add_location(regions["Menu"], name, location_table_score_checks[name])
+
+    # Room-based systems: each depth's check is placed in the biome region that
+    # owns its run depth ({UNDERWORLD,SURFACE}_BIOME_BOUNDS), so the boss-victory
+    # entrance rules (handle_area_logic) gate it exactly as in-game — a deep
+    # Tartarus room needs Hecate+Scylla+Cerberus, surface rooms need surface
+    # access + their biome's prior bosses. The room_weapon variant places the same
+    # per-region sets x 6 weapons.
+    room_region_tables = None
+    if options.location_system == "room_based":
+        room_region_tables = location_room_clears_by_region
+    elif options.location_system == "room_weapon_based":
+        room_region_tables = location_room_weapon_clears_by_region
+    if room_region_tables:
+        for region_name, table in room_region_tables.items():
+            for name, loc_id in table.items():
+                _add_location(regions[region_name], name, loc_id)
 
     # Biome victory events + boss reward checks.
     # `Chronos True Victory` is the True-Ending-only sentinel — the second Chronos

@@ -763,3 +763,535 @@ id,name,region,category
 2771,Toula Familiar Unlock Location,Oceanus,familiar
 2772,Hecuba Familiar Unlock Location,Fields,familiar
 2773,Gale Familiar Unlock Location,Olympus,familiar
+2774,Clear Underworld Room 01,Erebus,room_clear
+2775,Clear Underworld Room 02,Erebus,room_clear
+2776,Clear Underworld Room 03,Erebus,room_clear
+2777,Clear Underworld Room 04,Erebus,room_clear
+2778,Clear Underworld Room 05,Erebus,room_clear
+2779,Clear Underworld Room 06,Erebus,room_clear
+2780,Clear Underworld Room 07,Erebus,room_clear
+2781,Clear Underworld Room 08,Erebus,room_clear
+2782,Clear Underworld Room 09,Erebus,room_clear
+2783,Clear Underworld Room 10,Erebus,room_clear
+2784,Clear Underworld Room 11,Erebus,room_clear
+2785,Clear Underworld Room 12,Oceanus,room_clear
+2786,Clear Underworld Room 13,Oceanus,room_clear
+2787,Clear Underworld Room 14,Oceanus,room_clear
+2788,Clear Underworld Room 15,Oceanus,room_clear
+2789,Clear Underworld Room 16,Oceanus,room_clear
+2790,Clear Underworld Room 17,Oceanus,room_clear
+2791,Clear Underworld Room 18,Oceanus,room_clear
+2792,Clear Underworld Room 19,Oceanus,room_clear
+2793,Clear Underworld Room 20,Oceanus,room_clear
+2794,Clear Underworld Room 21,Fields,room_clear
+2795,Clear Underworld Room 22,Fields,room_clear
+2796,Clear Underworld Room 23,Fields,room_clear
+2797,Clear Underworld Room 24,Fields,room_clear
+2798,Clear Underworld Room 25,Fields,room_clear
+2799,Clear Underworld Room 26,Tartarus,room_clear
+2800,Clear Underworld Room 27,Tartarus,room_clear
+2801,Clear Underworld Room 28,Tartarus,room_clear
+2802,Clear Underworld Room 29,Tartarus,room_clear
+2803,Clear Underworld Room 30,Tartarus,room_clear
+2804,Clear Underworld Room 31,Tartarus,room_clear
+2805,Clear Underworld Room 32,Tartarus,room_clear
+2806,Clear Underworld Room 33,Tartarus,room_clear
+2807,Clear Underworld Room 34,Tartarus,room_clear
+2808,Clear Underworld Room 35,Tartarus,room_clear
+2809,Clear Underworld Room 36,Tartarus,room_clear
+2810,Clear Underworld Room 37,Tartarus,room_clear
+2811,Clear Underworld Room 38,Tartarus,room_clear
+2812,Clear Underworld Room 39,Tartarus,room_clear
+2813,Clear Underworld Room 40,Tartarus,room_clear
+2814,Clear Surface Room 01,Ephyra,room_clear
+2815,Clear Surface Room 02,Ephyra,room_clear
+2816,Clear Surface Room 03,Ephyra,room_clear
+2817,Clear Surface Room 04,Ephyra,room_clear
+2818,Clear Surface Room 05,Ephyra,room_clear
+2819,Clear Surface Room 06,Ephyra,room_clear
+2820,Clear Surface Room 07,Ephyra,room_clear
+2821,Clear Surface Room 08,Ephyra,room_clear
+2822,Clear Surface Room 09,Ephyra,room_clear
+2823,Clear Surface Room 10,Ephyra,room_clear
+2824,Clear Surface Room 11,Ephyra,room_clear
+2825,Clear Surface Room 12,Thessaly,room_clear
+2826,Clear Surface Room 13,Thessaly,room_clear
+2827,Clear Surface Room 14,Thessaly,room_clear
+2828,Clear Surface Room 15,Thessaly,room_clear
+2829,Clear Surface Room 16,Thessaly,room_clear
+2830,Clear Surface Room 17,Thessaly,room_clear
+2831,Clear Surface Room 18,Thessaly,room_clear
+2832,Clear Surface Room 19,Thessaly,room_clear
+2833,Clear Surface Room 20,Olympus,room_clear
+2834,Clear Surface Room 21,Olympus,room_clear
+2835,Clear Surface Room 22,Olympus,room_clear
+2836,Clear Surface Room 23,Olympus,room_clear
+2837,Clear Surface Room 24,Olympus,room_clear
+2838,Clear Surface Room 25,Olympus,room_clear
+2839,Clear Surface Room 26,Olympus,room_clear
+2840,Clear Surface Room 27,Olympus,room_clear
+2841,Clear Surface Room 28,Olympus,room_clear
+2842,Clear Surface Room 29,Olympus,room_clear
+2843,Clear Surface Room 30,Summit,room_clear
+2844,Clear Surface Room 31,Summit,room_clear
+2845,Clear Surface Room 32,Summit,room_clear
+2846,Clear Surface Room 33,Summit,room_clear
+2847,Clear Surface Room 34,Summit,room_clear
+2848,Clear Surface Room 35,Summit,room_clear
+2849,Clear Surface Room 36,Summit,room_clear
+2850,Clear Underworld Room 01 Staff,Erebus,room_weapon_clear
+2851,Clear Underworld Room 02 Staff,Erebus,room_weapon_clear
+2852,Clear Underworld Room 03 Staff,Erebus,room_weapon_clear
+2853,Clear Underworld Room 04 Staff,Erebus,room_weapon_clear
+2854,Clear Underworld Room 05 Staff,Erebus,room_weapon_clear
+2855,Clear Underworld Room 06 Staff,Erebus,room_weapon_clear
+2856,Clear Underworld Room 07 Staff,Erebus,room_weapon_clear
+2857,Clear Underworld Room 08 Staff,Erebus,room_weapon_clear
+2858,Clear Underworld Room 09 Staff,Erebus,room_weapon_clear
+2859,Clear Underworld Room 10 Staff,Erebus,room_weapon_clear
+2860,Clear Underworld Room 11 Staff,Erebus,room_weapon_clear
+2861,Clear Underworld Room 12 Staff,Oceanus,room_weapon_clear
+2862,Clear Underworld Room 13 Staff,Oceanus,room_weapon_clear
+2863,Clear Underworld Room 14 Staff,Oceanus,room_weapon_clear
+2864,Clear Underworld Room 15 Staff,Oceanus,room_weapon_clear
+2865,Clear Underworld Room 16 Staff,Oceanus,room_weapon_clear
+2866,Clear Underworld Room 17 Staff,Oceanus,room_weapon_clear
+2867,Clear Underworld Room 18 Staff,Oceanus,room_weapon_clear
+2868,Clear Underworld Room 19 Staff,Oceanus,room_weapon_clear
+2869,Clear Underworld Room 20 Staff,Oceanus,room_weapon_clear
+2870,Clear Underworld Room 21 Staff,Fields,room_weapon_clear
+2871,Clear Underworld Room 22 Staff,Fields,room_weapon_clear
+2872,Clear Underworld Room 23 Staff,Fields,room_weapon_clear
+2873,Clear Underworld Room 24 Staff,Fields,room_weapon_clear
+2874,Clear Underworld Room 25 Staff,Fields,room_weapon_clear
+2875,Clear Underworld Room 26 Staff,Tartarus,room_weapon_clear
+2876,Clear Underworld Room 27 Staff,Tartarus,room_weapon_clear
+2877,Clear Underworld Room 28 Staff,Tartarus,room_weapon_clear
+2878,Clear Underworld Room 29 Staff,Tartarus,room_weapon_clear
+2879,Clear Underworld Room 30 Staff,Tartarus,room_weapon_clear
+2880,Clear Underworld Room 31 Staff,Tartarus,room_weapon_clear
+2881,Clear Underworld Room 32 Staff,Tartarus,room_weapon_clear
+2882,Clear Underworld Room 33 Staff,Tartarus,room_weapon_clear
+2883,Clear Underworld Room 34 Staff,Tartarus,room_weapon_clear
+2884,Clear Underworld Room 35 Staff,Tartarus,room_weapon_clear
+2885,Clear Underworld Room 36 Staff,Tartarus,room_weapon_clear
+2886,Clear Underworld Room 37 Staff,Tartarus,room_weapon_clear
+2887,Clear Underworld Room 38 Staff,Tartarus,room_weapon_clear
+2888,Clear Underworld Room 39 Staff,Tartarus,room_weapon_clear
+2889,Clear Underworld Room 40 Staff,Tartarus,room_weapon_clear
+2890,Clear Surface Room 01 Staff,Ephyra,room_weapon_clear
+2891,Clear Surface Room 02 Staff,Ephyra,room_weapon_clear
+2892,Clear Surface Room 03 Staff,Ephyra,room_weapon_clear
+2893,Clear Surface Room 04 Staff,Ephyra,room_weapon_clear
+2894,Clear Surface Room 05 Staff,Ephyra,room_weapon_clear
+2895,Clear Surface Room 06 Staff,Ephyra,room_weapon_clear
+2896,Clear Surface Room 07 Staff,Ephyra,room_weapon_clear
+2897,Clear Surface Room 08 Staff,Ephyra,room_weapon_clear
+2898,Clear Surface Room 09 Staff,Ephyra,room_weapon_clear
+2899,Clear Surface Room 10 Staff,Ephyra,room_weapon_clear
+2900,Clear Surface Room 11 Staff,Ephyra,room_weapon_clear
+2901,Clear Surface Room 12 Staff,Thessaly,room_weapon_clear
+2902,Clear Surface Room 13 Staff,Thessaly,room_weapon_clear
+2903,Clear Surface Room 14 Staff,Thessaly,room_weapon_clear
+2904,Clear Surface Room 15 Staff,Thessaly,room_weapon_clear
+2905,Clear Surface Room 16 Staff,Thessaly,room_weapon_clear
+2906,Clear Surface Room 17 Staff,Thessaly,room_weapon_clear
+2907,Clear Surface Room 18 Staff,Thessaly,room_weapon_clear
+2908,Clear Surface Room 19 Staff,Thessaly,room_weapon_clear
+2909,Clear Surface Room 20 Staff,Olympus,room_weapon_clear
+2910,Clear Surface Room 21 Staff,Olympus,room_weapon_clear
+2911,Clear Surface Room 22 Staff,Olympus,room_weapon_clear
+2912,Clear Surface Room 23 Staff,Olympus,room_weapon_clear
+2913,Clear Surface Room 24 Staff,Olympus,room_weapon_clear
+2914,Clear Surface Room 25 Staff,Olympus,room_weapon_clear
+2915,Clear Surface Room 26 Staff,Olympus,room_weapon_clear
+2916,Clear Surface Room 27 Staff,Olympus,room_weapon_clear
+2917,Clear Surface Room 28 Staff,Olympus,room_weapon_clear
+2918,Clear Surface Room 29 Staff,Olympus,room_weapon_clear
+2919,Clear Surface Room 30 Staff,Summit,room_weapon_clear
+2920,Clear Surface Room 31 Staff,Summit,room_weapon_clear
+2921,Clear Surface Room 32 Staff,Summit,room_weapon_clear
+2922,Clear Surface Room 33 Staff,Summit,room_weapon_clear
+2923,Clear Surface Room 34 Staff,Summit,room_weapon_clear
+2924,Clear Surface Room 35 Staff,Summit,room_weapon_clear
+2925,Clear Surface Room 36 Staff,Summit,room_weapon_clear
+2926,Clear Underworld Room 01 Daggers,Erebus,room_weapon_clear
+2927,Clear Underworld Room 02 Daggers,Erebus,room_weapon_clear
+2928,Clear Underworld Room 03 Daggers,Erebus,room_weapon_clear
+2929,Clear Underworld Room 04 Daggers,Erebus,room_weapon_clear
+2930,Clear Underworld Room 05 Daggers,Erebus,room_weapon_clear
+2931,Clear Underworld Room 06 Daggers,Erebus,room_weapon_clear
+2932,Clear Underworld Room 07 Daggers,Erebus,room_weapon_clear
+2933,Clear Underworld Room 08 Daggers,Erebus,room_weapon_clear
+2934,Clear Underworld Room 09 Daggers,Erebus,room_weapon_clear
+2935,Clear Underworld Room 10 Daggers,Erebus,room_weapon_clear
+2936,Clear Underworld Room 11 Daggers,Erebus,room_weapon_clear
+2937,Clear Underworld Room 12 Daggers,Oceanus,room_weapon_clear
+2938,Clear Underworld Room 13 Daggers,Oceanus,room_weapon_clear
+2939,Clear Underworld Room 14 Daggers,Oceanus,room_weapon_clear
+2940,Clear Underworld Room 15 Daggers,Oceanus,room_weapon_clear
+2941,Clear Underworld Room 16 Daggers,Oceanus,room_weapon_clear
+2942,Clear Underworld Room 17 Daggers,Oceanus,room_weapon_clear
+2943,Clear Underworld Room 18 Daggers,Oceanus,room_weapon_clear
+2944,Clear Underworld Room 19 Daggers,Oceanus,room_weapon_clear
+2945,Clear Underworld Room 20 Daggers,Oceanus,room_weapon_clear
+2946,Clear Underworld Room 21 Daggers,Fields,room_weapon_clear
+2947,Clear Underworld Room 22 Daggers,Fields,room_weapon_clear
+2948,Clear Underworld Room 23 Daggers,Fields,room_weapon_clear
+2949,Clear Underworld Room 24 Daggers,Fields,room_weapon_clear
+2950,Clear Underworld Room 25 Daggers,Fields,room_weapon_clear
+2951,Clear Underworld Room 26 Daggers,Tartarus,room_weapon_clear
+2952,Clear Underworld Room 27 Daggers,Tartarus,room_weapon_clear
+2953,Clear Underworld Room 28 Daggers,Tartarus,room_weapon_clear
+2954,Clear Underworld Room 29 Daggers,Tartarus,room_weapon_clear
+2955,Clear Underworld Room 30 Daggers,Tartarus,room_weapon_clear
+2956,Clear Underworld Room 31 Daggers,Tartarus,room_weapon_clear
+2957,Clear Underworld Room 32 Daggers,Tartarus,room_weapon_clear
+2958,Clear Underworld Room 33 Daggers,Tartarus,room_weapon_clear
+2959,Clear Underworld Room 34 Daggers,Tartarus,room_weapon_clear
+2960,Clear Underworld Room 35 Daggers,Tartarus,room_weapon_clear
+2961,Clear Underworld Room 36 Daggers,Tartarus,room_weapon_clear
+2962,Clear Underworld Room 37 Daggers,Tartarus,room_weapon_clear
+2963,Clear Underworld Room 38 Daggers,Tartarus,room_weapon_clear
+2964,Clear Underworld Room 39 Daggers,Tartarus,room_weapon_clear
+2965,Clear Underworld Room 40 Daggers,Tartarus,room_weapon_clear
+2966,Clear Surface Room 01 Daggers,Ephyra,room_weapon_clear
+2967,Clear Surface Room 02 Daggers,Ephyra,room_weapon_clear
+2968,Clear Surface Room 03 Daggers,Ephyra,room_weapon_clear
+2969,Clear Surface Room 04 Daggers,Ephyra,room_weapon_clear
+2970,Clear Surface Room 05 Daggers,Ephyra,room_weapon_clear
+2971,Clear Surface Room 06 Daggers,Ephyra,room_weapon_clear
+2972,Clear Surface Room 07 Daggers,Ephyra,room_weapon_clear
+2973,Clear Surface Room 08 Daggers,Ephyra,room_weapon_clear
+2974,Clear Surface Room 09 Daggers,Ephyra,room_weapon_clear
+2975,Clear Surface Room 10 Daggers,Ephyra,room_weapon_clear
+2976,Clear Surface Room 11 Daggers,Ephyra,room_weapon_clear
+2977,Clear Surface Room 12 Daggers,Thessaly,room_weapon_clear
+2978,Clear Surface Room 13 Daggers,Thessaly,room_weapon_clear
+2979,Clear Surface Room 14 Daggers,Thessaly,room_weapon_clear
+2980,Clear Surface Room 15 Daggers,Thessaly,room_weapon_clear
+2981,Clear Surface Room 16 Daggers,Thessaly,room_weapon_clear
+2982,Clear Surface Room 17 Daggers,Thessaly,room_weapon_clear
+2983,Clear Surface Room 18 Daggers,Thessaly,room_weapon_clear
+2984,Clear Surface Room 19 Daggers,Thessaly,room_weapon_clear
+2985,Clear Surface Room 20 Daggers,Olympus,room_weapon_clear
+2986,Clear Surface Room 21 Daggers,Olympus,room_weapon_clear
+2987,Clear Surface Room 22 Daggers,Olympus,room_weapon_clear
+2988,Clear Surface Room 23 Daggers,Olympus,room_weapon_clear
+2989,Clear Surface Room 24 Daggers,Olympus,room_weapon_clear
+2990,Clear Surface Room 25 Daggers,Olympus,room_weapon_clear
+2991,Clear Surface Room 26 Daggers,Olympus,room_weapon_clear
+2992,Clear Surface Room 27 Daggers,Olympus,room_weapon_clear
+2993,Clear Surface Room 28 Daggers,Olympus,room_weapon_clear
+2994,Clear Surface Room 29 Daggers,Olympus,room_weapon_clear
+2995,Clear Surface Room 30 Daggers,Summit,room_weapon_clear
+2996,Clear Surface Room 31 Daggers,Summit,room_weapon_clear
+2997,Clear Surface Room 32 Daggers,Summit,room_weapon_clear
+2998,Clear Surface Room 33 Daggers,Summit,room_weapon_clear
+2999,Clear Surface Room 34 Daggers,Summit,room_weapon_clear
+3000,Clear Surface Room 35 Daggers,Summit,room_weapon_clear
+3001,Clear Surface Room 36 Daggers,Summit,room_weapon_clear
+3002,Clear Underworld Room 01 Torches,Erebus,room_weapon_clear
+3003,Clear Underworld Room 02 Torches,Erebus,room_weapon_clear
+3004,Clear Underworld Room 03 Torches,Erebus,room_weapon_clear
+3005,Clear Underworld Room 04 Torches,Erebus,room_weapon_clear
+3006,Clear Underworld Room 05 Torches,Erebus,room_weapon_clear
+3007,Clear Underworld Room 06 Torches,Erebus,room_weapon_clear
+3008,Clear Underworld Room 07 Torches,Erebus,room_weapon_clear
+3009,Clear Underworld Room 08 Torches,Erebus,room_weapon_clear
+3010,Clear Underworld Room 09 Torches,Erebus,room_weapon_clear
+3011,Clear Underworld Room 10 Torches,Erebus,room_weapon_clear
+3012,Clear Underworld Room 11 Torches,Erebus,room_weapon_clear
+3013,Clear Underworld Room 12 Torches,Oceanus,room_weapon_clear
+3014,Clear Underworld Room 13 Torches,Oceanus,room_weapon_clear
+3015,Clear Underworld Room 14 Torches,Oceanus,room_weapon_clear
+3016,Clear Underworld Room 15 Torches,Oceanus,room_weapon_clear
+3017,Clear Underworld Room 16 Torches,Oceanus,room_weapon_clear
+3018,Clear Underworld Room 17 Torches,Oceanus,room_weapon_clear
+3019,Clear Underworld Room 18 Torches,Oceanus,room_weapon_clear
+3020,Clear Underworld Room 19 Torches,Oceanus,room_weapon_clear
+3021,Clear Underworld Room 20 Torches,Oceanus,room_weapon_clear
+3022,Clear Underworld Room 21 Torches,Fields,room_weapon_clear
+3023,Clear Underworld Room 22 Torches,Fields,room_weapon_clear
+3024,Clear Underworld Room 23 Torches,Fields,room_weapon_clear
+3025,Clear Underworld Room 24 Torches,Fields,room_weapon_clear
+3026,Clear Underworld Room 25 Torches,Fields,room_weapon_clear
+3027,Clear Underworld Room 26 Torches,Tartarus,room_weapon_clear
+3028,Clear Underworld Room 27 Torches,Tartarus,room_weapon_clear
+3029,Clear Underworld Room 28 Torches,Tartarus,room_weapon_clear
+3030,Clear Underworld Room 29 Torches,Tartarus,room_weapon_clear
+3031,Clear Underworld Room 30 Torches,Tartarus,room_weapon_clear
+3032,Clear Underworld Room 31 Torches,Tartarus,room_weapon_clear
+3033,Clear Underworld Room 32 Torches,Tartarus,room_weapon_clear
+3034,Clear Underworld Room 33 Torches,Tartarus,room_weapon_clear
+3035,Clear Underworld Room 34 Torches,Tartarus,room_weapon_clear
+3036,Clear Underworld Room 35 Torches,Tartarus,room_weapon_clear
+3037,Clear Underworld Room 36 Torches,Tartarus,room_weapon_clear
+3038,Clear Underworld Room 37 Torches,Tartarus,room_weapon_clear
+3039,Clear Underworld Room 38 Torches,Tartarus,room_weapon_clear
+3040,Clear Underworld Room 39 Torches,Tartarus,room_weapon_clear
+3041,Clear Underworld Room 40 Torches,Tartarus,room_weapon_clear
+3042,Clear Surface Room 01 Torches,Ephyra,room_weapon_clear
+3043,Clear Surface Room 02 Torches,Ephyra,room_weapon_clear
+3044,Clear Surface Room 03 Torches,Ephyra,room_weapon_clear
+3045,Clear Surface Room 04 Torches,Ephyra,room_weapon_clear
+3046,Clear Surface Room 05 Torches,Ephyra,room_weapon_clear
+3047,Clear Surface Room 06 Torches,Ephyra,room_weapon_clear
+3048,Clear Surface Room 07 Torches,Ephyra,room_weapon_clear
+3049,Clear Surface Room 08 Torches,Ephyra,room_weapon_clear
+3050,Clear Surface Room 09 Torches,Ephyra,room_weapon_clear
+3051,Clear Surface Room 10 Torches,Ephyra,room_weapon_clear
+3052,Clear Surface Room 11 Torches,Ephyra,room_weapon_clear
+3053,Clear Surface Room 12 Torches,Thessaly,room_weapon_clear
+3054,Clear Surface Room 13 Torches,Thessaly,room_weapon_clear
+3055,Clear Surface Room 14 Torches,Thessaly,room_weapon_clear
+3056,Clear Surface Room 15 Torches,Thessaly,room_weapon_clear
+3057,Clear Surface Room 16 Torches,Thessaly,room_weapon_clear
+3058,Clear Surface Room 17 Torches,Thessaly,room_weapon_clear
+3059,Clear Surface Room 18 Torches,Thessaly,room_weapon_clear
+3060,Clear Surface Room 19 Torches,Thessaly,room_weapon_clear
+3061,Clear Surface Room 20 Torches,Olympus,room_weapon_clear
+3062,Clear Surface Room 21 Torches,Olympus,room_weapon_clear
+3063,Clear Surface Room 22 Torches,Olympus,room_weapon_clear
+3064,Clear Surface Room 23 Torches,Olympus,room_weapon_clear
+3065,Clear Surface Room 24 Torches,Olympus,room_weapon_clear
+3066,Clear Surface Room 25 Torches,Olympus,room_weapon_clear
+3067,Clear Surface Room 26 Torches,Olympus,room_weapon_clear
+3068,Clear Surface Room 27 Torches,Olympus,room_weapon_clear
+3069,Clear Surface Room 28 Torches,Olympus,room_weapon_clear
+3070,Clear Surface Room 29 Torches,Olympus,room_weapon_clear
+3071,Clear Surface Room 30 Torches,Summit,room_weapon_clear
+3072,Clear Surface Room 31 Torches,Summit,room_weapon_clear
+3073,Clear Surface Room 32 Torches,Summit,room_weapon_clear
+3074,Clear Surface Room 33 Torches,Summit,room_weapon_clear
+3075,Clear Surface Room 34 Torches,Summit,room_weapon_clear
+3076,Clear Surface Room 35 Torches,Summit,room_weapon_clear
+3077,Clear Surface Room 36 Torches,Summit,room_weapon_clear
+3078,Clear Underworld Room 01 Axe,Erebus,room_weapon_clear
+3079,Clear Underworld Room 02 Axe,Erebus,room_weapon_clear
+3080,Clear Underworld Room 03 Axe,Erebus,room_weapon_clear
+3081,Clear Underworld Room 04 Axe,Erebus,room_weapon_clear
+3082,Clear Underworld Room 05 Axe,Erebus,room_weapon_clear
+3083,Clear Underworld Room 06 Axe,Erebus,room_weapon_clear
+3084,Clear Underworld Room 07 Axe,Erebus,room_weapon_clear
+3085,Clear Underworld Room 08 Axe,Erebus,room_weapon_clear
+3086,Clear Underworld Room 09 Axe,Erebus,room_weapon_clear
+3087,Clear Underworld Room 10 Axe,Erebus,room_weapon_clear
+3088,Clear Underworld Room 11 Axe,Erebus,room_weapon_clear
+3089,Clear Underworld Room 12 Axe,Oceanus,room_weapon_clear
+3090,Clear Underworld Room 13 Axe,Oceanus,room_weapon_clear
+3091,Clear Underworld Room 14 Axe,Oceanus,room_weapon_clear
+3092,Clear Underworld Room 15 Axe,Oceanus,room_weapon_clear
+3093,Clear Underworld Room 16 Axe,Oceanus,room_weapon_clear
+3094,Clear Underworld Room 17 Axe,Oceanus,room_weapon_clear
+3095,Clear Underworld Room 18 Axe,Oceanus,room_weapon_clear
+3096,Clear Underworld Room 19 Axe,Oceanus,room_weapon_clear
+3097,Clear Underworld Room 20 Axe,Oceanus,room_weapon_clear
+3098,Clear Underworld Room 21 Axe,Fields,room_weapon_clear
+3099,Clear Underworld Room 22 Axe,Fields,room_weapon_clear
+3100,Clear Underworld Room 23 Axe,Fields,room_weapon_clear
+3101,Clear Underworld Room 24 Axe,Fields,room_weapon_clear
+3102,Clear Underworld Room 25 Axe,Fields,room_weapon_clear
+3103,Clear Underworld Room 26 Axe,Tartarus,room_weapon_clear
+3104,Clear Underworld Room 27 Axe,Tartarus,room_weapon_clear
+3105,Clear Underworld Room 28 Axe,Tartarus,room_weapon_clear
+3106,Clear Underworld Room 29 Axe,Tartarus,room_weapon_clear
+3107,Clear Underworld Room 30 Axe,Tartarus,room_weapon_clear
+3108,Clear Underworld Room 31 Axe,Tartarus,room_weapon_clear
+3109,Clear Underworld Room 32 Axe,Tartarus,room_weapon_clear
+3110,Clear Underworld Room 33 Axe,Tartarus,room_weapon_clear
+3111,Clear Underworld Room 34 Axe,Tartarus,room_weapon_clear
+3112,Clear Underworld Room 35 Axe,Tartarus,room_weapon_clear
+3113,Clear Underworld Room 36 Axe,Tartarus,room_weapon_clear
+3114,Clear Underworld Room 37 Axe,Tartarus,room_weapon_clear
+3115,Clear Underworld Room 38 Axe,Tartarus,room_weapon_clear
+3116,Clear Underworld Room 39 Axe,Tartarus,room_weapon_clear
+3117,Clear Underworld Room 40 Axe,Tartarus,room_weapon_clear
+3118,Clear Surface Room 01 Axe,Ephyra,room_weapon_clear
+3119,Clear Surface Room 02 Axe,Ephyra,room_weapon_clear
+3120,Clear Surface Room 03 Axe,Ephyra,room_weapon_clear
+3121,Clear Surface Room 04 Axe,Ephyra,room_weapon_clear
+3122,Clear Surface Room 05 Axe,Ephyra,room_weapon_clear
+3123,Clear Surface Room 06 Axe,Ephyra,room_weapon_clear
+3124,Clear Surface Room 07 Axe,Ephyra,room_weapon_clear
+3125,Clear Surface Room 08 Axe,Ephyra,room_weapon_clear
+3126,Clear Surface Room 09 Axe,Ephyra,room_weapon_clear
+3127,Clear Surface Room 10 Axe,Ephyra,room_weapon_clear
+3128,Clear Surface Room 11 Axe,Ephyra,room_weapon_clear
+3129,Clear Surface Room 12 Axe,Thessaly,room_weapon_clear
+3130,Clear Surface Room 13 Axe,Thessaly,room_weapon_clear
+3131,Clear Surface Room 14 Axe,Thessaly,room_weapon_clear
+3132,Clear Surface Room 15 Axe,Thessaly,room_weapon_clear
+3133,Clear Surface Room 16 Axe,Thessaly,room_weapon_clear
+3134,Clear Surface Room 17 Axe,Thessaly,room_weapon_clear
+3135,Clear Surface Room 18 Axe,Thessaly,room_weapon_clear
+3136,Clear Surface Room 19 Axe,Thessaly,room_weapon_clear
+3137,Clear Surface Room 20 Axe,Olympus,room_weapon_clear
+3138,Clear Surface Room 21 Axe,Olympus,room_weapon_clear
+3139,Clear Surface Room 22 Axe,Olympus,room_weapon_clear
+3140,Clear Surface Room 23 Axe,Olympus,room_weapon_clear
+3141,Clear Surface Room 24 Axe,Olympus,room_weapon_clear
+3142,Clear Surface Room 25 Axe,Olympus,room_weapon_clear
+3143,Clear Surface Room 26 Axe,Olympus,room_weapon_clear
+3144,Clear Surface Room 27 Axe,Olympus,room_weapon_clear
+3145,Clear Surface Room 28 Axe,Olympus,room_weapon_clear
+3146,Clear Surface Room 29 Axe,Olympus,room_weapon_clear
+3147,Clear Surface Room 30 Axe,Summit,room_weapon_clear
+3148,Clear Surface Room 31 Axe,Summit,room_weapon_clear
+3149,Clear Surface Room 32 Axe,Summit,room_weapon_clear
+3150,Clear Surface Room 33 Axe,Summit,room_weapon_clear
+3151,Clear Surface Room 34 Axe,Summit,room_weapon_clear
+3152,Clear Surface Room 35 Axe,Summit,room_weapon_clear
+3153,Clear Surface Room 36 Axe,Summit,room_weapon_clear
+3154,Clear Underworld Room 01 Skull,Erebus,room_weapon_clear
+3155,Clear Underworld Room 02 Skull,Erebus,room_weapon_clear
+3156,Clear Underworld Room 03 Skull,Erebus,room_weapon_clear
+3157,Clear Underworld Room 04 Skull,Erebus,room_weapon_clear
+3158,Clear Underworld Room 05 Skull,Erebus,room_weapon_clear
+3159,Clear Underworld Room 06 Skull,Erebus,room_weapon_clear
+3160,Clear Underworld Room 07 Skull,Erebus,room_weapon_clear
+3161,Clear Underworld Room 08 Skull,Erebus,room_weapon_clear
+3162,Clear Underworld Room 09 Skull,Erebus,room_weapon_clear
+3163,Clear Underworld Room 10 Skull,Erebus,room_weapon_clear
+3164,Clear Underworld Room 11 Skull,Erebus,room_weapon_clear
+3165,Clear Underworld Room 12 Skull,Oceanus,room_weapon_clear
+3166,Clear Underworld Room 13 Skull,Oceanus,room_weapon_clear
+3167,Clear Underworld Room 14 Skull,Oceanus,room_weapon_clear
+3168,Clear Underworld Room 15 Skull,Oceanus,room_weapon_clear
+3169,Clear Underworld Room 16 Skull,Oceanus,room_weapon_clear
+3170,Clear Underworld Room 17 Skull,Oceanus,room_weapon_clear
+3171,Clear Underworld Room 18 Skull,Oceanus,room_weapon_clear
+3172,Clear Underworld Room 19 Skull,Oceanus,room_weapon_clear
+3173,Clear Underworld Room 20 Skull,Oceanus,room_weapon_clear
+3174,Clear Underworld Room 21 Skull,Fields,room_weapon_clear
+3175,Clear Underworld Room 22 Skull,Fields,room_weapon_clear
+3176,Clear Underworld Room 23 Skull,Fields,room_weapon_clear
+3177,Clear Underworld Room 24 Skull,Fields,room_weapon_clear
+3178,Clear Underworld Room 25 Skull,Fields,room_weapon_clear
+3179,Clear Underworld Room 26 Skull,Tartarus,room_weapon_clear
+3180,Clear Underworld Room 27 Skull,Tartarus,room_weapon_clear
+3181,Clear Underworld Room 28 Skull,Tartarus,room_weapon_clear
+3182,Clear Underworld Room 29 Skull,Tartarus,room_weapon_clear
+3183,Clear Underworld Room 30 Skull,Tartarus,room_weapon_clear
+3184,Clear Underworld Room 31 Skull,Tartarus,room_weapon_clear
+3185,Clear Underworld Room 32 Skull,Tartarus,room_weapon_clear
+3186,Clear Underworld Room 33 Skull,Tartarus,room_weapon_clear
+3187,Clear Underworld Room 34 Skull,Tartarus,room_weapon_clear
+3188,Clear Underworld Room 35 Skull,Tartarus,room_weapon_clear
+3189,Clear Underworld Room 36 Skull,Tartarus,room_weapon_clear
+3190,Clear Underworld Room 37 Skull,Tartarus,room_weapon_clear
+3191,Clear Underworld Room 38 Skull,Tartarus,room_weapon_clear
+3192,Clear Underworld Room 39 Skull,Tartarus,room_weapon_clear
+3193,Clear Underworld Room 40 Skull,Tartarus,room_weapon_clear
+3194,Clear Surface Room 01 Skull,Ephyra,room_weapon_clear
+3195,Clear Surface Room 02 Skull,Ephyra,room_weapon_clear
+3196,Clear Surface Room 03 Skull,Ephyra,room_weapon_clear
+3197,Clear Surface Room 04 Skull,Ephyra,room_weapon_clear
+3198,Clear Surface Room 05 Skull,Ephyra,room_weapon_clear
+3199,Clear Surface Room 06 Skull,Ephyra,room_weapon_clear
+3200,Clear Surface Room 07 Skull,Ephyra,room_weapon_clear
+3201,Clear Surface Room 08 Skull,Ephyra,room_weapon_clear
+3202,Clear Surface Room 09 Skull,Ephyra,room_weapon_clear
+3203,Clear Surface Room 10 Skull,Ephyra,room_weapon_clear
+3204,Clear Surface Room 11 Skull,Ephyra,room_weapon_clear
+3205,Clear Surface Room 12 Skull,Thessaly,room_weapon_clear
+3206,Clear Surface Room 13 Skull,Thessaly,room_weapon_clear
+3207,Clear Surface Room 14 Skull,Thessaly,room_weapon_clear
+3208,Clear Surface Room 15 Skull,Thessaly,room_weapon_clear
+3209,Clear Surface Room 16 Skull,Thessaly,room_weapon_clear
+3210,Clear Surface Room 17 Skull,Thessaly,room_weapon_clear
+3211,Clear Surface Room 18 Skull,Thessaly,room_weapon_clear
+3212,Clear Surface Room 19 Skull,Thessaly,room_weapon_clear
+3213,Clear Surface Room 20 Skull,Olympus,room_weapon_clear
+3214,Clear Surface Room 21 Skull,Olympus,room_weapon_clear
+3215,Clear Surface Room 22 Skull,Olympus,room_weapon_clear
+3216,Clear Surface Room 23 Skull,Olympus,room_weapon_clear
+3217,Clear Surface Room 24 Skull,Olympus,room_weapon_clear
+3218,Clear Surface Room 25 Skull,Olympus,room_weapon_clear
+3219,Clear Surface Room 26 Skull,Olympus,room_weapon_clear
+3220,Clear Surface Room 27 Skull,Olympus,room_weapon_clear
+3221,Clear Surface Room 28 Skull,Olympus,room_weapon_clear
+3222,Clear Surface Room 29 Skull,Olympus,room_weapon_clear
+3223,Clear Surface Room 30 Skull,Summit,room_weapon_clear
+3224,Clear Surface Room 31 Skull,Summit,room_weapon_clear
+3225,Clear Surface Room 32 Skull,Summit,room_weapon_clear
+3226,Clear Surface Room 33 Skull,Summit,room_weapon_clear
+3227,Clear Surface Room 34 Skull,Summit,room_weapon_clear
+3228,Clear Surface Room 35 Skull,Summit,room_weapon_clear
+3229,Clear Surface Room 36 Skull,Summit,room_weapon_clear
+3230,Clear Underworld Room 01 Coat,Erebus,room_weapon_clear
+3231,Clear Underworld Room 02 Coat,Erebus,room_weapon_clear
+3232,Clear Underworld Room 03 Coat,Erebus,room_weapon_clear
+3233,Clear Underworld Room 04 Coat,Erebus,room_weapon_clear
+3234,Clear Underworld Room 05 Coat,Erebus,room_weapon_clear
+3235,Clear Underworld Room 06 Coat,Erebus,room_weapon_clear
+3236,Clear Underworld Room 07 Coat,Erebus,room_weapon_clear
+3237,Clear Underworld Room 08 Coat,Erebus,room_weapon_clear
+3238,Clear Underworld Room 09 Coat,Erebus,room_weapon_clear
+3239,Clear Underworld Room 10 Coat,Erebus,room_weapon_clear
+3240,Clear Underworld Room 11 Coat,Erebus,room_weapon_clear
+3241,Clear Underworld Room 12 Coat,Oceanus,room_weapon_clear
+3242,Clear Underworld Room 13 Coat,Oceanus,room_weapon_clear
+3243,Clear Underworld Room 14 Coat,Oceanus,room_weapon_clear
+3244,Clear Underworld Room 15 Coat,Oceanus,room_weapon_clear
+3245,Clear Underworld Room 16 Coat,Oceanus,room_weapon_clear
+3246,Clear Underworld Room 17 Coat,Oceanus,room_weapon_clear
+3247,Clear Underworld Room 18 Coat,Oceanus,room_weapon_clear
+3248,Clear Underworld Room 19 Coat,Oceanus,room_weapon_clear
+3249,Clear Underworld Room 20 Coat,Oceanus,room_weapon_clear
+3250,Clear Underworld Room 21 Coat,Fields,room_weapon_clear
+3251,Clear Underworld Room 22 Coat,Fields,room_weapon_clear
+3252,Clear Underworld Room 23 Coat,Fields,room_weapon_clear
+3253,Clear Underworld Room 24 Coat,Fields,room_weapon_clear
+3254,Clear Underworld Room 25 Coat,Fields,room_weapon_clear
+3255,Clear Underworld Room 26 Coat,Tartarus,room_weapon_clear
+3256,Clear Underworld Room 27 Coat,Tartarus,room_weapon_clear
+3257,Clear Underworld Room 28 Coat,Tartarus,room_weapon_clear
+3258,Clear Underworld Room 29 Coat,Tartarus,room_weapon_clear
+3259,Clear Underworld Room 30 Coat,Tartarus,room_weapon_clear
+3260,Clear Underworld Room 31 Coat,Tartarus,room_weapon_clear
+3261,Clear Underworld Room 32 Coat,Tartarus,room_weapon_clear
+3262,Clear Underworld Room 33 Coat,Tartarus,room_weapon_clear
+3263,Clear Underworld Room 34 Coat,Tartarus,room_weapon_clear
+3264,Clear Underworld Room 35 Coat,Tartarus,room_weapon_clear
+3265,Clear Underworld Room 36 Coat,Tartarus,room_weapon_clear
+3266,Clear Underworld Room 37 Coat,Tartarus,room_weapon_clear
+3267,Clear Underworld Room 38 Coat,Tartarus,room_weapon_clear
+3268,Clear Underworld Room 39 Coat,Tartarus,room_weapon_clear
+3269,Clear Underworld Room 40 Coat,Tartarus,room_weapon_clear
+3270,Clear Surface Room 01 Coat,Ephyra,room_weapon_clear
+3271,Clear Surface Room 02 Coat,Ephyra,room_weapon_clear
+3272,Clear Surface Room 03 Coat,Ephyra,room_weapon_clear
+3273,Clear Surface Room 04 Coat,Ephyra,room_weapon_clear
+3274,Clear Surface Room 05 Coat,Ephyra,room_weapon_clear
+3275,Clear Surface Room 06 Coat,Ephyra,room_weapon_clear
+3276,Clear Surface Room 07 Coat,Ephyra,room_weapon_clear
+3277,Clear Surface Room 08 Coat,Ephyra,room_weapon_clear
+3278,Clear Surface Room 09 Coat,Ephyra,room_weapon_clear
+3279,Clear Surface Room 10 Coat,Ephyra,room_weapon_clear
+3280,Clear Surface Room 11 Coat,Ephyra,room_weapon_clear
+3281,Clear Surface Room 12 Coat,Thessaly,room_weapon_clear
+3282,Clear Surface Room 13 Coat,Thessaly,room_weapon_clear
+3283,Clear Surface Room 14 Coat,Thessaly,room_weapon_clear
+3284,Clear Surface Room 15 Coat,Thessaly,room_weapon_clear
+3285,Clear Surface Room 16 Coat,Thessaly,room_weapon_clear
+3286,Clear Surface Room 17 Coat,Thessaly,room_weapon_clear
+3287,Clear Surface Room 18 Coat,Thessaly,room_weapon_clear
+3288,Clear Surface Room 19 Coat,Thessaly,room_weapon_clear
+3289,Clear Surface Room 20 Coat,Olympus,room_weapon_clear
+3290,Clear Surface Room 21 Coat,Olympus,room_weapon_clear
+3291,Clear Surface Room 22 Coat,Olympus,room_weapon_clear
+3292,Clear Surface Room 23 Coat,Olympus,room_weapon_clear
+3293,Clear Surface Room 24 Coat,Olympus,room_weapon_clear
+3294,Clear Surface Room 25 Coat,Olympus,room_weapon_clear
+3295,Clear Surface Room 26 Coat,Olympus,room_weapon_clear
+3296,Clear Surface Room 27 Coat,Olympus,room_weapon_clear
+3297,Clear Surface Room 28 Coat,Olympus,room_weapon_clear
+3298,Clear Surface Room 29 Coat,Olympus,room_weapon_clear
+3299,Clear Surface Room 30 Coat,Summit,room_weapon_clear
+3300,Clear Surface Room 31 Coat,Summit,room_weapon_clear
+3301,Clear Surface Room 32 Coat,Summit,room_weapon_clear
+3302,Clear Surface Room 33 Coat,Summit,room_weapon_clear
+3303,Clear Surface Room 34 Coat,Summit,room_weapon_clear
+3304,Clear Surface Room 35 Coat,Summit,room_weapon_clear
+3305,Clear Surface Room 36 Coat,Summit,room_weapon_clear

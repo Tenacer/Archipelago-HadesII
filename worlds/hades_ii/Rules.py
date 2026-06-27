@@ -189,18 +189,17 @@ class HadesIILogic(LogicMixin):
         return self._has_surface_door(player, options)
 
 def _restrict_score_check_progression(world, player: int, options) -> None:
-    """Block progression items from score checks.
+    """Block progression items from score/room checks.
 
-    Score checks are intended for filler/useful (CLAUDE.md). Marking them
-    EXCLUDED forced filler-only and biased filler to the lowest-numbered
-    checks. A per-location item rule preserves the no-progression
-    constraint while letting AP's shuffled fill place useful + filler
-    uniformly across all score checks.
+    These are intended for filler/useful (CLAUDE.md). Marking them EXCLUDED
+    forced filler-only and biased filler to the lowest-numbered checks. A
+    per-location item rule preserves the no-progression constraint while
+    letting AP's shuffled fill place useful + filler uniformly across them.
+    Covers all three location systems: "Score Check " (score_based) and
+    "Clear Underworld/Surface Room " (room_based / room_weapon_based).
     """
-    if options.location_system.value != 0:  # score_based only
-        return
     for loc in world.get_locations(player):
-        if loc.name.startswith("Score Check "):
+        if loc.name.startswith("Score Check ") or loc.name.startswith("Clear "):
             add_item_rule(loc, lambda item: not item.advancement)
 
 
