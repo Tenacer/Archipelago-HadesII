@@ -10,7 +10,7 @@ from Options import Range, Toggle, DeathLink, Choice, StartInventoryPool, PerGam
 class InitialWeapon(Choice):
     """
     Chooses an initial weapon to start with.
-    Pick "Random_Pick" to have the seed roll a weapon for you at generation time.
+    Set to "random" to have Archipelago roll a weapon for you at generation time.
     """
     display_name = "Initial Weapon"
     option_Staff = 0
@@ -19,8 +19,7 @@ class InitialWeapon(Choice):
     option_Axe = 3
     option_Skull = 4
     option_Coat = 5
-    option_Random_Pick = 6
-    default = 6
+    default = "random"
 
 class LocationSystem(Choice):
     """

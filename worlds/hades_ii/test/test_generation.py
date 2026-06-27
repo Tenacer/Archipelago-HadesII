@@ -523,7 +523,7 @@ _WEAPON_UNLOCK_LOCATIONS = [
 
 
 class TestRandomInitialWeapon(HadesIITestBase):
-    options = {"initial_weapon": 6, "weaponsanity": 1}
+    options = {"initial_weapon": "random", "weaponsanity": 1}
 
     def test_random_resolves_to_concrete_weapon(self) -> None:
         self.assertIn(self.world.options.initial_weapon.value, range(0, 6))
