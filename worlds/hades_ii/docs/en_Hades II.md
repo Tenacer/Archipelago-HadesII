@@ -36,9 +36,12 @@ points, and reaching a score milestone fires a filler-item check
 Tartarus, the Chronos path) and the surface route (Ephyra → Summit, the
 Typhon path) each accumulate their own score and can only earn their own
 share of the checks (`surface_score_ratio`, default 40% to the surface),
-so earning every score check means playing both routes. Set
-`score_split_mode` to *combined* for a single pool where either route can
-earn all of them.
+so earning every score check means playing both routes. In separate mode
+the checks are named per route — *Underworld Score Check N* and *Surface
+Score Check N* — so the route is visible in the client and on trackers, and
+the in-game toast names which route's score you're building. Set
+`score_split_mode` to *combined* for a single *Score Check N* pool where
+either route can earn all of them.
 
 In **True Ending** mode, the rewards normally dropped after each Chronos
 and Typhon kill are replaced with AP location checks (one per kill, up to

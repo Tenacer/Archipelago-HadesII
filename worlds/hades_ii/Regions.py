@@ -3,6 +3,8 @@ from .Locations import (
     HadesIILocation,
     SURFACE_LOCK_LOCATIONS,
     location_table_score_checks,
+    location_table_underworld_score_checks,
+    location_table_surface_score_checks,
     score_check_split,
     location_room_clears_by_region,
     location_room_weapon_clears_by_region,
@@ -77,11 +79,13 @@ def create_regions(player, multiworld, location_database, options):
     if options.location_system == "score_based":
         n = options.score_rewards_amount.value
         if options.score_split_mode == 1:  # separate
-            underworld_budget, _ = score_check_split(n, options.surface_score_ratio.value)
-            for i in range(1, n + 1):
-                name = f"Score Check {i}"
-                region = regions["Erebus"] if i <= underworld_budget else regions["Ephyra"]
-                _add_location(region, name, location_table_score_checks[name])
+            underworld_budget, surface_budget = score_check_split(n, options.surface_score_ratio.value)
+            for i in range(1, underworld_budget + 1):
+                name = f"Underworld Score Check {i}"
+                _add_location(regions["Erebus"], name, location_table_underworld_score_checks[name])
+            for i in range(1, surface_budget + 1):
+                name = f"Surface Score Check {i}"
+                _add_location(regions["Ephyra"], name, location_table_surface_score_checks[name])
         else:  # combined
             for i in range(1, n + 1):
                 name = f"Score Check {i}"

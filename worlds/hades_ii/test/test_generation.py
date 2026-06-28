@@ -13,7 +13,7 @@ def _assert_score_checks_block_progression(test_case) -> None:
     fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
     score_locs = [
         loc for loc in test_case.multiworld.get_locations(test_case.player)
-        if loc.name.startswith("Score Check ")
+        if loc.name.startswith(("Score Check ", "Underworld Score Check ", "Surface Score Check "))
     ]
     test_case.assertGreater(len(score_locs), 0, "no score checks found")
     for loc in score_locs:
@@ -511,9 +511,11 @@ class TestScoreRewards72(HadesIITestBase):
     options = {"location_system": 0, "score_rewards_amount": 72}
 
     def test_score_check_count(self) -> None:
+        # Default split mode is separate, so the pool is split across the two
+        # route-named pools, but their counts still sum to score_rewards_amount.
         score_locs = [
             loc for loc in self.multiworld.get_locations(self.player)
-            if loc.name.startswith("Score Check ")
+            if loc.name.startswith(("Score Check ", "Underworld Score Check ", "Surface Score Check "))
         ]
         self.assertEqual(len(score_locs), 72)
 
@@ -527,7 +529,7 @@ class TestScoreRewardsMax(HadesIITestBase):
     def test_score_check_count(self) -> None:
         score_locs = [
             loc for loc in self.multiworld.get_locations(self.player)
-            if loc.name.startswith("Score Check ")
+            if loc.name.startswith(("Score Check ", "Underworld Score Check ", "Surface Score Check "))
         ]
         self.assertEqual(len(score_locs), 150)
 
@@ -720,23 +722,24 @@ class TestScoreSplitSeparate(HadesIITestBase):
         self.assertEqual((under, surf), (60, 40))
 
     def test_underworld_checks_in_erebus(self) -> None:
-        # The first `underworld_budget` checks are placed in Erebus.
-        loc = self.multiworld.get_location("Score Check 1", self.player)
+        # The underworld budget (60) of route-named checks is placed in Erebus.
+        loc = self.multiworld.get_location("Underworld Score Check 1", self.player)
         self.assertEqual(loc.parent_region.name, "Erebus")
-        loc = self.multiworld.get_location("Score Check 60", self.player)
+        loc = self.multiworld.get_location("Underworld Score Check 60", self.player)
         self.assertEqual(loc.parent_region.name, "Erebus")
 
     def test_surface_checks_in_ephyra(self) -> None:
-        loc = self.multiworld.get_location("Score Check 61", self.player)
+        # The surface budget (40) of route-named checks is placed in Ephyra.
+        loc = self.multiworld.get_location("Surface Score Check 1", self.player)
         self.assertEqual(loc.parent_region.name, "Ephyra")
-        loc = self.multiworld.get_location("Score Check 100", self.player)
+        loc = self.multiworld.get_location("Surface Score Check 40", self.player)
         self.assertEqual(loc.parent_region.name, "Ephyra")
 
     def test_surface_checks_need_surface_access(self) -> None:
         # With no items collected the surface unlock incantations are missing,
         # so surface score checks are unreachable while underworld ones are not.
-        self.assertTrue(self.can_reach_location("Score Check 1"))
-        self.assertFalse(self.can_reach_location("Score Check 100"))
+        self.assertTrue(self.can_reach_location("Underworld Score Check 1"))
+        self.assertFalse(self.can_reach_location("Surface Score Check 40"))
 
 
 class TestScoreSplitCombined(HadesIITestBase):

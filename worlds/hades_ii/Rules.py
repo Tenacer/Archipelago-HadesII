@@ -195,11 +195,13 @@ def _restrict_score_check_progression(world, player: int, options) -> None:
     forced filler-only and biased filler to the lowest-numbered checks. A
     per-location item rule preserves the no-progression constraint while
     letting AP's shuffled fill place useful + filler uniformly across them.
-    Covers all three location systems: "Score Check " (score_based) and
+    Covers all three location systems: score_based — "Score Check " (combined)
+    and "Underworld/Surface Score Check " (separate) — and the room systems'
     "Clear Underworld/Surface Room " (room_based / room_weapon_based).
     """
+    score_prefixes = ("Score Check ", "Underworld Score Check ", "Surface Score Check ", "Clear ")
     for loc in world.get_locations(player):
-        if loc.name.startswith("Score Check ") or loc.name.startswith("Clear "):
+        if loc.name.startswith(score_prefixes):
             add_item_rule(loc, lambda item: not item.advancement)
 
 

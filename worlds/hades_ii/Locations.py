@@ -46,12 +46,25 @@ def _by_region(region: str, category: Optional[str] = None) -> Dict[str, Optiona
 
 # -- Exports consumed by Regions.py / HadesIIClient.py / Rules.py ---------------
 
-# Score checks. In combined split mode they all live in Menu (always accessible).
-# In separate mode the first `underworld_budget` go to Erebus (underworld route,
-# reachable from start) and the rest to Ephyra (surface route, gated by surface
-# access) — see score_check_split and Regions.create_regions.
+# Score checks. Three name pools so the route a check belongs to is visible to
+# the AP client/server/trackers (location names are a static datapackage mapping,
+# so the route can't be baked into a single pool per-seed):
+#   - "Score Check N"            — combined split mode only; all live in Menu.
+#   - "Underworld Score Check N" — separate mode, the Chronos route (Erebus).
+#   - "Surface Score Check N"    — separate mode, the Typhon route (Ephyra).
+# See score_check_split and Regions.create_regions for placement; the Lua mod
+# reports per-route counts and HadesIIClient maps each pool to its own id range.
 location_table_score_checks: Dict[str, int] = _by_category("score")  # values are all int
+location_table_underworld_score_checks: Dict[str, int] = _by_category("score_underworld")
+location_table_surface_score_checks: Dict[str, int] = _by_category("score_surface")
 SCORE_LOCATION_COUNT = len(location_table_score_checks)
+
+# Lowest id of each route pool ("… Score Check 1"). The pools are contiguous in
+# locations.csv, so the client maps a per-route count to ids [base, base+count).
+UNDERWORLD_SCORE_BASE_ID = location_table_underworld_score_checks["Underworld Score Check 1"]
+SURFACE_SCORE_BASE_ID = location_table_surface_score_checks["Surface Score Check 1"]
+UNDERWORLD_SCORE_COUNT = len(location_table_underworld_score_checks)
+SURFACE_SCORE_COUNT = len(location_table_surface_score_checks)
 
 
 def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
@@ -209,10 +222,23 @@ def setup_location_table_with_settings(options) -> dict:
             total[name] = location_table_boss_rewards[name]
 
     # Score checks only under score_based system; limited to first N.
+    # Combined: one "Score Check N" pool. Separate: split into the route-named
+    # pools by their budgets so each route's checks carry its name (mirrors the
+    # Regions.create_regions placement).
     if options.location_system == "score_based":
-        for i in range(1, options.score_rewards_amount.value + 1):
-            name = f"Score Check {i}"
-            total[name] = location_table_score_checks[name]
+        if options.score_split_mode == 1:  # separate
+            underworld_budget, surface_budget = score_check_split(
+                options.score_rewards_amount.value, options.surface_score_ratio.value)
+            for i in range(1, underworld_budget + 1):
+                name = f"Underworld Score Check {i}"
+                total[name] = location_table_underworld_score_checks[name]
+            for i in range(1, surface_budget + 1):
+                name = f"Surface Score Check {i}"
+                total[name] = location_table_surface_score_checks[name]
+        else:  # combined
+            for i in range(1, options.score_rewards_amount.value + 1):
+                name = f"Score Check {i}"
+                total[name] = location_table_score_checks[name]
 
     # Room-based systems: per-route depth checks (and per-weapon for the weapon
     # variant). Mirrors the Regions.create_regions placement.
