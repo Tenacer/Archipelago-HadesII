@@ -28,6 +28,7 @@ from NetUtils import ClientStatus
 
 from .Locations import (
     SCORE_LOCATION_COUNT,
+    SURFACE_LOCK_LOCATIONS,
     UNDERWORLD_SCORE_BASE_ID,
     SURFACE_SCORE_BASE_ID,
     UNDERWORLD_SCORE_COUNT,
@@ -61,6 +62,15 @@ _INCANTATION_LOCATION_IDS: dict = {
 _PROPHECY_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "prophecy" and d.code is not None
+}
+# The two surface-unlock incantation locations (Permeation / Unraveling). They're
+# a subset of the incantation category but are owned by lock_surface_incantations,
+# NOT cauldronsanity — so they must be scouted up front under that toggle (see the
+# Connected handler). Without this they were never scouted in surface-lock mode,
+# so the in-game label fell back to "AP Location Check".
+_SURFACE_LOCK_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if name in SURFACE_LOCK_LOCATIONS and d.code is not None
 }
 # Boss kill reward locations are scouted so the Lua mod can decide whether to
 # spawn the AP icon obstacle (other player's item, or our own non-resource item)
@@ -256,6 +266,11 @@ class HadesIIContext(CommonContext):
             to_scout: list = []
             if slot_data.get("cauldronsanity") == 1:
                 to_scout.extend(_INCANTATION_LOCATION_IDS.keys())
+            # Surface-lock incantations are owned by lock_surface_incantations, not
+            # cauldronsanity, so scout them whenever the lock is on (the cauldronsanity
+            # extend above already covers them when both are on — duplicates are fine).
+            if slot_data.get("lock_surface_incantations") == 1:
+                to_scout.extend(_SURFACE_LOCK_LOCATION_IDS.keys())
             if slot_data.get("fatesanity") == 1:
                 to_scout.extend(_PROPHECY_LOCATION_IDS.keys())
             if slot_data.get("true_ending"):
