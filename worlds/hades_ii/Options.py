@@ -43,9 +43,9 @@ class LocationSystem(Choice):
 class ScoreRewardsAmount(Range):
     """
     When using score based system, this sets how many checks are available based on the score.
-    Each room in hades gives "its depth" in score when completed, and each new check needs one more
-    point to be unlocked (so check 10 needs 10 points, which can be obtained, for example,
-    by completing rooms 5 and 6)
+    Each room in Hades gives "its depth" in score when completed. The points needed between
+    consecutive checks start small, rise gently to a steady mid-game plateau, then climb again
+    toward the final checks — so the early game unlocks quickly and the last checks are the grind.
     """
     display_name = "Score Rewards Amount"
     range_start = 72
