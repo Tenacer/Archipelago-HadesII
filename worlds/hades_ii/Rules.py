@@ -22,11 +22,7 @@ class HadesIILogic(LogicMixin):
     def _has_enough_of_item(self, player: int, amount: int, item: str) -> bool:
         return self.count(item, player) >= amount  # type: ignore
     
-    # Generation-time reachability approximation for the weapon-clears goal:
-    # owning N weapons + reaching the endgame proves N distinct clears are
-    # POSSIBLE. The actual distinct-clear count is tracked in-game by the mod
-    # and enforced client-side via the victory signal (see HadesIIClient
-    # _process_victory + the per-weapon "<W> Clear" trackable checks).
+    # Generation-time approximation: owning N weapons + endgame reach proves N distinct clears are possible; the real count is enforced client-side.
     def _has_enough_weapons(self, player: int, options, amount: int) -> bool:
         if not options.weaponsanity:
             return True
@@ -79,11 +75,7 @@ class HadesIILogic(LogicMixin):
 
         return can_win
 
-    # True Ending: both final bosses, ingredient counts, Gigaros, Entropy, and a
-    # *final* Chronos kill performed after Dissolution of Time has been cast
-    # (represented by the `Chronos True Victory` event). The incantations
-    # themselves are brewed in-game (vanilla, not AP items); having the
-    # ingredients here is what makes them brewable, so they need no `has()` gate.
+    # True Ending needs both final bosses, the incantation ingredients, and the final Chronos kill event.
     def _has_true_ending_requirements(self, player: int, options) -> bool:
         return (
             self.has("Chronos True Victory", player)  # type: ignore
@@ -98,22 +90,13 @@ class HadesIILogic(LogicMixin):
     def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
         return self.has(boss_event, player)  # type: ignore
 
-    # Sugar over `_has_defeated_final_boss` that takes the boss base name
-    # ("Hecate", "Scylla", …) and appends " Victory". Used by the unified
-    # handle_keepsakes / handle_incantations / handle_prophecies handlers.
+    # Sugar: boss base name + " Victory".
     def _has_boss(self, boss: str, player: int) -> bool:
         return self.has(f"{boss} Victory", player)  # type: ignore
 
-    # True when cauldronsanity is OFF (player brews the incantation freely)
-    # or the AP item for that incantation has been received. Used for
-    # incantation→incantation prerequisite chains in handle_incantations and
-    # handle_prophecies. The surface-unlock 2 are NOT routed through this —
-    # they have their own _has_surface_door / _has_surface_access predicates.
+    # True when cauldronsanity is off or the incantation's AP item has been received (surface-unlock 2 excluded).
     def _has_incantation(self, name: str, player: int, options) -> bool:
-        # The Broker is granted for free at game start when unlock_broker is on,
-        # so its incantation is removed from the pool — treat it as satisfied so
-        # the chains that depend on it (Deathly/Kinship/Earthly Fortune, Long Arm
-        # of the Unseen, Night's Craftwork → garden chain) stay reachable.
+        # The Broker is free under unlock_broker, so treat its incantation as satisfied.
         if name == "Summoning of Mercantile Fortune" and options.unlock_broker:
             return True
         if not options.cauldronsanity:
@@ -121,13 +104,7 @@ class HadesIILogic(LogicMixin):
             return self._can_afford(name, player, options)
         return self.has(name, player)  # type: ignore
 
-    # Every familiar recruit sits behind the familiar-system unlock. The system is
-    # granted by Hecate (post-Hecate gate) via the WorldUpgradeFamiliarSystem
-    # incantation ("Faith of Familiar Spirits"), reached through a chain that needs
-    # the Tablet of Peace, Crescent Pickaxe and Silver Spade. Those extra
-    # dependencies only constrain logic when the matching sanity is on:
-    # cauldronsanity keys the incantation (via _has_incantation), toolsanity makes
-    # the three tools into items.
+    # Familiar recruits sit behind the familiar-system unlock: Hecate + its incantation + the three tools.
     def _has_familiar_system(self, player: int, options) -> bool:
         if not self._has_boss("Hecate", player):
             return False
@@ -135,11 +112,7 @@ class HadesIILogic(LogicMixin):
             return False
         return self._has_familiar_tools(player, options)
 
-    # The Tablet of Peace, Crescent Pickaxe and Silver Spade must be available
-    # before the HecateBossGrantsFamiliarSystem01 conversation fires (which is
-    # what unlocks brewing the WorldUpgradeFamiliarSystem incantation). Only a
-    # logic constraint when toolsanity makes the tools into items; otherwise
-    # they unlock through vanilla play.
+    # The three tools must be available before Hecate's conversation unlocks the familiar-system incantation.
     def _has_familiar_tools(self, player: int, options) -> bool:
         if not options.toolsanity:
             return True
@@ -149,11 +122,7 @@ class HadesIILogic(LogicMixin):
             and self.has("Silver Spade Tool Unlock", player)  # type: ignore
         )
 
-    # Checks if the player has reached the end-game.
-    # Combined mode: either Chronos or Typhon cleared (kill counts enforced
-    # client-side via the BossDefeatsNeeded victory signal).
-    # Separate mode: both Chronos AND Typhon cleared (per-boss kill counts
-    # enforced client-side via the Chronos/TyphonKillsNeeded victory signal).
+    # Endgame: combined mode needs either final boss, separate mode needs both (kill counts enforced client-side).
     def _can_reach_endgame(self, player: int, options) -> bool:
         if options.boss_defeats_mode == 1:  # separate
             return self.has("Chronos Victory", player) and self.has("Typhon Victory", player)  # type: ignore
@@ -163,13 +132,7 @@ class HadesIILogic(LogicMixin):
     def _enough_weapons_victories(self, player: int, options, amount: int) -> bool:
         return self._can_reach_endgame(player, options) and self._has_enough_weapons(player, options, amount)
     
-    # Surface access: the two surface-gating incantations.
-    # Permeation of Witching-Wards (WorldUpgradeAltRunDoor) opens the surface
-    # run door at the Crossroads. Unraveling a Fateful Bond
-    # (WorldUpgradeSurfacePenaltyCure) cures the surface penalty so runs are
-    # actually viable. Gated solely by lock_surface_incantations — these two
-    # incantations are intentionally independent of cauldronsanity. When the
-    # lock is off, the player brews them naturally and they aren't AP items.
+    # Surface access: Permeation opens the door, Unraveling cures the penalty; AP items only under lock_surface_incantations.
     def _has_surface_door(self, player: int, options) -> bool:
         if not options.lock_surface_incantations:
             # Brewed vanilla — Permeation's recipe needs a Hecate boss material.
@@ -186,9 +149,7 @@ class HadesIILogic(LogicMixin):
             and self.has("Unraveling a Fateful Bond", player)  # type: ignore
         )
 
-    # Moros only appears at the Crossroads after Melinoë's first surface run,
-    # which requires `Permeation of Witching-Wards`. The Penalty Cure is not
-    # required to meet him — just to *survive* a real surface run.
+    # Moros appears only after the first surface run, which needs just the door.
     def _has_moros_access(self, player: int, options) -> bool:
         return self._has_surface_door(player, options)
 
@@ -529,16 +490,7 @@ def handle_ingredients(world, player: int, options) -> None:
 
 
 def _restrict_score_check_progression(world, player: int, options) -> None:
-    """Block progression items from score/room checks.
-
-    These are intended for filler/useful (CLAUDE.md). Marking them EXCLUDED
-    forced filler-only and biased filler to the lowest-numbered checks. A
-    per-location item rule preserves the no-progression constraint while
-    letting AP's shuffled fill place useful + filler uniformly across them.
-    Covers all three location systems: score_based — "Score Check " (combined)
-    and "Underworld/Surface Score Check " (separate) — and the room systems'
-    "Clear Underworld/Surface Room " (room_based / room_weapon_based).
-    """
+    """Block progression items from score/room checks while letting useful + filler fill them uniformly."""
     score_prefixes = ("Score Check ", "Underworld Score Check ", "Surface Score Check ", "Clear ")
     for loc in world.get_locations(player):
         if loc.name.startswith(score_prefixes):
@@ -546,13 +498,7 @@ def _restrict_score_check_progression(world, player: int, options) -> None:
 
 
 def _set_weapon_clear_rules(world, player: int, options) -> None:
-    """Per-weapon final-boss clears: trackable filler checks.
-
-    The mod fires "<Weapon> Clear" the first time a final boss is defeated
-    with that weapon, so each is logically reachable once the endgame is
-    reachable AND the weapon is owned. They carry filler/useful only — the
-    weapon-clears GOAL is enforced client-side, not by these checks.
-    """
+    """Weapon Clear checks are trackable filler; the weapon-clears goal itself is enforced client-side."""
     if not options.weaponsanity:
         return
     for weapon in weapons:
@@ -574,8 +520,7 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     _set_weapon_clear_rules(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
-    # Each sanity gets one unified handler. Surface gating is folded into each
-    # handler per the per-entry tables, not a separate pass.
+    # One unified handler per sanity.
     handle_keepsakes(world, player, options)
     handle_hidden_aspects(world, player, options)
     handle_familiars(world, player, options)
@@ -583,10 +528,7 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
     handle_prophecies(world, player, options)
     handle_ingredients(world, player, options)
 
-    # True Ending: the final Chronos kill can only happen after the first
-    # Chronos kill AND the Dissolution of Time ritual (Zodiac Sand + Entropy);
-    # Gigaros is required because the True-Ending run also needs Disintegration
-    # of Monstrosity brewed.
+    # True Ending: the final Chronos kill needs the first kill plus the goal-incantation ingredients.
     if options.true_ending:
         add_rule(
             world.get_location("Chronos True Victory", player),
@@ -621,11 +563,7 @@ def handle_area_logic(world, player, options):
     for entrance_name, victory_item in area_rules:
         add_rule(world.get_entrance(entrance_name, player), lambda state, v=victory_item: state.has(v, player))
 
-    # Surface biome entrance: both surface-unlock incantations are needed for
-    # a viable run (Permeation opens the door; Unraveling cures the penalty).
-    # Requiring both here prevents either item from being placed at any
-    # surface-chain location (Ephyra → Summit), including Typhon Kill Rewards.
-    # No-op when lock_surface_incantations is off.
+    # Requiring full surface access here keeps both surface-unlock items off the whole surface chain.
     add_rule(
         world.get_entrance("Crossroads -> Ephyra", player),
         lambda state: state._has_surface_access(player, options),  # type: ignore
@@ -650,10 +588,7 @@ def handle_hidden_aspects(world, player, options):
         )
 
 
-# Each familiar recruit is gated on the familiar-system unlock. Biome reachability
-# (Toula→Oceanus, Hecuba→Fields, Gale→Olympus) is already enforced by region
-# connectivity, so the only extra rule each location needs is _has_familiar_system,
-# which folds in the post-Hecate gate plus the tool/incantation dependencies.
+# Familiar recruits only need _has_familiar_system; biome reach is enforced by region connectivity.
 def handle_familiars(world, player, options):
     if not options.familiarsanity:
         return
@@ -672,15 +607,7 @@ def handle_familiars(world, player, options):
 
 
 # ── Keepsake gates ───────────────────────────────────────────────────────────
-# One unified `handle_keepsakes` replaces the previous boss-only +
-# surface-only split. Each keepsake is gated on the NPC's reachability:
-# Crossroads-only (no rule), boss-locked Crossroads (Hermes), surface (every
-# Ephyra / Thessaly / Olympus NPC), or surface-door (Moros only appears post-
-# first-surface-run).
-#
-# Rows marked `[VERIFY]` in the planning doc are encoded as written; revisit
-# when the underlying TextLine gates have been cross-checked against the
-# NPCData/KeepsakeData source.
+# Each keepsake is gated on its NPC's reachability; [VERIFY] rows still need cross-checking against the game data.
 
 _KEEPSAKE_RULES_BOSS = (
     # (AP location, boss base name)
@@ -709,14 +636,7 @@ _KEEPSAKE_RULES_SURFACE_DOOR = (
 
 
 def handle_keepsakes(world, player, options):
-    """Gate every keepsake location on its NPC's reachability.
-
-    Crossroads-only NPCs (Hecate, Odysseus, Schelemeus, Charon, Nemesis, Dora,
-    Selene, Artemis, Zeus, Poseidon, Demeter, Apollo, Aphrodite, Hephaestus,
-    Hestia, Chaos) have no rule — they're available as soon as
-    keepsakesanity is on. Underworld-biome NPCs (Arachne in F, Narcissus in G,
-    Echo in H) also have no rule — gifting them doesn't require a surface run.
-    """
+    """Gate every keepsake location on its NPC's reachability (Crossroads and underworld-biome NPCs need no rule)."""
     if not options.keepsakesanity:
         return
 
@@ -740,20 +660,9 @@ def handle_keepsakes(world, player, options):
 
 
 # ── Incantation gates ────────────────────────────────────────────────────────
-# Sourced from WorldUpgradeData.lua GameStateRequirements chains. Surface
-# 2 (Permeation + Unraveling) are owned by `lock_surface_incantations`, the
-# remaining 84 cauldronsanity-controlled entries (we excluded Rivals of Old
-# and Rot under true_ending) are owned by `cauldronsanity`.
+# Sourced from WorldUpgradeData.lua GameStateRequirements chains.
 
-# Cauldronsanity entries with no prereq (always reachable when the location
-# exists). Listed for completeness; no add_rule call needed.
-#
-# Tier-1 set documented in the plan file under "Group 1" / "Group 2" /
-# parts of "Group 4" / etc. Intentionally not enumerated in code.
-
-# Cauldronsanity entries that need one or more prereq incantations to be
-# brewable. Format: (location, [incantation prereqs]). Each prereq is
-# resolved via _has_incantation (inert when cauldronsanity is off).
+# Entries needing prereq incantations: (location, [incantation prereqs]) resolved via _has_incantation.
 _INCANTATION_CHAIN_RULES = (
     # Group 2 — underworld biome reprieves / Erebus shops
     ("Surge of Stygian Wells",       ("Rise of Stygian Wells",)),
@@ -788,19 +697,14 @@ _INCANTATION_CHAIN_RULES = (
     ("Kindred Keepsakes",        ("Favored of All Keepsakes",)),  # [VERIFY]
 )
 
-# Cauldronsanity entries that need a boss victory (post-Hecate dialogue,
-# post-Chronos dialogue, etc.). Format: (location, boss base name).
+# Entries needing a boss victory: (location, boss base name).
 _INCANTATION_BOSS_RULES = (
     ("Necromantic Influence",   "Hecate"),
     ("Abyssal Insight",         "Hecate"),
-    # "Faith of Familiar Spirits" (WorldUpgradeFamiliarSystem) is handled
-    # separately in handle_incantations: it needs Hecate AND the three tools,
-    # because HecateBossGrantsFamiliarSystem01 only fires once they're available.
+    # "Faith of Familiar Spirits" is handled separately: it needs Hecate AND the three tools.
 )
 
-# Cauldronsanity entries gated purely on surface access (no intra-cauldron
-# prereq besides the surface-unlock 2, which `_has_surface_access` already
-# enforces).
+# Entries gated purely on surface access.
 _INCANTATION_SURFACE_ACCESS = (
     # Group 1 tail
     "Greater Removal of Rubbish",
@@ -821,8 +725,7 @@ _INCANTATION_SURFACE_ACCESS = (
     "End to Dearest Slumber",
 )
 
-# Cauldronsanity entries gated on surface access AND a prereq incantation.
-# Format: (location, [incantation prereqs]).
+# Entries gated on surface access AND a prereq incantation: (location, [incantation prereqs]).
 _INCANTATION_SURFACE_ACCESS_AND_CHAIN = (
     ("Surge of Fresh Air",           ("Rush of Fresh Air",)),
     ("Eyes of Night and Darkness",   ("Arisen Troves", "Exhumed Troves",)), 
@@ -830,17 +733,12 @@ _INCANTATION_SURFACE_ACCESS_AND_CHAIN = (
     ("Alteration of Familiar Forms", ("Faith of Familiar Spirits",)),  # [VERIFY]
 )
 
-# Cauldronsanity entries gated on the surface door (Permeation only — Moros
-# appears post-first-surface-run, doesn't need the penalty cure).
+# Entries gated on the surface door only (Moros doesn't need the cure).
 _INCANTATION_SURFACE_DOOR = (
     "Doomed Beckoning",         # MorosUnlock
 )
 
-# Rivals chain: each tier needs the relevant bosses cleared AND (T2+) surface
-# access. Format: (location, [bosses], requires_surface).
-# [VERIFY] vanilla boss triples for T2/T3.
-# T4 ("Rivals of Old and Rot") is EXCLUDED from the pool under true_ending —
-# handled in Locations.py.setup_location_table_with_settings + Items.py.
+# Rivals chain: (location, [bosses], requires_surface); T4 is excluded from the pool under true_ending. [VERIFY] boss triples for T2/T3.
 _INCANTATION_RIVALS_RULES = (
     ("Rivals of Depth and Sea",   ("Scylla", "Eris"),             True),
     ("Rivals of Plain and Peak",  ("Prometheus", "Cerberus"),     True),
@@ -849,15 +747,7 @@ _INCANTATION_RIVALS_RULES = (
 
 
 def handle_incantations(world, player, options):
-    """Gate cauldron-incantation locations on their in-game prerequisites.
-
-    Two independent option toggles drive what gets added:
-      • `lock_surface_incantations` owns the two surface-unlock locations
-        (Permeation, Unraveling). Permeation has no gate. Unraveling needs
-        the surface door (Moros must have appeared).
-      • `cauldronsanity` owns the 84+ remaining locations. Each gets the rule
-        from one of the tables above.
-    """
+    """Gate cauldron-incantation locations on their in-game prerequisites."""
     # Surface-unlock 2 — owned by lock_surface_incantations.
     if options.lock_surface_incantations:
         add_rule(
@@ -884,8 +774,7 @@ def handle_incantations(world, player, options):
             lambda state, b=boss: state._has_boss(b, player),  # type: ignore
         )
 
-    # Familiar-system incantation: Hecate AND the three tools (Tablet, Pickaxe,
-    # Spade), since HecateBossGrantsFamiliarSystem01 gates brewing it.
+    # Familiar-system incantation: Hecate AND the three tools.
     add_rule(
         world.get_location("Faith of Familiar Spirits", player),
         lambda state: (
@@ -935,10 +824,7 @@ def handle_incantations(world, player, options):
 
 
 # ── Prophecy gates ───────────────────────────────────────────────────────────
-# Mirrors handle_incantations. Sourced from QuestData.lua
-# UnlockGameStateRequirements + CompleteGameStateRequirements. Surface-NPC
-# dialogue triggers map to _has_surface_access; coarse boss grinds map to
-# _has_boss; system-unlock prophecies map to _has_incantation.
+# Mirrors handle_incantations, sourced from QuestData.lua requirement chains.
 
 _PROPHECY_BOSS_RULES = (
     # Group A — boss-defeat
@@ -955,12 +841,7 @@ _PROPHECY_BOSS_RULES = (
     ("Improbable Outcomes",      "Hecate"),   # [VERIFY] coarse — ChaosGift06 + bounty board
 )
 
-# Prophecies whose UnlockGameStateRequirements chain off a *prereq prophecy*
-# being cashed out (QuestStatus IsAny CashedOut / QuestsCompleted HasAll).
-# Format: (AP location, boss base name, (prereq "X Reward" item names)).
-# The prereq item names follow items.csv naming — they are AP items, not
-# locations. Each prereq listed here must also be in
-# Items.PROGRESSION_PROPHECY_ITEMS so state.has(...) can see it.
+# (location, boss, (prereq "X Reward" item names)); each prereq must be in Items.PROGRESSION_PROPHECY_ITEMS so state.has() can see it.
 _PROPHECY_BOSS_AND_CHAIN_RULES = (
     ("Natural Talent",      "Hecate",  ("Witch of the Crossroads Reward",)),  # QuestBeatHecateWithoutArcana → QuestBeatHecate
     ("Arcana of the Ages",  "Chronos", ("Temporary Setback Reward",)),         # QuestBeatChronosWithArcana → QuestFirstUnderworldClear
@@ -1055,8 +936,7 @@ def _sword_of_the_night_rule(state, player, options):
     return state.has("Temporary Setback Reward", player)  # type: ignore
 
 
-# Bearing Dark Gifts: (Chronos OR Typhon) AND The Unseen Sentinel Reward
-# (QuestClearedWithAllAspects chain on QuestUnlockAllWeaponAspects).
+# Bearing Dark Gifts: (Chronos OR Typhon) AND The Unseen Sentinel Reward.
 def _bearing_dark_gifts_rule(state, player, options):
     if not (state._has_boss("Chronos", player) or state._has_boss("Typhon", player)):  # type: ignore
         return False

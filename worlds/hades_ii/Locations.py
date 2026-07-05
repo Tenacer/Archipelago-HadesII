@@ -46,21 +46,13 @@ def _by_region(region: str, category: Optional[str] = None) -> Dict[str, Optiona
 
 # -- Exports consumed by Regions.py / HadesIIClient.py / Rules.py ---------------
 
-# Score checks. Three name pools so the route a check belongs to is visible to
-# the AP client/server/trackers (location names are a static datapackage mapping,
-# so the route can't be baked into a single pool per-seed):
-#   - "Score Check N"            — combined split mode only; all live in Menu.
-#   - "Underworld Score Check N" — separate mode, the Chronos route (Erebus).
-#   - "Surface Score Check N"    — separate mode, the Typhon route (Ephyra).
-# See score_check_split and Regions.create_regions for placement; the Lua mod
-# reports per-route counts and HadesIIClient maps each pool to its own id range.
+# Score checks: one combined pool plus two route-named pools so the route is visible in the static datapackage.
 location_table_score_checks: Dict[str, int] = _by_category("score")  # values are all int
 location_table_underworld_score_checks: Dict[str, int] = _by_category("score_underworld")
 location_table_surface_score_checks: Dict[str, int] = _by_category("score_surface")
 SCORE_LOCATION_COUNT = len(location_table_score_checks)
 
-# Lowest id of each route pool ("… Score Check 1"). The pools are contiguous in
-# locations.csv, so the client maps a per-route count to ids [base, base+count).
+# Lowest id of each route pool; the pools are contiguous so the client maps counts to [base, base+count).
 UNDERWORLD_SCORE_BASE_ID = location_table_underworld_score_checks["Underworld Score Check 1"]
 SURFACE_SCORE_BASE_ID = location_table_surface_score_checks["Surface Score Check 1"]
 UNDERWORLD_SCORE_COUNT = len(location_table_underworld_score_checks)
@@ -68,44 +60,21 @@ SURFACE_SCORE_COUNT = len(location_table_surface_score_checks)
 
 
 def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
-    """Return (underworld_budget, surface_budget) for the score-check pool.
-
-    The surface route gets `surface_score_ratio`% of the total checks; the
-    underworld route gets the remainder. Shared boundary used by Regions.py
-    (location placement), HadesIIClient.py (counter→location-id mapping) and
-    mirrored in the Lua mod's H2AP_ScoreChecksSent — all three MUST agree.
-    """
+    """Return (underworld_budget, surface_budget); Regions.py, HadesIIClient.py and the Lua mod MUST all agree on this split."""
     surface_budget = score_rewards_amount * surface_score_ratio // 100
     underworld_budget = score_rewards_amount - surface_budget
     return underworld_budget, surface_budget
 
 
 # -- Room-based location systems (room_based / room_weapon_based) --------------
-# A check the first time the player reaches each run depth, keyed per route
-# ("Clear Underworld Room NN" / "Clear Surface Room NN", optionally suffixed with
-# the equipped weapon for room_weapon_based). Mirrors Polycosmos' room_based /
-# room_weapon_based, adapted to Hades II's two routes.
-#
-# Per-route biome depth ranges: ordered (region, last_run_depth) pairs. Each room
-# check is placed in the biome region that owns its run depth, so the existing
-# boss-victory entrance rules (handle_area_logic) gate it exactly as in-game:
-# "Clear Underworld Room 35" lands in Tartarus → needs Hecate+Scylla+Cerberus.
-# These are GAME-STRUCTURE constants (not player options) and the route maxima
-# below derive from the last entry. The mod logs both the observed max run depth
-# AND each biome-transition depth per route ("[HadesII_AP] biome <X> starts at
-# run depth N") so these can be confirmed/tightened from a real run.
-# TODO(confirm): boundaries are estimates — update after one full run of each
-# route, then regenerate the room rows (scripts/gen_room_locations.py).
+# Per-route biome depth bounds as ordered (region, last_run_depth) pairs; each room check lives in the biome region owning its depth.
+# TODO(confirm): boundaries are estimates — update from the mod's logged depths, then regenerate the room rows (scripts/gen_room_locations.py).
 UNDERWORLD_BIOME_BOUNDS = [("Erebus", 11), ("Oceanus", 20), ("Fields", 25), ("Tartarus", 40)]
 SURFACE_BIOME_BOUNDS    = [("Ephyra", 11), ("Thessaly", 19), ("Olympus", 29), ("Summit", 36)]
 
 UNDERWORLD_ROOM_MAX = UNDERWORLD_BIOME_BOUNDS[-1][1]
 SURFACE_ROOM_MAX    = SURFACE_BIOME_BOUNDS[-1][1]
-# Run depth where Tartarus (the variable final underworld biome, optional rooms
-# like Hades 1's Styx) begins. The Chronos-kill auto-grant covers
-# [UNDERWORLD_AUTOGRANT_FROM .. UNDERWORLD_ROOM_MAX] so players who took a short
-# path through Tartarus still complete those checks. Defaults to the start of the
-# last underworld biome.
+# Run depth where Tartarus begins; the Chronos-kill auto-grant covers from here to the underworld max.
 UNDERWORLD_AUTOGRANT_FROM = UNDERWORLD_BIOME_BOUNDS[-2][1] + 1
 
 
@@ -116,9 +85,7 @@ def room_region_for(bounds, depth: int) -> str:
             return region
     return bounds[-1][0]  # clamp into the final biome
 
-# AP-facing weapon tokens for room_weapon_based suffixes. Order matches the
-# InitialWeapon option (Staff=0 … Coat=5); the Lua mod maps GetEquippedWeapon()'s
-# internal names to these (see WEAPON_SHORT in lib/weapons.lua).
+# Weapon tokens for room_weapon_based suffixes; MUST match WEAPON_SHORT in the Lua mod.
 ROOM_WEAPON_TOKENS = ["Staff", "Daggers", "Torches", "Axe", "Skull", "Coat"]
 
 
@@ -134,10 +101,7 @@ location_room_weapon_clears = _by_category("room_weapon_clear")
 
 
 def _room_clears_by_region(category: str) -> Dict[str, Dict[str, Optional[int]]]:
-    """Group a room category's locations by the biome region in their CSV row, so
-    each depth's check sits behind that biome's boss-victory gate (and the surface
-    biomes behind the surface-access gate). The CSV regions are materialized by
-    scripts/gen_room_locations.py from {UNDERWORLD,SURFACE}_BIOME_BOUNDS."""
+    """Group a room category's locations by the biome region in their CSV row."""
     grouped: Dict[str, Dict[str, Optional[int]]] = {}
     for name, d in location_table.items():
         if d.category == category:
@@ -162,14 +126,12 @@ location_table_summit   = _by_region("Summit",   "biome_victory")
 # Crossroads (option-gated) tables
 location_keepsakes          = _by_category("keepsake")
 location_weapons            = _by_category("weapon")
-# Per-weapon final-boss clears — trackable filler checks fired by the mod the
-# first time a final boss is defeated with each weapon. Gated by weaponsanity.
+# Per-weapon final-boss clears (trackable filler checks, gated by weaponsanity).
 location_weapon_clears      = _by_category("weapon_clear")
 location_hidden_aspects     = _by_category("hidden_aspect")
 location_tools              = _by_category("tool")
 location_familiars          = _by_category("familiar")
-# Familiar recruits live in the biome where the wild familiar appears (Frinos in
-# the Crossroads hub), so they're placed per-region rather than all in Crossroads.
+# Familiar recruits live in the biome where the wild familiar appears.
 location_familiars_by_region = {
     region: _by_region(region, "familiar")
     for region in ("Crossroads", "Erebus", "Oceanus", "Fields", "Olympus")
@@ -177,16 +139,13 @@ location_familiars_by_region = {
 location_incantations       = _by_category("incantation")
 location_table_prophecies   = _by_category("prophecy")
 
-# The two surface-unlock incantation locations — owned by
-# lock_surface_incantations, never by cauldronsanity.
+# The two surface-unlock incantation locations, owned by lock_surface_incantations.
 SURFACE_LOCK_LOCATIONS = ("Permeation of Witching-Wards", "Unraveling a Fateful Bond")
 
-# Boss kill reward locations — separate from biome-victory events above.
-# Names follow the pattern "Chronos Kill Reward N" / "Typhon Kill Reward N".
+# Boss kill reward locations ("Chronos Kill Reward N" / "Typhon Kill Reward N").
 location_table_boss_rewards: Dict[str, int] = _by_category("boss_reward")
 
-# Unused placeholder (kept for back-compat — no Crossroads-category locations
-# live outside the specialised tables above).
+# Unused placeholder kept for back-compat.
 location_table_crossroads: Dict[str, int] = {}
 
 # Location groups (exported as `location_name_groups` on the World class).
@@ -211,8 +170,7 @@ def setup_location_table_with_settings(options) -> dict:
     """Returns the locations actually in play for this seed, filtered by options."""
     total: Dict[str, Optional[int]] = {}
 
-    # Boss kill rewards: only in True Ending mode. BossDefeats mode counts
-    # successful runs and doesn't need to replace the per-kill rewards.
+    # Boss kill rewards: only in True Ending mode.
     if options.true_ending:
         for i in range(1, options.chronos_kills_needed.value + 1):
             name = f"Chronos Kill Reward {i}"
@@ -221,10 +179,7 @@ def setup_location_table_with_settings(options) -> dict:
             name = f"Typhon Kill Reward {i}"
             total[name] = location_table_boss_rewards[name]
 
-    # Score checks only under score_based system; limited to first N.
-    # Combined: one "Score Check N" pool. Separate: split into the route-named
-    # pools by their budgets so each route's checks carry its name (mirrors the
-    # Regions.create_regions placement).
+    # Score checks: one combined pool, or the two route-named pools split by budget.
     if options.location_system == "score_based":
         if options.score_split_mode == 1:  # separate
             underworld_budget, surface_budget = score_check_split(
@@ -240,8 +195,7 @@ def setup_location_table_with_settings(options) -> dict:
                 name = f"Score Check {i}"
                 total[name] = location_table_score_checks[name]
 
-    # Room-based systems: per-route depth checks (and per-weapon for the weapon
-    # variant). Mirrors the Regions.create_regions placement.
+    # Room-based systems: per-route depth checks.
     elif options.location_system == "room_based":
         total.update(location_room_clears)
     elif options.location_system == "room_weapon_based":
@@ -267,10 +221,7 @@ def setup_location_table_with_settings(options) -> dict:
     if options.hidden_aspectsanity.value == 1:
         total.update(location_hidden_aspects)
 
-    # Cauldronsanity covers the 86 non-surface incantation locations.
-    # `Rivals of Old and Rot` is excluded under true_ending because vanilla
-    # T4 requires `ReachedTrueEnding` (post-goal) — see also the matching
-    # exclusion in Items.create_items.
+    # Cauldronsanity covers the non-surface incantation locations; Rivals T4 is excluded under true_ending (post-goal gate).
     if options.cauldronsanity.value == 1:
         for name, code in location_incantations.items():
             if name in SURFACE_LOCK_LOCATIONS:
@@ -282,8 +233,7 @@ def setup_location_table_with_settings(options) -> dict:
                 continue
             total[name] = code
 
-    # Lock-surface toggle owns the two surface-unlock incantation locations,
-    # independent of cauldronsanity.
+    # lock_surface_incantations owns the two surface-unlock locations.
     if options.lock_surface_incantations.value == 1:
         for name in SURFACE_LOCK_LOCATIONS:
             total[name] = location_incantations[name]

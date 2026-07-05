@@ -4,11 +4,7 @@ from ..Options import hades_ii_option_presets
 
 
 def _assert_score_checks_block_progression(test_case) -> None:
-    """Score checks must reject progression items via their per-location item rule.
-
-    Verifies the rule directly (no fill required) so the test is independent
-    of fill order or RNG. EXCLUDED marking is intentionally NOT used.
-    """
+    """Score checks must reject progression items via their per-location item rule."""
     fake_progression = Item("test", ItemClassification.progression, None, test_case.player)
     fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
     score_locs = [
@@ -200,10 +196,7 @@ class TestTrueEndingAllSanities(HadesIITestBase):
 
 
 class TestAllSanitiesOff(HadesIITestBase):
-    # true_ending off: with every sanity off there are no item locations beyond
-    # the (progression-rejecting) score checks, so the True Ending default would
-    # have nowhere to place its progression items. This class tests sanity-off
-    # location absence under the simple BossDefeats goal.
+    # true_ending off: with every sanity off the True Ending progression items would have nowhere to go.
     options = {
         "true_ending": 0,
         "keepsakesanity": 0,
@@ -296,9 +289,7 @@ class TestLockSurfaceIncantationsDefault(HadesIITestBase):
 class TestLockSurfaceOffCauldronsanityOn(HadesIITestBase):
     """lock_surface_incantations off, cauldronsanity on — the surface 2 are NOT
     AP items/locations. The cauldronsanity pool covers every non-surface incantation."""
-    # unlock_broker off so the Broker incantation stays in the cauldronsanity pool
-    # (this test asserts full non-surface coverage). true_ending off so the
-    # true-ending-excluded "Rivals of Old and Rot" stays in the pool.
+    # unlock_broker and true_ending off so every non-surface incantation stays in the pool.
     options = {"lock_surface_incantations": 0, "cauldronsanity": 1, "unlock_broker": 0,
                "true_ending": 0}
 
@@ -388,9 +379,7 @@ class TestUnlockBroker(HadesIITestBase):
             self.assertIsNotNone(loc)
 
     def test_dependent_locations_reachable(self) -> None:
-        # all_state collects every pool item — but NOT the removed Broker
-        # incantation. The dependents must still be reachable, which only holds
-        # if _has_incantation treats Market as satisfied under unlock_broker.
+        # The Broker incantation is not in the pool, so dependents are only reachable if _has_incantation treats it as satisfied.
         all_state = self.multiworld.get_all_state()
         for name in _BROKER_DEPENDENTS:
             loc = self.multiworld.get_location(name, self.player)
@@ -457,16 +446,7 @@ class TestKeepsakeGoal(HadesIITestBase):
 
 
 def _assert_count_goal_gated(test, item_names, needed: int) -> None:
-    """Shared gate check for a count-based goal (keepsakes / fates).
-
-    Starts from all-state (endgame reachable, every relevant item collected),
-    zeroes the counted items, then re-adds them one at a time. The goal must
-    stay unmet at `needed - 1` and flip to met at `needed`. Mutates prog_items
-    directly (add_item / remove_item) — the count goals read prog_items via
-    `state.count`, and that is also what the AP client mirrors at runtime, so
-    a fresh `create_item` (which keeps the CSV `useful` class) is deliberately
-    avoided here.
-    """
+    """Shared gate check for a count-based goal: unmet at needed-1, met at needed."""
     player = test.player
     completion = test.multiworld.completion_condition[player]
     state = test.multiworld.get_all_state(False)
@@ -563,9 +543,6 @@ class TestRandomInitialWeapon(HadesIITestBase):
 
 
 # ── handle_X refactor coverage ──────────────────────────────────────────────
-# The plan replaced handle_surface_{incantations,fates,keepsakes} with three
-# unified handlers (handle_keepsakes, handle_incantations, handle_prophecies)
-# and folded surface gating into each per-entry table.
 
 class TestExpandedSurfaceKeepsakes(HadesIITestBase):
     """Every keepsake in `_KEEPSAKE_RULES_SURFACE_ACCESS` must be blocked

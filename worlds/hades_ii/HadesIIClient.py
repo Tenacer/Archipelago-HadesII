@@ -41,20 +41,12 @@ from .Items import item_table_keepsakes, item_table_prophecies
 
 POLL_INTERVAL = 0.5
 
-# Item codes that count toward the keepsakes/fates goal thresholds. Mirrors the
-# generation-time reachability logic in Rules._has_enough_keepsakes /
-# _has_enough_prophecies_done, which count RECEIVED items (item_table_keepsakes /
-# item_table_prophecies). Counting received items here — rather than checked
-# locations — keeps the runtime goal gate consistent with what generation
-# guarantees collectible (in a multiworld the prophecy/keepsake items may be
-# placed in other players' worlds).
+# Item codes that count toward the keepsakes/fates goal thresholds. 
 _KEEPSAKE_ITEM_IDS = {d.code for d in item_table_keepsakes.values() if d.code is not None}
 _PROPHECY_ITEM_IDS = {d.code for d in item_table_prophecies.values() if d.code is not None}
 
-# name→id for every non-event location; used to resolve names from the outbox
 _LOCATION_NAME_TO_ID = {name: d.code for name, d in location_table.items() if d.code is not None}
 
-# id→name for locations whose item placements we display in-game (cauldron / Fated List)
 _INCANTATION_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "incantation" and d.code is not None
@@ -63,25 +55,16 @@ _PROPHECY_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "prophecy" and d.code is not None
 }
-# The two surface-unlock incantation locations (Permeation / Unraveling). They're
-# a subset of the incantation category but are owned by lock_surface_incantations,
-# NOT cauldronsanity — so they must be scouted up front under that toggle (see the
-# Connected handler). Without this they were never scouted in surface-lock mode,
-# so the in-game label fell back to "AP Location Check".
+# The two surface-unlock incantation locations, owned by lock_surface_incantations.
 _SURFACE_LOCK_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if name in SURFACE_LOCK_LOCATIONS and d.code is not None
 }
-# Boss kill reward locations are scouted so the Lua mod can decide whether to
-# spawn the AP icon obstacle (other player's item, or our own non-resource item)
-# or the matching vanilla resource-drop obstacle (when the placed item is one
-# of our own resources like Zodiac Sand / Void Lens / etc).
+# Boss kill reward locations are scouted so the game can pick the right drop obstacle.
 _BOSS_REWARD_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "boss_reward" and d.code is not None
 }
-# Schelmy's WeaponShop entries (weapons / tools / hidden aspects) are scouted so
-# the Lua mod can show the placed AP item + owning player on the shop slot.
 _WEAPON_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "weapon" and d.code is not None
@@ -152,7 +135,6 @@ class HadesIIClientCommandProcessor(ClientCommandProcessor):
             return
         lines = []
         if ctx._weaponsanity:
-            # Distinct weapon clears are in-game data, reported via the outbox.
             clears = 0
             outbox = ctx._ipc_file("ap_out.json")
             if outbox.exists():
@@ -244,12 +226,7 @@ class HadesIIContext(CommonContext):
             self._keepsakes_needed = slot_data.get("keepsakes_needed", 0)
             self._fatesanity = slot_data.get("fatesanity") == 1
             self._fates_needed = slot_data.get("fates_needed", 0)
-            # Score split: in separate mode the underworld route's checks map to
-            # the "Underworld Score Check N" id range and the surface route's to the
-            # "Surface Score Check N" range; each route's count is capped at its own
-            # budget (must match Locations.score_check_split and the Lua mod). In
-            # combined mode the single counter lights the "Score Check N" ids
-            # consecutively (see _process_score_checks).
+            # Score split budgets must match Locations.score_check_split and the Lua mod.
             self._score_split = slot_data.get("score_split_mode") == 1
             self._underworld_budget, self._surface_budget = score_check_split(
                 slot_data.get("score_rewards_amount", 150),
@@ -260,15 +237,11 @@ class HadesIIContext(CommonContext):
             # Enable DeathLink if the slot data says so (and the player hasn't overridden it)
             if not self.deathlink_client_override and slot_data.get("death_link"):
                 Utils.async_start(self.update_death_link(True))
-            # Scout incantation/prophecy locations so the game mod can display
-            # AP item names. Boss reward locations are scouted in TrueEnding mode
-            # so the mod can pick the matching obstacle on each boss kill.
+            # Scout the option-gated locations so the game mod can display AP item names.
             to_scout: list = []
             if slot_data.get("cauldronsanity") == 1:
                 to_scout.extend(_INCANTATION_LOCATION_IDS.keys())
-            # Surface-lock incantations are owned by lock_surface_incantations, not
-            # cauldronsanity, so scout them whenever the lock is on (the cauldronsanity
-            # extend above already covers them when both are on — duplicates are fine).
+            # Surface-lock incantations are scouted whenever the lock is on (duplicates are fine).
             if slot_data.get("lock_surface_incantations") == 1:
                 to_scout.extend(_SURFACE_LOCK_LOCATION_IDS.keys())
             if slot_data.get("fatesanity") == 1:
@@ -286,16 +259,14 @@ class HadesIIContext(CommonContext):
                         to_scout.append(loc_id)
                     elif name.startswith("Typhon") and idx <= typhon_n:
                         to_scout.append(loc_id)
-            # WeaponShop entries (weapons / tools / hidden aspects) so the mod can
-            # display the placed AP item + player on each shop slot.
+            # WeaponShop entries so the mod can label each shop slot.
             if slot_data.get("weaponsanity") == 1:
                 to_scout.extend(_WEAPON_LOCATION_IDS.keys())
             if slot_data.get("toolsanity") == 1:
                 to_scout.extend(_TOOL_LOCATION_IDS.keys())
             if slot_data.get("hidden_aspectsanity") == 1:
                 to_scout.extend(_HIDDEN_ASPECT_LOCATION_IDS.keys())
-            # Only scout locations that exist in this slot. Weapon sanity omits the
-            # player's initial weapon location, so its id would be an invalid scout.
+            # Only scout locations that exist in this slot.
             existing = self.missing_locations | self.checked_locations
             to_scout = [loc_id for loc_id in to_scout if loc_id in existing]
             if to_scout:
@@ -323,13 +294,7 @@ class HadesIIContext(CommonContext):
     # ── Inbox (AP server → game mod) ─────────────────────────────────────────
 
     def _write_inbox(self):
-        """
-        Write all received items to ap_in.json.
-        Each entry has: index, item_code, item_name, player_slot, player_name,
-        sender_game, is_local. The Lua mod uses item_name to grant the item and
-        the sender fields to label the in-game "Received" notification with
-        "from <Player> (<Game>)" for remote items.
-        """
+        """Write all received items (with sender info) to ap_in.json."""
         items = []
         for i, net_item in enumerate(self.items_received):
             item_name = self.item_names.lookup_in_slot(net_item.item, self.slot)
@@ -398,19 +363,7 @@ class HadesIIContext(CommonContext):
         logger.debug(f"Scouted {len(location_ids)} locations")
 
     def _write_location_items(self, args: dict) -> None:
-        """Merge LocationInfo into ap_location_items.json (location_name → entry).
-
-        Each entry is structured as:
-            {"item_name": str, "player_slot": int, "player_name": str,
-             "sender_game": str, "is_local": bool, "display": str}
-
-        - `item_name` is the raw item (no [Player] suffix).
-        - `is_local` lets the Lua mod tell apart our own items vs other players'.
-        - `sender_game` is the receiving player's game (used by H2AP_NotifySent).
-        - `display` is the cauldron/Fated List label: "Item Name" for local,
-          "Item Name [Player (Game)]" for remote (falls back to
-          "Item Name [Player]" if sender_game is unavailable).
-        """
+        """Merge LocationInfo into ap_location_items.json as location_name → {item_name, player fields, display}."""
         if not self._world_id:
             return
         path = self._ipc_file("ap_location_items.json")
@@ -494,14 +447,7 @@ class HadesIIContext(CommonContext):
         await self._process_deathlink(data)
 
     async def _process_score_checks(self, data: dict):
-        """Convert the Lua mod's score-check counters into AP LocationChecks.
-
-        Separate split mode: the underworld and surface routes carry their own
-        counters, each mapped to its own route-named location pool — underworld to
-        the "Underworld Score Check N" ids (Erebus), surface to the "Surface Score
-        Check N" ids (Ephyra), each capped at its budget. Combined mode: a single
-        counter lights the "Score Check N" ids consecutively.
-        """
+        """Convert the Lua mod's score-check counters into AP LocationChecks, per route pool in separate mode."""
         if self._score_split:
             await self._send_score_range(
                 data.get("checks_sent_underworld", 0),
@@ -525,8 +471,7 @@ class HadesIIContext(CommonContext):
         )
 
     async def _send_score_range(self, count: int, base_id: int, pool_count: int, last_attr: str):
-        """Light score-check location ids [base_id+last, base_id+count) for one pool,
-        capped at `pool_count` checks."""
+        """Light score-check location ids [base_id+last, base_id+count) for one pool."""
         last = getattr(self, last_attr)
         if count <= last:
             return
@@ -545,12 +490,7 @@ class HadesIIContext(CommonContext):
         setattr(self, last_attr, count)
 
     async def _process_named_checks(self, data: dict):
-        """
-        Handle all non-score location checks reported by name from the game.
-        The outbox 'checked_locations' field is a list of AP location name strings.
-        Covers: boss rewards, keepsakes, weapons, tools, hidden aspects,
-                incantations, and prophecy checks.
-        """
+        """Handle all non-score location checks reported by name from the game."""
         checked = data.get("checked_locations", [])
         if not checked:
             return
@@ -567,12 +507,7 @@ class HadesIIContext(CommonContext):
             logger.debug(f"Sent {len(new_locations)} named check(s)")
 
     async def _process_hints(self, data: dict):
-        """
-        Hint locations the game has displayed (cauldron tab / Fated List).
-        Lua sends a cumulative 'hinted_locations' array; we dedupe via a session
-        set and call LocationScouts with create_as_hint=2 (free hint, no point cost).
-        Already-checked locations are skipped — hinting a collected location is a no-op.
-        """
+        """Hint locations the game has displayed, via LocationScouts create_as_hint=2."""
         hinted = data.get("hinted_locations", [])
         if not hinted:
             return
@@ -606,26 +541,7 @@ class HadesIIContext(CommonContext):
         return sum(1 for ni in self.items_received if ni.item in _PROPHECY_ITEM_IDS)
 
     async def _process_victory(self, data: dict):
-        """Send goal status when the game signals the run is complete.
-
-        The mod's run-completion signal (`victory`) is necessary but not always
-        sufficient. Each "needed" goal option layers an extra threshold on top,
-        all enforced here client-side (mirroring the generation-time logic in
-        Rules._can_get_victory):
-
-        - Weaponsanity: at least `weapons_clears_needed` distinct weapons must
-          have cleared a final boss (reported as `weapon_clears` in the outbox;
-          this is in-game data AP can't see on its own).
-        - Keepsakesanity: at least `keepsakes_needed` distinct keepsake items
-          received.
-        - Fatesanity: at least `fates_needed` prophecy reward items received.
-
-        Keepsake/fate counts come from `items_received` (not the outbox) because
-        AP is the source of truth for collected items — the items may even be
-        delivered by other players in a multiworld. `_process_victory` runs every
-        outbox poll, so once enough items arrive after the run is won the goal
-        fires on the next tick.
-        """
+        """Send goal status once the game signals victory AND every "needed" threshold is met client-side."""
         if self._sent_goal:
             return
         if not data.get("victory"):

@@ -28,10 +28,7 @@ from .Locations import (
     should_ignore_weapon_location,
 )
 
-# Biome → (event location table, boss reward base name or None).
-# When base name is set, per-kill rewards "<base> N" are emitted up to the
-# matching option count (chronos_kills_needed / typhon_kills_needed) in True
-# Ending mode only.
+# Biome → (event location table, boss reward base name or None); rewards are emitted in True Ending mode only.
 _biome_data = {
     "Erebus":    (location_table_erebus,   None),
     "Oceanus":   (location_table_oceanus,  None),
@@ -64,18 +61,7 @@ def _add_location(region: Region, name: str, address):
 def create_regions(player, multiworld, location_database, options):
     regions = {name: Region(name, player, multiworld) for name in _region_connections}
 
-    # Score checks — only populated under the score_based location system and
-    # limited to the first N per ScoreRewardsAmount.
-    # Combined split mode: all live in Menu (always accessible — any route can
-    #   earn every check).
-    # Separate split mode: the underworld route can only earn its budget share
-    #   and the surface route only earns the rest, so the checks are placed in
-    #   the region whose access they actually require — the first
-    #   `underworld_budget` in Erebus (reachable from start), the remaining
-    #   surface ones in Ephyra (gated by the Crossroads -> Ephyra surface rule).
-    #   This keeps multiworld fill from treating surface checks as reachable
-    #   before surface access is unlocked.
-    # Progress types are set later in set_rules once the item pool is known.
+    # Score checks: combined mode lives in Menu; separate mode places each route's budget in Erebus/Ephyra so fill respects surface access.
     if options.location_system == "score_based":
         n = options.score_rewards_amount.value
         if options.score_split_mode == 1:  # separate
@@ -91,12 +77,7 @@ def create_regions(player, multiworld, location_database, options):
                 name = f"Score Check {i}"
                 _add_location(regions["Menu"], name, location_table_score_checks[name])
 
-    # Room-based systems: each depth's check is placed in the biome region that
-    # owns its run depth ({UNDERWORLD,SURFACE}_BIOME_BOUNDS), so the boss-victory
-    # entrance rules (handle_area_logic) gate it exactly as in-game — a deep
-    # Tartarus room needs Hecate+Scylla+Cerberus, surface rooms need surface
-    # access + their biome's prior bosses. The room_weapon variant places the same
-    # per-region sets x 6 weapons.
+    # Room-based systems: each depth's check goes in the biome region owning its run depth.
     room_region_tables = None
     if options.location_system == "room_based":
         room_region_tables = location_room_clears_by_region
@@ -107,11 +88,7 @@ def create_regions(player, multiworld, location_database, options):
             for name, loc_id in table.items():
                 _add_location(regions[region_name], name, loc_id)
 
-    # Biome victory events + boss reward checks.
-    # `Chronos True Victory` is the True-Ending-only sentinel — the second Chronos
-    # kill performed after Dissolution of Time. Skip it unless the goal needs it.
-    # Boss rewards are only emitted in True Ending mode, up to the per-boss kill
-    # count option (chronos_kills_needed / typhon_kills_needed).
+    # Biome victory events + boss reward checks; Chronos True Victory only exists under true_ending.
     for region_name, (event_table, boss_reward) in _biome_data.items():
         region = regions[region_name]
         for event_name in event_table:
@@ -142,10 +119,7 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_hidden_aspects.items():
             _add_location(regions["Crossroads"], name, loc_id)
 
-    # Cauldronsanity owns the 86 non-surface incantation locations.
-    # `Rivals of Old and Rot` is excluded under true_ending — vanilla T4
-    # requires `ReachedTrueEnding` (post-goal). Mirror in Items.create_items
-    # and Locations.setup_location_table_with_settings.
+    # Cauldronsanity owns the non-surface incantation locations; Rivals T4 is excluded under true_ending (post-goal gate).
     if options.cauldronsanity:
         for name, loc_id in location_incantations.items():
             if name in SURFACE_LOCK_LOCATIONS:
@@ -157,8 +131,7 @@ def create_regions(player, multiworld, location_database, options):
                 continue
             _add_location(regions["Crossroads"], name, loc_id)
 
-    # Lock-surface toggle owns the two surface-unlock incantation locations,
-    # independent of cauldronsanity.
+    # lock_surface_incantations owns the two surface-unlock locations.
     if options.lock_surface_incantations:
         for name in SURFACE_LOCK_LOCATIONS:
             _add_location(regions["Crossroads"], name, location_incantations[name])
@@ -172,9 +145,7 @@ def create_regions(player, multiworld, location_database, options):
         for name, loc_id in location_tools.items():
             _add_location(regions["Crossroads"], name, loc_id)
 
-    # Familiar recruits, gated by familiarsanity — placed in the biome where each
-    # wild familiar appears (Frinos in the Crossroads hub). Access rules are set in
-    # Rules.handle_familiars; biome reachability is enforced by region connectivity.
+    # Familiar recruits go in the biome where each wild familiar appears.
     if options.familiarsanity:
         for region_name, table in location_familiars_by_region.items():
             for name, loc_id in table.items():

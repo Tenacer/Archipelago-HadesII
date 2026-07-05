@@ -90,14 +90,6 @@ class HadesIIWorld(World):
         return {name: rank for name, rank in ranks.items() if rank > 0}
 
     def generate_early(self) -> None:
-        # initial_weapon's default = "random" makes Archipelago roll a concrete
-        # weapon (0..5) at option-resolution time, so Rules, Locations,
-        # fill_slot_data and the Lua mod always see a fixed weapon here.
-
-        # True Ending: the goal/brewing threshold must not exceed the per-boss
-        # kill count, which now drives the size of the Zodiac Sand / Void Lens
-        # item pool. Without this check, a misconfigured YAML would produce a
-        # pool that cannot satisfy its own goal predicate.
         if self.options.true_ending:
             if self.options.zodiac_sand_needed.value > self.options.chronos_kills_needed.value:
                 raise OptionError(
@@ -131,10 +123,6 @@ class HadesIIWorld(World):
         set_rules(self.multiworld, self.player, local_location_table, self.options)
 
     def fill_slot_data(self) -> dict:
-        # Everything the Lua mod needs to know about the seed.
-        # Excludes start_inventory_from_pool (AP core handles it) and the
-        # *_percentage / filler_trap_percentage options (generation-time only —
-        # they shape the pool, they don't influence runtime behaviour).
         slot_data = self.options.as_dict(
             # Gameplay
             "initial_weapon",
@@ -164,7 +152,7 @@ class HadesIIWorld(World):
             "fates_needed",
             # Fear system mode
             "fear_system",
-            # Filler pack sizes (how much resource each pack grants when received)
+            # Filler pack sizes 
             "ash_pack_value",
             "bones_pack_value",
             "psyche_pack_value",
@@ -181,7 +169,5 @@ class HadesIIWorld(World):
             "death_link",
             "death_link_amnesty",
         )
-        # vow_ranks: shrine_upgrade_name -> rank (only non-zero entries).
-        # Lua mod applies these as starting/locked levels (reverse_fear) or floor (minimal_fear).
         slot_data["vow_ranks"] = self.vow_ranks
         return slot_data

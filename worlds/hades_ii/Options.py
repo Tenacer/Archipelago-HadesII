@@ -699,12 +699,7 @@ hades_ii_option_groups = [
 ]
 
 # ------------------------------ Presets
-#
-# Six presets: Easy / Normal / Hard for each goal mode (Boss Defeats and True
-# Ending). Each preset is the difficulty knobs (resource generosity, fear,
-# traps, scope — shared across goal modes) merged with the goal configuration.
-# "True Ending Normal" is the recommended default and mirrors the bare option
-# defaults, so loading it is a no-op.
+# Six presets: Easy / Normal / Hard per goal mode; "True Ending Normal" mirrors the bare defaults.
 
 # Shared difficulty knobs — identical regardless of goal mode.
 _DIFFICULTY: Dict[str, Dict[str, Any]] = {
@@ -762,8 +757,7 @@ _DIFFICULTY: Dict[str, Dict[str, Any]] = {
     },
 }
 
-# Boss Defeats goal. Easy counts combined kills; Normal and Hard count each boss
-# separately (Chronos and Typhon thresholds tracked independently).
+# Boss Defeats goal: Easy counts combined kills, Normal and Hard count each boss separately.
 _BOSS_GOAL: Dict[str, Dict[str, Any]] = {
     "Easy":   {"true_ending": False, "boss_defeats_mode": "combined", "boss_defeats_needed": 3},
     "Normal": {"true_ending": False, "boss_defeats_mode": "separate",
