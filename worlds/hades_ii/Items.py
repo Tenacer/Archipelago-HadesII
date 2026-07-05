@@ -58,6 +58,9 @@ PROGRESSION_INCANTATION_ITEMS = frozenset({
     "Greater Favor of Gaia",
     "Necromantic Influence",
     "Rite of River-Fording",
+    # Ingredient-logic gates (Rules.handle_ingredients / _has_hidden_aspect)
+    "Aspects of Night and Darkness",
+    "Bravery of Familiar Spirits",
 })
 
 # Prophecy items referenced as chain prereqs in Rules.py logic gates
@@ -207,7 +210,10 @@ def create_items(self) -> None:
 
     # Hidden aspects — 1 per weapon; visible aspects ride along with the weapon unlock.
     if self.options.hidden_aspectsanity:
-        pool.extend(self.create_item(name) for name in item_table_hidden_aspects)
+        for name in item_table_hidden_aspects:
+            item = self.create_item(name)
+            item.classification = ItemClassification.progression
+            pool.append(item)
 
     # Tools — gated by toolsanity (otherwise tools stay vanilla)
     if self.options.toolsanity:
@@ -216,7 +222,10 @@ def create_items(self) -> None:
     # Familiars — gated by familiarsanity (otherwise familiars stay vanilla).
     # No goal counts them, so the CSV's `useful` classification stands.
     if self.options.familiarsanity:
-        pool.extend(self.create_item(name) for name in item_table_familiars)
+        for name in item_table_familiars:
+            item = self.create_item(name)
+            item.classification = ItemClassification.progression
+            pool.append(item)
 
     # Surface-unlock incantations — owned exclusively by lock_surface_incantations
     # (independent of cauldronsanity). Always progression so Rules.py's

@@ -847,6 +847,125 @@ class TestRoomWeaponBased(HadesIITestBase):
         _assert_room_checks_block_progression(self)
 
 
+# ── Ingredient logic ──────────────────────────────────────────────────────────
+# Cost-bearing locations (shops, cauldron recipes, gather-dependent prophecies)
+# must require the matching gathering tool or familiar plus its farming reach.
+
+class TestIngredientLogicAllSanities(HadesIITestBase):
+    """Tool/familiar ingredient gates under the full sanity suite."""
+    options = {
+        "toolsanity": 1, "familiarsanity": 1, "weaponsanity": 1,
+        "hidden_aspectsanity": 1, "cauldronsanity": 1, "fatesanity": 1,
+        "keepsakesanity": 1, "lock_surface_incantations": 1, "unlock_broker": 0,
+        "initial_weapon": 0,
+    }
+
+    def _empty_state(self):
+        from BaseClasses import CollectionState
+        return CollectionState(self.multiworld)
+
+    def _grant(self, state, *names):
+        for name in names:
+            state.prog_items[self.player][name] += 1
+
+    def test_tool_shop_needs_nights_craftwork(self) -> None:
+        loc = self.multiworld.get_location("Crescent Pickaxe Tool Unlock Location", self.player)
+        state = self._empty_state()
+        self.assertFalse(loc.access_rule(state), "tool shop tab needs Night's Craftwork")
+        self._grant(state, "Night's Craftwork")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_spade_purchase_needs_mining(self) -> None:
+        loc = self.multiworld.get_location("Silver Spade Tool Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Night's Craftwork")
+        self.assertFalse(loc.access_rule(state), "8 Silver — needs a miner")
+        # Raki substitutes the pickaxe.
+        self._grant(state, "Raki Familiar")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_rod_purchase_needs_mining_and_surface(self) -> None:
+        loc = self.multiworld.get_location("Rod of Fishing Tool Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Night's Craftwork", "Crescent Pickaxe Tool Unlock")
+        self.assertFalse(loc.access_rule(state), "1 Bronze — needs Ephyra reach")
+        self._grant(state, "Permeation of Witching-Wards", "Unraveling a Fateful Bond")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_skull_weapon_needs_priors_mining_and_reach(self) -> None:
+        loc = self.multiworld.get_location("Skull Weapon Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Daggers Weapon Unlock", "Torches Weapon Unlock",
+                    "Axe Weapon Unlock", "Crescent Pickaxe Tool Unlock")
+        self.assertFalse(loc.access_rule(state),
+            "Bronze needs surface, Glassrock needs Scylla")
+        self._grant(state, "Scylla Victory",
+                    "Permeation of Witching-Wards", "Unraveling a Fateful Bond")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_incantation_needs_mining(self) -> None:
+        loc = self.multiworld.get_location("Woodsy Lifespring", self.player)
+        state = self._empty_state()
+        self.assertFalse(loc.access_rule(state), "3 Silver — needs a miner")
+        self._grant(state, "Crescent Pickaxe Tool Unlock")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_grown_plant_needs_dig_and_garden(self) -> None:
+        loc = self.multiworld.get_location("Rise of Stygian Wells", self.player)
+        state = self._empty_state()
+        self._grant(state, "Night's Craftwork", "Silver Spade Tool Unlock")
+        self.assertFalse(loc.access_rule(state), "Nightshade needs the garden")
+        self._grant(state, "Flourishing Soil")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_tools_of_the_unseen_needs_all_four_tools(self) -> None:
+        loc = self.multiworld.get_location("Tools of the Unseen", self.player)
+        state = self._empty_state()
+        self._grant(state, "Crescent Pickaxe Tool Unlock", "Silver Spade Tool Unlock",
+                    "Tablet of Peace Tool Unlock")
+        self.assertFalse(loc.access_rule(state), "missing the Rod")
+        self._grant(state, "Rod of Fishing Tool Unlock")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_denizen_of_the_depths_needs_fishing(self) -> None:
+        loc = self.multiworld.get_location("Denizen of the Depths", self.player)
+        state = self._empty_state()
+        self._grant(state, "Night's Craftwork", "Rite of River-Fording")
+        self.assertFalse(loc.access_rule(state), "needs the Rod or Toula")
+        self._grant(state, "Toula Familiar")
+        self.assertTrue(loc.access_rule(state))
+
+    def test_hidden_aspect_needs_system_and_ore(self) -> None:
+        loc = self.multiworld.get_location("Coat Weapon Shiva Aspect Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Coat Weapon Unlock", "Crescent Pickaxe Tool Unlock",
+                    "Scylla Victory")
+        self.assertFalse(loc.access_rule(state), "needs Aspects of Night and Darkness")
+        self._grant(state, "Aspects of Night and Darkness")
+        self.assertTrue(loc.access_rule(state))
+
+
+class TestIngredientLogicVanillaWeapons(HadesIITestBase):
+    """Weapon prophecies with weaponsanity OFF fall back to the vanilla
+    purchase chain (mining + shop sequencing reach)."""
+    options = {
+        "weaponsanity": 0, "toolsanity": 0, "familiarsanity": 0,
+        "cauldronsanity": 0, "fatesanity": 1, "lock_surface_incantations": 1,
+    }
+
+    def test_black_coat_vanilla_chain(self) -> None:
+        from BaseClasses import CollectionState
+        loc = self.multiworld.get_location("The Black Coat", self.player)
+        state = CollectionState(self.multiworld)
+        self.assertFalse(loc.access_rule(state))
+        for name in ("Hecate Victory", "Scylla Victory", "Eris Victory",
+                      "Permeation of Witching-Wards"):
+            state.prog_items[self.player][name] += 1
+        self.assertFalse(loc.access_rule(state), "Bronze needs full surface access")
+        state.prog_items[self.player]["Unraveling a Fateful Bond"] += 1
+        self.assertTrue(loc.access_rule(state))
+
+
 # ── Preset smoke tests ────────────────────────────────────────────────────────
 # Generate every shipped preset and run the inherited base checks (fill +
 # all-state reachability), so a preset can never ship an ungeneratable combo.
