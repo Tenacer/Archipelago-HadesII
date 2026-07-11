@@ -26,9 +26,7 @@ class HadesIILogic(LogicMixin):
     def _has_enough_weapons(self, player: int, options, amount: int) -> bool:
         if not options.weaponsanity:
             return True
-        count = 0
-        count = sum(self._has_weapon(w, player, options) for w in weapons)
-        return count >= amount
+        return sum(self._has_weapon(w, player, options) for w in weapons) >= amount
     
     # Checks if the player has a given weapon
     def _has_weapon(self, weaponName: str, player: int, options) -> bool:
@@ -86,10 +84,6 @@ class HadesIILogic(LogicMixin):
             and self.count("Void Lens", player) >= options.void_lens_needed.value  # type: ignore
         )
     
-    # Checks if a specific biome boss has been defeated (used for region/keepsake logic)
-    def _has_defeated_final_boss(self, boss_event: str, player: int, options=None) -> bool:
-        return self.has(boss_event, player)  # type: ignore
-
     # Sugar: boss base name + " Victory".
     def _has_boss(self, boss: str, player: int) -> bool:
         return self.has(f"{boss} Victory", player)  # type: ignore
@@ -514,7 +508,7 @@ def _set_weapon_clear_rules(world, player: int, options) -> None:
         add_item_rule(loc, lambda item: not item.advancement)
 
 
-def set_rules(world, player: int, location_table: dict, options) -> None:
+def set_rules(world, player: int, options) -> None:
     handle_area_logic(world, player, options)
     _restrict_score_check_progression(world, player, options)
     _set_weapon_clear_rules(world, player, options)
@@ -539,14 +533,6 @@ def set_rules(world, player: int, location_table: dict, options) -> None:
                 and state.count("Zodiac Sand", player) >= options.zodiac_sand_needed.value
             ),
         )
-        
-    # if options.weaponsanity:
-    #     add_rule(world.get_entrance("Weapon Cache", player), lambda state: True)
-        
-    # if options.fatesanity:
-    #     set_fates_rules(world, player, location_table, options, "")
-        
-    # set_fates_rules(world, player, location_table, options, " Event")
 
 # Defines logic for each area / region
 def handle_area_logic(world, player, options):

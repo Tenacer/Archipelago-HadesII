@@ -5,7 +5,7 @@ from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, Type, components, icon_paths
 from . import web_world
 from .Options import HadesIIOptions
-from .Locations import give_all_locations_table, location_name_groups, setup_location_table_with_settings
+from .Locations import give_all_locations_table, location_name_groups
 from .Regions import create_regions
 from .Items import item_table, item_name_groups, create_items, Hades_II_Item
 from .Rules import set_rules
@@ -119,8 +119,7 @@ class HadesIIWorld(World):
         create_items(self)
 
     def set_rules(self):
-        local_location_table = setup_location_table_with_settings(self.options).copy()
-        set_rules(self.multiworld, self.player, local_location_table, self.options)
+        set_rules(self.multiworld, self.player, self.options)
 
     def fill_slot_data(self) -> dict:
         slot_data = self.options.as_dict(

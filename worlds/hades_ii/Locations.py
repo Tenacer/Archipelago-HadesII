@@ -89,13 +89,6 @@ def room_region_for(bounds, depth: int) -> str:
 ROOM_WEAPON_TOKENS = ["Staff", "Daggers", "Torches", "Axe", "Skull", "Coat"]
 
 
-def room_location_name(route: str, depth: int, weapon: str = None) -> str:
-    """Canonical room-check location name. `route` is 'Underworld' or 'Surface'.
-    MUST match the Lua mod's name construction in H2AP_OnRoomCleared."""
-    base = f"Clear {route} Room {depth:02d}"
-    return f"{base} {weapon}" if weapon else base
-
-
 location_room_clears        = _by_category("room_clear")
 location_room_weapon_clears = _by_category("room_weapon_clear")
 
@@ -144,9 +137,6 @@ SURFACE_LOCK_LOCATIONS = ("Permeation of Witching-Wards", "Unraveling a Fateful 
 
 # Boss kill reward locations ("Chronos Kill Reward N" / "Typhon Kill Reward N").
 location_table_boss_rewards: Dict[str, int] = _by_category("boss_reward")
-
-# Unused placeholder kept for back-compat.
-location_table_crossroads: Dict[str, int] = {}
 
 # Location groups (exported as `location_name_groups` on the World class).
 location_name_groups = {
