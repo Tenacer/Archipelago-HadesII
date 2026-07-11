@@ -13,6 +13,8 @@ from .Locations import (
     location_weapons,
     location_weapon_clears,
     location_hidden_aspects,
+    location_base_aspects,
+    location_standard_aspects,
     location_tools,
     location_familiars_by_region,
     location_incantations,
@@ -26,6 +28,7 @@ from .Locations import (
     location_table_olympus,
     location_table_summit,
     should_ignore_weapon_location,
+    should_ignore_aspect_location,
 )
 
 # Biome → (event location table, boss reward base name or None); rewards are emitted in True Ending mode only.
@@ -118,6 +121,12 @@ def create_regions(player, multiworld, location_database, options):
     if options.hidden_aspectsanity:
         for name, loc_id in location_hidden_aspects.items():
             _add_location(regions["Crossroads"], name, loc_id)
+
+    # Base + standard aspects — the starting weapon's Initial Aspect is granted, not a check.
+    if options.aspectsanity:
+        for name, loc_id in {**location_base_aspects, **location_standard_aspects}.items():
+            if not should_ignore_aspect_location(name, options):
+                _add_location(regions["Crossroads"], name, loc_id)
 
     # Cauldronsanity owns the non-surface incantation locations; Rivals T4 is excluded under true_ending (post-goal gate).
     if options.cauldronsanity:

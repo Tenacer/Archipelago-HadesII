@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from .Items import item_table_fears, item_table_keepsakes, item_table_prophecies
+from .Locations import initial_aspect_item
 from worlds.AutoWorld import LogicMixin
 from worlds.generic.Rules import add_rule, add_item_rule
 
@@ -261,21 +262,57 @@ class HadesIILogic(LogicMixin):
             for atom in _INCANTATION_INGREDIENTS.get(name, ())
         )
 
+    # The aspect purchase system: granted from the start by the QoL toggle, else the incantation.
+    def _has_aspect_system(self, player: int, options) -> bool:
+        if options.aspect_system_unlocked:
+            return True
+        return self._has_incantation("Aspects of Night and Darkness", player, options)
+
+    # A standard aspect owned/obtainable: the AP item (or granted initial aspect) under
+    # aspectsanity; otherwise the vanilla purchase = weapon + system + cost (+ familiar).
+    def _has_standard_aspect(self, item: str, player: int, options) -> bool:
+        if options.aspectsanity:
+            return item == initial_aspect_item(options) or self.has(item, player)  # type: ignore
+        weapon, atoms, needs_familiar = _STANDARD_ASPECT_BY_ITEM[item]
+        if not self._has_weapon(weapon, player, options):
+            return False
+        if not self._has_aspect_system(player, options):
+            return False
+        if needs_familiar and not self._has_familiar_system(player, options):
+            return False
+        return all(self._has_ingredient(a, player, options) for a in atoms)
+
+    # Aspect leveling to rank 5 needs Nightmare. Outside vanilla fear it is supplied via the
+    # filler pool; in vanilla fear it wants the run progress that yields Nightmare (both bosses).
+    def _nightmare_available(self, player: int, options) -> bool:
+        if options.fear_system.value != 3:
+            return True
+        return self.has("Chronos Victory", player) and self.has("Typhon Victory", player)  # type: ignore
+
+    # Faithful vanilla hidden-aspect reveal: system + both standard aspects + all six weapons
+    # + reach the revealing god + rank-5 Nightmare + the purchase's gathered ingredients.
+    def _can_unlock_hidden_aspect(self, weapon, atoms, reveal, player: int, options) -> bool:
+        if not self._has_aspect_system(player, options):
+            return False
+        if not _reveal_gate_ok(self, reveal, player, options):
+            return False
+        s1, s2 = _WEAPON_STANDARD_ITEMS[weapon]
+        if not (self._has_standard_aspect(s1, player, options)
+                and self._has_standard_aspect(s2, player, options)):
+            return False
+        if not self._has_enough_weapons(player, options, 6):
+            return False
+        if not self._nightmare_available(player, options):
+            return False
+        return all(self._has_ingredient(a, player, options) for a in atoms)
+
     # A hidden aspect owned/obtainable: the AP item under hidden_aspectsanity;
-    # otherwise the vanilla purchase = weapon + aspect system + reveal NPC + cost.
+    # otherwise the vanilla reveal chain + purchase.
     def _has_hidden_aspect(self, item: str, player: int, options) -> bool:
         if options.hidden_aspectsanity:
             return self.has(item, player)  # type: ignore
         weapon, atoms, reveal = _HIDDEN_ASPECT_VANILLA[item]
-        if not self._has_weapon(weapon, player, options):
-            return False
-        if not self._has_incantation("Aspects of Night and Darkness", player, options):
-            return False
-        if reveal == "surface" and not self._has_surface_access(player, options):
-            return False
-        if reveal == "door" and not self._has_surface_door(player, options):
-            return False
-        return all(self._has_ingredient(a, player, options) for a in atoms)
+        return self._can_unlock_hidden_aspect(weapon, atoms, reveal, player, options)
 
     # A weapon obtainable at the Silver Pool: the AP item (or initial weapon)
     # under weaponsanity; otherwise the cumulative vanilla purchase costs
@@ -417,6 +454,44 @@ _HIDDEN_ASPECT_VANILLA = {
     for _loc, item, weapon, atoms, reveal in _HIDDEN_ASPECT_DATA
 }
 
+# Base aspects: (location, item, weapon). The Bones cost carries no gathering atom.
+_BASE_ASPECT_DATA = (
+    ("Staff Weapon Melinoe Aspect Unlock Location",   "Staff Melinoe Aspect Unlock",   "Staff Weapon"),
+    ("Daggers Weapon Melinoe Aspect Unlock Location", "Daggers Melinoe Aspect Unlock", "Daggers Weapon"),
+    ("Torches Weapon Melinoe Aspect Unlock Location", "Torches Melinoe Aspect Unlock", "Torches Weapon"),
+    ("Axe Weapon Melinoe Aspect Unlock Location",     "Axe Melinoe Aspect Unlock",     "Axe Weapon"),
+    ("Skull Weapon Melinoe Aspect Unlock Location",   "Skull Melinoe Aspect Unlock",   "Skull Weapon"),
+    ("Coat Weapon Melinoe Aspect Unlock Location",    "Coat Melinoe Aspect Unlock",    "Coat Weapon"),
+)
+
+# Standard aspects: (location, item, weapon, ingredient atoms, needs_familiar). Costs from WeaponShopData.
+_STANDARD_ASPECT_DATA = (
+    ("Staff Weapon Circe Aspect Unlock Location",     "Circe Aspect Unlock",     "Staff Weapon",   (("grow", "G"), ("mine", "I")), True),
+    ("Staff Weapon Momus Aspect Unlock Location",     "Momus Aspect Unlock",     "Staff Weapon",   (("boss", "Scylla"), ("mine", "G")), False),
+    ("Daggers Weapon Artemis Aspect Unlock Location", "Artemis Aspect Unlock",   "Daggers Weapon", (("mine", "H"),), False),
+    ("Daggers Weapon Pan Aspect Unlock Location",     "Pan Aspect Unlock",       "Daggers Weapon", (("grow", "I"), ("boss", "Polyphemus")), False),
+    ("Torches Weapon Moros Aspect Unlock Location",   "Moros Aspect Unlock",     "Torches Weapon", (("boss", "Cerberus"), ("mine", "N")), False),
+    ("Torches Weapon Eos Aspect Unlock Location",     "Eos Aspect Unlock",       "Torches Weapon", (("boss", "Eris"), ("grow", "O")), False),
+    ("Axe Weapon Charon Aspect Unlock Location",      "Charon Aspect Unlock",    "Axe Weapon",     (("boss", "Scylla"),), False),
+    ("Axe Weapon Thanatos Aspect Unlock Location",    "Thanatos Aspect Unlock",  "Axe Weapon",     (("mine", "H"), ("grow", "F")), False),
+    ("Skull Weapon Medea Aspect Unlock Location",     "Medea Aspect Unlock",     "Skull Weapon",   (("mine", "O"), ("grow", "O")), False),
+    ("Skull Weapon Persephone Aspect Unlock Location","Persephone Aspect Unlock","Skull Weapon",   (("grow", "I"), ("grow", "N")), False),
+    ("Coat Weapon Nyx Aspect Unlock Location",        "Nyx Aspect Unlock",       "Coat Weapon",    (("mine", "Chaos"),), False),
+    ("Coat Weapon Selene Aspect Unlock Location",     "Selene Aspect Unlock",    "Coat Weapon",    (), False),
+)
+
+# item → (weapon, atoms, needs_familiar) for the vanilla path of _has_standard_aspect.
+_STANDARD_ASPECT_BY_ITEM = {
+    item: (weapon, atoms, needs_familiar)
+    for _loc, item, weapon, atoms, needs_familiar in _STANDARD_ASPECT_DATA
+}
+
+# weapon → its two standard aspect items (the pair the hidden reveal chain requires).
+_WEAPON_STANDARD_ITEMS = {
+    weapon: tuple(item for _l, item, w, _a, _f in _STANDARD_ASPECT_DATA if w == weapon)
+    for _loc, _item, weapon, _atoms, _needs in _STANDARD_ASPECT_DATA
+}
+
 
 def _reveal_gate_ok(state, reveal, player, options) -> bool:
     if reveal == "surface":
@@ -472,13 +547,35 @@ def handle_ingredients(world, player: int, options) -> None:
                 and all(state._has_ingredient(a, player, options) for a in ats)
             ))
 
-    # Hidden aspects: aspect system + reveal NPC + cost.
+    # Hidden aspects: the faithful vanilla reveal chain (system + both standards + all six
+    # weapons + reach god + rank-5 Nightmare + cost).
     if options.hidden_aspectsanity:
-        for loc_name, _item, _weapon, atoms, reveal in _HIDDEN_ASPECT_DATA:
+        for loc_name, _item, weapon, atoms, reveal in _HIDDEN_ASPECT_DATA:
             add_rule(world.get_location(loc_name, player),
-                     lambda state, ats=atoms, rev=reveal: (
-                state._has_incantation("Aspects of Night and Darkness", player, options)
-                and _reveal_gate_ok(state, rev, player, options)
+                     lambda state, w=weapon, ats=atoms, rev=reveal:
+                     state._can_unlock_hidden_aspect(w, ats, rev, player, options))
+
+    # Base + standard aspects: both live in the system-gated weapon-shop category. Base
+    # costs only Bones (no gathering atom); standard adds its vanilla ingredient cost.
+    if options.aspectsanity:
+        for loc_name, _item, weapon in _BASE_ASPECT_DATA:
+            try:
+                location = world.get_location(loc_name, player)
+            except KeyError:
+                continue  # the initial aspect has no shop location
+            add_rule(location, lambda state, w=weapon: (
+                state._has_weapon(w, player, options)
+                and state._has_aspect_system(player, options)
+            ))
+        for loc_name, _item, weapon, atoms, needs_familiar in _STANDARD_ASPECT_DATA:
+            try:
+                location = world.get_location(loc_name, player)
+            except KeyError:
+                continue
+            add_rule(location, lambda state, w=weapon, ats=atoms, f=needs_familiar: (
+                state._has_weapon(w, player, options)
+                and state._has_aspect_system(player, options)
+                and (not f or state._has_familiar_system(player, options))
                 and all(state._has_ingredient(a, player, options) for a in ats)
             ))
 

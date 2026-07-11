@@ -125,6 +125,7 @@ class HadesIIWorld(World):
         slot_data = self.options.as_dict(
             # Gameplay
             "initial_weapon",
+            "initial_aspect",
             "location_system",
             "score_rewards_amount",
             "score_split_mode",
@@ -133,7 +134,9 @@ class HadesIIWorld(World):
             "keepsakesanity",
             "weaponsanity",
             "toolsanity",
+            "aspectsanity",
             "hidden_aspectsanity",
+            "aspect_system_unlocked",
             "familiarsanity",
             "cauldronsanity",
             "lock_surface_incantations",
@@ -169,4 +172,7 @@ class HadesIIWorld(World):
             "death_link_amnesty",
         )
         slot_data["vow_ranks"] = self.vow_ranks
+        # Outside vanilla fear, each Nightmare pack is worth the max so aspect leveling keeps pace.
+        if self.options.fear_system.value != 3:
+            slot_data["nightmare_pack_value"] = 10
         return slot_data

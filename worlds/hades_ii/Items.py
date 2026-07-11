@@ -5,7 +5,8 @@ from typing import Dict, List, NamedTuple, Optional, Set
 from BaseClasses import Item, ItemClassification
 
 from . import data
-from .Locations import setup_location_table_with_settings, should_ignore_weapon_location
+from .Locations import setup_location_table_with_settings, should_ignore_weapon_location, \
+    initial_aspect_item
 
 
 _BOSS_VICTORY_NAMES = {
@@ -141,6 +142,8 @@ item_table_post_ending_keepsakes = _items_in_group("post_ending_keepsakes")
 item_table_weapons     = _items_in_group("weapons")
 item_table_tools       = _items_in_group("tools")
 item_table_hidden_aspects = _items_in_group("hidden_aspects")
+item_table_base_aspects = _items_in_group("base_aspects")
+item_table_standard_aspects = _items_in_group("standard_aspects")
 item_table_familiars   = _items_in_group("familiars")
 item_table_traps       = _items_in_group("traps")
 item_table_helpers     = _items_in_group("helpers")
@@ -191,6 +194,17 @@ def create_items(self) -> None:
     # Hidden aspects — 1 per weapon, promoted to progression for the Rules.py gates.
     if self.options.hidden_aspectsanity:
         for name in item_table_hidden_aspects:
+            item = self.create_item(name)
+            item.classification = ItemClassification.progression
+            pool.append(item)
+
+    # Base + standard aspects — progression (gate wielding + the hidden reveal chain).
+    # The starting weapon's Initial Aspect is granted at start, so it leaves the pool.
+    if self.options.aspectsanity:
+        skip = initial_aspect_item(self.options)
+        for name in (*item_table_base_aspects, *item_table_standard_aspects):
+            if name == skip:
+                continue
             item = self.create_item(name)
             item.classification = ItemClassification.progression
             pool.append(item)
@@ -274,13 +288,19 @@ def handle_fillers(self, pool, local_location_table):
     trap_pct   = self.options.filler_trap_percentage   if self.options.enable_traps   else 0
     helper_pct = self.options.filler_helper_percentage if self.options.enable_helpers else 0
 
+    # Outside vanilla fear the game only hands out Nightmare at the True Ending, so aspect
+    # leveling would stall — guarantee at least a 5% Nightmare share from the filler pool.
+    nightmare_pct = self.options.nightmare_pack_percentage.value
+    if self.options.fear_system.value != 3:
+        nightmare_pct = max(5, nightmare_pct)
+
     percentages = {
         "ash":         self.options.ash_pack_percentage,
         "bones":       self.options.bones_pack_percentage,
         "psyche":      self.options.psyche_pack_percentage,
         "nectar":      self.options.nectar_pack_percentage,
         "ambrosia":    self.options.ambrosia_pack_percentage,
-        "nightmare":   self.options.nightmare_pack_percentage,
+        "nightmare":   nightmare_pct,
         "moon_dust":   self.options.moon_dust_pack_percentage,
         "fate_fabric": self.options.fate_fabric_pack_percentage,
         "traps":       trap_pct,

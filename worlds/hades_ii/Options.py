@@ -21,6 +21,19 @@ class InitialWeapon(Choice):
     option_Coat = 5
     default = "random"
 
+class InitialAspect(Choice):
+    """
+    Chooses which aspect of your initial weapon you start with: its base aspect or one of
+    its two standard aspects (never a hidden aspect). Only used when Aspect Sanity is on;
+    the chosen aspect is granted at the start and is not a check.
+    Set to "random" to have Archipelago roll one of the three at generation time.
+    """
+    display_name = "Initial Aspect"
+    option_base = 0
+    option_first_standard = 1
+    option_second_standard = 2
+    default = "random"
+
 class LocationSystem(Choice):
     """
     Chooses how the game turns cleared rooms into checks.
@@ -106,12 +119,31 @@ class ToolSanity(DefaultOnToggle):
     """
     display_name = "Tool Sanity"
 
-class HiddenAspectSanity(DefaultOnToggle):
+class AspectSanity(DefaultOnToggle):
     """
-    Shuffles weapon aspects into the item pool, and makes obtaining each aspect a check
-    (which needs to be unlocked before being able to be bought).
+    Shuffles the base and standard weapon aspects into the item pool (the "Aspect of
+    Melinoë" per weapon plus each weapon's two named aspects), and makes unlocking each
+    one a check. Base aspects become purchasable with Bones; standard aspects keep their
+    vanilla ingredient costs. You start with your Initial Aspect for your starting weapon.
+    Hidden aspects are handled separately by Hidden Aspect Sanity.
+    """
+    display_name = "Aspect Sanity"
+
+class HiddenAspectSanity(Toggle):
+    """
+    Shuffles the six hidden weapon aspects into the item pool, and makes obtaining each
+    one a check. Each hidden aspect keeps its full vanilla reveal chain in logic (both of
+    that weapon's standard aspects, all six weapons, and reaching the revealing god).
     """
     display_name = "Hidden Aspect Sanity"
+
+class AspectSystemUnlocked(DefaultOnToggle):
+    """
+    Quality-of-life: grants the weapon aspect purchase system (Aspects of Night and
+    Darkness) from the start, so aspects can be bought and played right away. When off,
+    aspect checks stay gated behind brewing that incantation first.
+    """
+    display_name = "Aspect System Unlocked"
 
 class FamiliarSanity(DefaultOnToggle):
     """
@@ -569,6 +601,7 @@ class DeathLinkAmnesty(Range):
 class HadesIIOptions(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     initial_weapon: InitialWeapon
+    initial_aspect: InitialAspect
     location_system: LocationSystem
     score_rewards_amount: ScoreRewardsAmount
     score_split_mode: ScoreSplitMode
@@ -577,7 +610,9 @@ class HadesIIOptions(PerGameCommonOptions):
     keepsakesanity: KeepsakeSanity
     weaponsanity: WeaponSanity
     toolsanity: ToolSanity
+    aspectsanity: AspectSanity
     hidden_aspectsanity: HiddenAspectSanity
+    aspect_system_unlocked: AspectSystemUnlocked
     familiarsanity: FamiliarSanity
     cauldronsanity: CauldronSanity
     lock_surface_incantations: LockSurfaceIncantations
@@ -632,6 +667,7 @@ class HadesIIOptions(PerGameCommonOptions):
 hades_ii_option_groups = [
     OptionGroup("Game Options", [
         InitialWeapon,
+        InitialAspect,
         LocationSystem,
         ScoreRewardsAmount,
         ScoreSplitMode,
@@ -639,7 +675,9 @@ hades_ii_option_groups = [
         KeepsakeSanity,
         WeaponSanity,
         ToolSanity,
+        AspectSanity,
         HiddenAspectSanity,
+        AspectSystemUnlocked,
         FamiliarSanity,
         CauldronSanity,
         LockSurfaceIncantations,

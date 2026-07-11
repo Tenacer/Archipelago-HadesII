@@ -912,14 +912,77 @@ class TestIngredientLogicAllSanities(HadesIITestBase):
         self._grant(state, "Toula Familiar")
         self.assertTrue(loc.access_rule(state))
 
-    def test_hidden_aspect_needs_system_and_ore(self) -> None:
+    def test_hidden_aspect_needs_reveal_chain(self) -> None:
+        # Faithful vanilla reveal: both of the weapon's standard aspects, all six weapons,
+        # and the purchase cost (Glassrock = mining + Scylla). The QoL grants the system by
+        # default, and reverse fear supplies Nightmare from the pool.
         loc = self.multiworld.get_location("Coat Weapon Shiva Aspect Unlock Location", self.player)
         state = self._empty_state()
-        self._grant(state, "Coat Weapon Unlock", "Crescent Pickaxe Tool Unlock",
-                    "Scylla Victory")
-        self.assertFalse(loc.access_rule(state), "needs Aspects of Night and Darkness")
+        self._grant(state, "Daggers Weapon Unlock", "Torches Weapon Unlock",
+                    "Axe Weapon Unlock", "Skull Weapon Unlock", "Coat Weapon Unlock",
+                    "Crescent Pickaxe Tool Unlock", "Scylla Victory")
+        self.assertFalse(loc.access_rule(state), "needs both Coat standard aspects")
+        self._grant(state, "Nyx Aspect Unlock", "Selene Aspect Unlock")
+        self.assertTrue(loc.access_rule(state))
+
+
+class TestAspectSanity(HadesIITestBase):
+    """Base + standard aspect gates, with the aspect-system QoL turned off."""
+    options = {
+        "aspectsanity": 1, "weaponsanity": 1, "toolsanity": 1, "familiarsanity": 1,
+        "cauldronsanity": 1, "aspect_system_unlocked": 0,
+        "initial_weapon": 0, "initial_aspect": 0,  # Staff, base Aspect of Melinoë
+    }
+
+    def _empty_state(self):
+        from BaseClasses import CollectionState
+        return CollectionState(self.multiworld)
+
+    def _grant(self, state, *names):
+        for name in names:
+            state.prog_items[self.player][name] += 1
+
+    def test_initial_aspect_has_no_check(self) -> None:
+        # The granted starting aspect (Staff base) is not a location.
+        names = {loc.name for loc in self.multiworld.get_locations(self.player)}
+        self.assertNotIn("Staff Weapon Melinoe Aspect Unlock Location", names)
+        self.assertIn("Staff Weapon Circe Aspect Unlock Location", names)
+
+    def test_base_aspect_needs_weapon_and_system(self) -> None:
+        # Base aspects sit in the system-gated shop category (QoL off here).
+        loc = self.multiworld.get_location("Daggers Weapon Melinoe Aspect Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Daggers Weapon Unlock")
+        self.assertFalse(loc.access_rule(state), "needs the aspect system")
         self._grant(state, "Aspects of Night and Darkness")
         self.assertTrue(loc.access_rule(state))
+
+    def test_standard_aspect_needs_system_and_cost(self) -> None:
+        # Momus (Staff): the QoL is off so it needs the incantation, plus Scylla + mined G.
+        loc = self.multiworld.get_location("Staff Weapon Momus Aspect Unlock Location", self.player)
+        state = self._empty_state()
+        self._grant(state, "Hecate Victory", "Scylla Victory", "Crescent Pickaxe Tool Unlock")
+        self.assertFalse(loc.access_rule(state), "needs the aspect system")
+        self._grant(state, "Aspects of Night and Darkness")
+        self.assertTrue(loc.access_rule(state))
+
+
+class TestAspectSanityVanillaFear(HadesIITestBase):
+    """Aspect + hidden aspect sanity under vanilla fear (hidden reveal wants both bosses);
+    full fill/reachability must still succeed. Boss Defeats goal."""
+    options = {
+        "aspectsanity": 1, "hidden_aspectsanity": 1, "aspect_system_unlocked": 0,
+        "weaponsanity": 1, "fear_system": 3, "true_ending": 0,
+    }
+
+
+class TestAspectSanityTrueEndingAllOn(HadesIITestBase):
+    """Aspect + hidden aspect sanity with the full sanity suite under True Ending."""
+    options = {
+        "aspectsanity": 1, "hidden_aspectsanity": 1, "weaponsanity": 1,
+        "toolsanity": 1, "familiarsanity": 1, "cauldronsanity": 1, "fatesanity": 1,
+        "keepsakesanity": 1, "true_ending": 1,
+    }
 
 
 class TestIngredientLogicVanillaWeapons(HadesIITestBase):

@@ -122,6 +122,8 @@ location_weapons            = _by_category("weapon")
 # Per-weapon final-boss clears (trackable filler checks, gated by weaponsanity).
 location_weapon_clears      = _by_category("weapon_clear")
 location_hidden_aspects     = _by_category("hidden_aspect")
+location_base_aspects       = _by_category("base_aspect")
+location_standard_aspects   = _by_category("standard_aspect")
 location_tools              = _by_category("tool")
 location_familiars          = _by_category("familiar")
 # Familiar recruits live in the biome where the wild familiar appears.
@@ -211,6 +213,12 @@ def setup_location_table_with_settings(options) -> dict:
     if options.hidden_aspectsanity.value == 1:
         total.update(location_hidden_aspects)
 
+    # Base + standard aspects; the starting weapon's Initial Aspect has no check (granted at start).
+    if options.aspectsanity.value == 1:
+        for name, code in {**location_base_aspects, **location_standard_aspects}.items():
+            if not should_ignore_aspect_location(name, options):
+                total[name] = code
+
     # Cauldronsanity covers the non-surface incantation locations; Rivals T4 is excluded under true_ending (post-goal gate).
     if options.cauldronsanity.value == 1:
         for name, code in location_incantations.items():
@@ -244,6 +252,44 @@ def should_ignore_weapon_location(weaponLocation: str, options) -> bool:
         5: "Coat Weapon Unlock Location",
     }
     return mapping.get(options.initial_weapon.value) == weaponLocation
+
+
+# Per initial_weapon value: [base, first standard, second standard] — for aspect sanity.
+# initial_aspect (0=base, 1=first standard, 2=second standard) picks the granted starting aspect.
+ASPECT_BY_WEAPON_ITEM = {
+    0: ["Staff Melinoe Aspect Unlock",   "Circe Aspect Unlock",    "Momus Aspect Unlock"],
+    1: ["Daggers Melinoe Aspect Unlock", "Artemis Aspect Unlock",  "Pan Aspect Unlock"],
+    2: ["Torches Melinoe Aspect Unlock", "Moros Aspect Unlock",    "Eos Aspect Unlock"],
+    3: ["Axe Melinoe Aspect Unlock",     "Charon Aspect Unlock",   "Thanatos Aspect Unlock"],
+    4: ["Skull Melinoe Aspect Unlock",   "Medea Aspect Unlock",    "Persephone Aspect Unlock"],
+    5: ["Coat Melinoe Aspect Unlock",    "Nyx Aspect Unlock",      "Selene Aspect Unlock"],
+}
+ASPECT_BY_WEAPON_LOC = {
+    0: ["Staff Weapon Melinoe Aspect Unlock Location",   "Staff Weapon Circe Aspect Unlock Location",    "Staff Weapon Momus Aspect Unlock Location"],
+    1: ["Daggers Weapon Melinoe Aspect Unlock Location", "Daggers Weapon Artemis Aspect Unlock Location","Daggers Weapon Pan Aspect Unlock Location"],
+    2: ["Torches Weapon Melinoe Aspect Unlock Location", "Torches Weapon Moros Aspect Unlock Location",  "Torches Weapon Eos Aspect Unlock Location"],
+    3: ["Axe Weapon Melinoe Aspect Unlock Location",     "Axe Weapon Charon Aspect Unlock Location",     "Axe Weapon Thanatos Aspect Unlock Location"],
+    4: ["Skull Weapon Melinoe Aspect Unlock Location",   "Skull Weapon Medea Aspect Unlock Location",    "Skull Weapon Persephone Aspect Unlock Location"],
+    5: ["Coat Weapon Melinoe Aspect Unlock Location",    "Coat Weapon Nyx Aspect Unlock Location",       "Coat Weapon Selene Aspect Unlock Location"],
+}
+
+
+def initial_aspect_item(options):
+    """AP item name for the granted starting aspect, or None when aspect sanity is off."""
+    if options.aspectsanity.value != 1:
+        return None
+    return ASPECT_BY_WEAPON_ITEM[options.initial_weapon.value][options.initial_aspect.value]
+
+
+def initial_aspect_location(options):
+    """AP location name skipped because it is the granted starting aspect, or None."""
+    if options.aspectsanity.value != 1:
+        return None
+    return ASPECT_BY_WEAPON_LOC[options.initial_weapon.value][options.initial_aspect.value]
+
+
+def should_ignore_aspect_location(name: str, options) -> bool:
+    return initial_aspect_location(options) == name
 
 
 class HadesIILocation(Location):

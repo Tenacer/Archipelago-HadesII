@@ -77,6 +77,10 @@ _HIDDEN_ASPECT_LOCATION_IDS: dict = {
     d.code: name for name, d in location_table.items()
     if d.category == "hidden_aspect" and d.code is not None
 }
+_ASPECT_LOCATION_IDS: dict = {
+    d.code: name for name, d in location_table.items()
+    if d.category in ("base_aspect", "standard_aspect") and d.code is not None
+}
 _SCOUTABLE_LOCATION_IDS: dict = {
     **_INCANTATION_LOCATION_IDS,
     **_PROPHECY_LOCATION_IDS,
@@ -84,6 +88,7 @@ _SCOUTABLE_LOCATION_IDS: dict = {
     **_WEAPON_LOCATION_IDS,
     **_TOOL_LOCATION_IDS,
     **_HIDDEN_ASPECT_LOCATION_IDS,
+    **_ASPECT_LOCATION_IDS,
 }
 
 
@@ -266,6 +271,8 @@ class HadesIIContext(CommonContext):
                 to_scout.extend(_TOOL_LOCATION_IDS.keys())
             if slot_data.get("hidden_aspectsanity") == 1:
                 to_scout.extend(_HIDDEN_ASPECT_LOCATION_IDS.keys())
+            if slot_data.get("aspectsanity") == 1:
+                to_scout.extend(_ASPECT_LOCATION_IDS.keys())
             # Only scout locations that exist in this slot.
             existing = self.missing_locations | self.checked_locations
             to_scout = [loc_id for loc_id in to_scout if loc_id in existing]
