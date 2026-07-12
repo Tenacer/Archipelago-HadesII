@@ -57,22 +57,22 @@ id,name,classification,groups
 79,Zagreus Keepsake,useful,post_ending_keepsakes
 80,Chronos Keepsake,useful,post_ending_keepsakes
 81,Chaos Keepsake,useful,keepsakes
-82,Staff Weapon Unlock,progression,weapons
-83,Daggers Weapon Unlock,progression,weapons
-84,Torches Weapon Unlock,progression,weapons
-85,Axe Weapon Unlock,progression,weapons
-86,Skull Weapon Unlock,progression,weapons
-87,Coat Weapon Unlock,progression,weapons
-88,Crescent Pickaxe Tool Unlock,progression,tools
-89,Tablet of Peace Tool Unlock,progression,tools
-90,Silver Spade Tool Unlock,progression,tools
-91,Rod of Fishing Tool Unlock,progression,tools
-92,Anubis Aspect Unlock,useful,hidden_aspects
-93,Morrigan Aspect Unlock,useful,hidden_aspects
-94,Supay Aspect Unlock,useful,hidden_aspects
-95,Nergal Aspect Unlock,useful,hidden_aspects
-96,Hel Aspect Unlock,useful,hidden_aspects
-97,Shiva Aspect Unlock,useful,hidden_aspects
+82,Witch's Staff,progression,weapons
+83,Sister Blades,progression,weapons
+84,Umbral Flames,progression,weapons
+85,Moonstone Axe,progression,weapons
+86,Argent Skull,progression,weapons
+87,Black Coat,progression,weapons
+88,Crescent Pickaxe,progression,tools
+89,Tablet of Peace,progression,tools
+90,Silver Spade,progression,tools
+91,Rod of Fishing,progression,tools
+92,Anubis,useful,hidden_aspects
+93,Morrigan,useful,hidden_aspects
+94,Supay,useful,hidden_aspects
+95,Nergal,useful,hidden_aspects
+96,Hel,useful,hidden_aspects
+97,Shiva,useful,hidden_aspects
 102,Storm in the Heavens Reward,useful,prophecies
 103,Temporary Setback Reward,useful,prophecies
 104,Harbinger of Doom Reward,useful,prophecies
@@ -250,26 +250,26 @@ id,name,classification,groups
 280,Max Health Helper,useful,helpers
 281,Boon Boost Helper,useful,helpers
 282,Initial Money Helper,useful,helpers
-284,Frinos Familiar,useful,familiars
-285,Raki Familiar,useful,familiars
-286,Toula Familiar,useful,familiars
-287,Hecuba Familiar,useful,familiars
-288,Gale Familiar,useful,familiars
-289,Staff Melinoe Aspect Unlock,useful,base_aspects
-290,Daggers Melinoe Aspect Unlock,useful,base_aspects
-291,Torches Melinoe Aspect Unlock,useful,base_aspects
-292,Axe Melinoe Aspect Unlock,useful,base_aspects
-293,Skull Melinoe Aspect Unlock,useful,base_aspects
-294,Coat Melinoe Aspect Unlock,useful,base_aspects
-295,Circe Aspect Unlock,useful,standard_aspects
-296,Momus Aspect Unlock,useful,standard_aspects
-297,Artemis Aspect Unlock,useful,standard_aspects
-298,Pan Aspect Unlock,useful,standard_aspects
-299,Moros Aspect Unlock,useful,standard_aspects
-300,Eos Aspect Unlock,useful,standard_aspects
-301,Charon Aspect Unlock,useful,standard_aspects
-302,Thanatos Aspect Unlock,useful,standard_aspects
-303,Medea Aspect Unlock,useful,standard_aspects
-304,Persephone Aspect Unlock,useful,standard_aspects
-305,Nyx Aspect Unlock,useful,standard_aspects
-306,Selene Aspect Unlock,useful,standard_aspects
+284,Frinos,useful,familiars
+285,Raki,useful,familiars
+286,Toula,useful,familiars
+287,Hecuba,useful,familiars
+288,Gale,useful,familiars
+289,Staff Melinoe,useful,base_aspects
+290,Daggers Melinoe,useful,base_aspects
+291,Torches Melinoe,useful,base_aspects
+292,Axe Melinoe,useful,base_aspects
+293,Skull Melinoe,useful,base_aspects
+294,Coat Melinoe,useful,base_aspects
+295,Circe,useful,standard_aspects
+296,Momus,useful,standard_aspects
+297,Artemis,useful,standard_aspects
+298,Pan,useful,standard_aspects
+299,Moros,useful,standard_aspects
+300,Eos,useful,standard_aspects
+301,Charon,useful,standard_aspects
+302,Thanatos,useful,standard_aspects
+303,Medea,useful,standard_aspects
+304,Persephone,useful,standard_aspects
+305,Nyx,useful,standard_aspects
+306,Selene,useful,standard_aspects

@@ -218,18 +218,18 @@ class TestAllSanitiesOff(HadesIITestBase):
 
 
 _FAMILIAR_LOCATION_NAMES = (
-    "Frinos Familiar Unlock Location",
-    "Raki Familiar Unlock Location",
-    "Toula Familiar Unlock Location",
-    "Hecuba Familiar Unlock Location",
-    "Gale Familiar Unlock Location",
+    "Frinos",
+    "Raki",
+    "Toula",
+    "Hecuba",
+    "Gale",
 )
 _FAMILIAR_ITEM_NAMES = (
-    "Frinos Familiar",
-    "Raki Familiar",
-    "Toula Familiar",
-    "Hecuba Familiar",
-    "Gale Familiar",
+    "Frinos",
+    "Raki",
+    "Toula",
+    "Hecuba",
+    "Gale",
 )
 
 
@@ -518,12 +518,12 @@ class TestScoreRewardsMax(HadesIITestBase):
 
 
 _WEAPON_UNLOCK_LOCATIONS = [
-    "Staff Weapon Unlock Location",
-    "Daggers Weapon Unlock Location",
-    "Torches Weapon Unlock Location",
-    "Axe Weapon Unlock Location",
-    "Skull Weapon Unlock Location",
-    "Coat Weapon Unlock Location",
+    "Witch's Staff",
+    "Sister Blades",
+    "Umbral Flames",
+    "Moonstone Axe",
+    "Argent Skull",
+    "Black Coat",
 ]
 
 
@@ -846,34 +846,34 @@ class TestIngredientLogicAllSanities(HadesIITestBase):
             state.prog_items[self.player][name] += 1
 
     def test_tool_shop_needs_nights_craftwork(self) -> None:
-        loc = self.multiworld.get_location("Crescent Pickaxe Tool Unlock Location", self.player)
+        loc = self.multiworld.get_location("Crescent Pickaxe", self.player)
         state = self._empty_state()
         self.assertFalse(loc.access_rule(state), "tool shop tab needs Night's Craftwork")
         self._grant(state, "Night's Craftwork")
         self.assertTrue(loc.access_rule(state))
 
     def test_spade_purchase_needs_mining(self) -> None:
-        loc = self.multiworld.get_location("Silver Spade Tool Unlock Location", self.player)
+        loc = self.multiworld.get_location("Silver Spade", self.player)
         state = self._empty_state()
         self._grant(state, "Night's Craftwork")
         self.assertFalse(loc.access_rule(state), "8 Silver — needs a miner")
         # Raki substitutes the pickaxe.
-        self._grant(state, "Raki Familiar")
+        self._grant(state, "Raki")
         self.assertTrue(loc.access_rule(state))
 
     def test_rod_purchase_needs_mining_and_surface(self) -> None:
-        loc = self.multiworld.get_location("Rod of Fishing Tool Unlock Location", self.player)
+        loc = self.multiworld.get_location("Rod of Fishing", self.player)
         state = self._empty_state()
-        self._grant(state, "Night's Craftwork", "Crescent Pickaxe Tool Unlock")
+        self._grant(state, "Night's Craftwork", "Crescent Pickaxe")
         self.assertFalse(loc.access_rule(state), "1 Bronze — needs Ephyra reach")
         self._grant(state, "Permeation of Witching-Wards", "Unraveling a Fateful Bond")
         self.assertTrue(loc.access_rule(state))
 
     def test_skull_weapon_needs_priors_mining_and_reach(self) -> None:
-        loc = self.multiworld.get_location("Skull Weapon Unlock Location", self.player)
+        loc = self.multiworld.get_location("Argent Skull", self.player)
         state = self._empty_state()
-        self._grant(state, "Daggers Weapon Unlock", "Torches Weapon Unlock",
-                    "Axe Weapon Unlock", "Crescent Pickaxe Tool Unlock")
+        self._grant(state, "Sister Blades", "Umbral Flames",
+                    "Moonstone Axe", "Crescent Pickaxe")
         self.assertFalse(loc.access_rule(state),
             "Bronze needs surface, Glassrock needs Scylla")
         self._grant(state, "Scylla Victory",
@@ -884,13 +884,13 @@ class TestIngredientLogicAllSanities(HadesIITestBase):
         loc = self.multiworld.get_location("Woodsy Lifespring", self.player)
         state = self._empty_state()
         self.assertFalse(loc.access_rule(state), "3 Silver — needs a miner")
-        self._grant(state, "Crescent Pickaxe Tool Unlock")
+        self._grant(state, "Crescent Pickaxe")
         self.assertTrue(loc.access_rule(state))
 
     def test_grown_plant_needs_dig_and_garden(self) -> None:
         loc = self.multiworld.get_location("Rise of Stygian Wells", self.player)
         state = self._empty_state()
-        self._grant(state, "Night's Craftwork", "Silver Spade Tool Unlock")
+        self._grant(state, "Night's Craftwork", "Silver Spade")
         self.assertFalse(loc.access_rule(state), "Nightshade needs the garden")
         self._grant(state, "Flourishing Soil")
         self.assertTrue(loc.access_rule(state))
@@ -898,10 +898,10 @@ class TestIngredientLogicAllSanities(HadesIITestBase):
     def test_tools_of_the_unseen_needs_all_four_tools(self) -> None:
         loc = self.multiworld.get_location("Tools of the Unseen", self.player)
         state = self._empty_state()
-        self._grant(state, "Crescent Pickaxe Tool Unlock", "Silver Spade Tool Unlock",
-                    "Tablet of Peace Tool Unlock")
+        self._grant(state, "Crescent Pickaxe", "Silver Spade",
+                    "Tablet of Peace")
         self.assertFalse(loc.access_rule(state), "missing the Rod")
-        self._grant(state, "Rod of Fishing Tool Unlock")
+        self._grant(state, "Rod of Fishing")
         self.assertTrue(loc.access_rule(state))
 
     def test_denizen_of_the_depths_needs_fishing(self) -> None:
@@ -909,20 +909,20 @@ class TestIngredientLogicAllSanities(HadesIITestBase):
         state = self._empty_state()
         self._grant(state, "Night's Craftwork", "Rite of River-Fording")
         self.assertFalse(loc.access_rule(state), "needs the Rod or Toula")
-        self._grant(state, "Toula Familiar")
+        self._grant(state, "Toula")
         self.assertTrue(loc.access_rule(state))
 
     def test_hidden_aspect_needs_reveal_chain(self) -> None:
         # Faithful vanilla reveal: both of the weapon's standard aspects, all six weapons,
         # and the purchase cost (Glassrock = mining + Scylla). The QoL grants the system by
         # default, and reverse fear supplies Nightmare from the pool.
-        loc = self.multiworld.get_location("Coat Weapon Shiva Aspect Unlock Location", self.player)
+        loc = self.multiworld.get_location("Shiva", self.player)
         state = self._empty_state()
-        self._grant(state, "Daggers Weapon Unlock", "Torches Weapon Unlock",
-                    "Axe Weapon Unlock", "Skull Weapon Unlock", "Coat Weapon Unlock",
-                    "Crescent Pickaxe Tool Unlock", "Scylla Victory")
+        self._grant(state, "Sister Blades", "Umbral Flames",
+                    "Moonstone Axe", "Argent Skull", "Black Coat",
+                    "Crescent Pickaxe", "Scylla Victory")
         self.assertFalse(loc.access_rule(state), "needs both Coat standard aspects")
-        self._grant(state, "Nyx Aspect Unlock", "Selene Aspect Unlock")
+        self._grant(state, "Nyx", "Selene")
         self.assertTrue(loc.access_rule(state))
 
 
@@ -945,23 +945,23 @@ class TestAspectSanity(HadesIITestBase):
     def test_initial_aspect_has_no_check(self) -> None:
         # The granted starting aspect (Staff base) is not a location.
         names = {loc.name for loc in self.multiworld.get_locations(self.player)}
-        self.assertNotIn("Staff Weapon Melinoe Aspect Unlock Location", names)
-        self.assertIn("Staff Weapon Circe Aspect Unlock Location", names)
+        self.assertNotIn("Staff Melinoe", names)
+        self.assertIn("Circe", names)
 
     def test_base_aspect_needs_weapon_and_system(self) -> None:
         # Base aspects sit in the system-gated shop category (QoL off here).
-        loc = self.multiworld.get_location("Daggers Weapon Melinoe Aspect Unlock Location", self.player)
+        loc = self.multiworld.get_location("Daggers Melinoe", self.player)
         state = self._empty_state()
-        self._grant(state, "Daggers Weapon Unlock")
+        self._grant(state, "Sister Blades")
         self.assertFalse(loc.access_rule(state), "needs the aspect system")
         self._grant(state, "Aspects of Night and Darkness")
         self.assertTrue(loc.access_rule(state))
 
     def test_standard_aspect_needs_system_and_cost(self) -> None:
         # Momus (Staff): the QoL is off so it needs the incantation, plus Scylla + mined G.
-        loc = self.multiworld.get_location("Staff Weapon Momus Aspect Unlock Location", self.player)
+        loc = self.multiworld.get_location("Momus", self.player)
         state = self._empty_state()
-        self._grant(state, "Hecate Victory", "Scylla Victory", "Crescent Pickaxe Tool Unlock")
+        self._grant(state, "Hecate Victory", "Scylla Victory", "Crescent Pickaxe")
         self.assertFalse(loc.access_rule(state), "needs the aspect system")
         self._grant(state, "Aspects of Night and Darkness")
         self.assertTrue(loc.access_rule(state))

@@ -244,12 +244,12 @@ def setup_location_table_with_settings(options) -> dict:
 
 def should_ignore_weapon_location(weaponLocation: str, options) -> bool:
     mapping = {
-        0: "Staff Weapon Unlock Location",
-        1: "Daggers Weapon Unlock Location",
-        2: "Torches Weapon Unlock Location",
-        3: "Axe Weapon Unlock Location",
-        4: "Skull Weapon Unlock Location",
-        5: "Coat Weapon Unlock Location",
+        0: "Witch's Staff",
+        1: "Sister Blades",
+        2: "Umbral Flames",
+        3: "Moonstone Axe",
+        4: "Argent Skull",
+        5: "Black Coat",
     }
     return mapping.get(options.initial_weapon.value) == weaponLocation
 
@@ -257,20 +257,20 @@ def should_ignore_weapon_location(weaponLocation: str, options) -> bool:
 # Per initial_weapon value: [base, first standard, second standard] — for aspect sanity.
 # initial_aspect (0=base, 1=first standard, 2=second standard) picks the granted starting aspect.
 ASPECT_BY_WEAPON_ITEM = {
-    0: ["Staff Melinoe Aspect Unlock",   "Circe Aspect Unlock",    "Momus Aspect Unlock"],
-    1: ["Daggers Melinoe Aspect Unlock", "Artemis Aspect Unlock",  "Pan Aspect Unlock"],
-    2: ["Torches Melinoe Aspect Unlock", "Moros Aspect Unlock",    "Eos Aspect Unlock"],
-    3: ["Axe Melinoe Aspect Unlock",     "Charon Aspect Unlock",   "Thanatos Aspect Unlock"],
-    4: ["Skull Melinoe Aspect Unlock",   "Medea Aspect Unlock",    "Persephone Aspect Unlock"],
-    5: ["Coat Melinoe Aspect Unlock",    "Nyx Aspect Unlock",      "Selene Aspect Unlock"],
+    0: ["Staff Melinoe",   "Circe",    "Momus"],
+    1: ["Daggers Melinoe", "Artemis",  "Pan"],
+    2: ["Torches Melinoe", "Moros",    "Eos"],
+    3: ["Axe Melinoe",     "Charon",   "Thanatos"],
+    4: ["Skull Melinoe",   "Medea",    "Persephone"],
+    5: ["Coat Melinoe",    "Nyx",      "Selene"],
 }
 ASPECT_BY_WEAPON_LOC = {
-    0: ["Staff Weapon Melinoe Aspect Unlock Location",   "Staff Weapon Circe Aspect Unlock Location",    "Staff Weapon Momus Aspect Unlock Location"],
-    1: ["Daggers Weapon Melinoe Aspect Unlock Location", "Daggers Weapon Artemis Aspect Unlock Location","Daggers Weapon Pan Aspect Unlock Location"],
-    2: ["Torches Weapon Melinoe Aspect Unlock Location", "Torches Weapon Moros Aspect Unlock Location",  "Torches Weapon Eos Aspect Unlock Location"],
-    3: ["Axe Weapon Melinoe Aspect Unlock Location",     "Axe Weapon Charon Aspect Unlock Location",     "Axe Weapon Thanatos Aspect Unlock Location"],
-    4: ["Skull Weapon Melinoe Aspect Unlock Location",   "Skull Weapon Medea Aspect Unlock Location",    "Skull Weapon Persephone Aspect Unlock Location"],
-    5: ["Coat Weapon Melinoe Aspect Unlock Location",    "Coat Weapon Nyx Aspect Unlock Location",       "Coat Weapon Selene Aspect Unlock Location"],
+    0: ["Staff Melinoe",   "Circe",    "Momus"],
+    1: ["Daggers Melinoe", "Artemis","Pan"],
+    2: ["Torches Melinoe", "Moros",  "Eos"],
+    3: ["Axe Melinoe",     "Charon",     "Thanatos"],
+    4: ["Skull Melinoe",   "Medea",    "Persephone"],
+    5: ["Coat Melinoe",    "Nyx",       "Selene"],
 }
 
 

@@ -540,16 +540,16 @@ id,name,region,category
 2529,Circe Keepsake,Crossroads,keepsake
 2530,Icarus Keepsake,Crossroads,keepsake
 2531,Chaos Keepsake,Crossroads,keepsake
-2532,Staff Weapon Unlock Location,Crossroads,weapon
-2533,Daggers Weapon Unlock Location,Crossroads,weapon
-2534,Torches Weapon Unlock Location,Crossroads,weapon
-2535,Axe Weapon Unlock Location,Crossroads,weapon
-2536,Skull Weapon Unlock Location,Crossroads,weapon
-2537,Coat Weapon Unlock Location,Crossroads,weapon
-2538,Crescent Pickaxe Tool Unlock Location,Crossroads,tool
-2539,Silver Spade Tool Unlock Location,Crossroads,tool
-2540,Tablet of Peace Tool Unlock Location,Crossroads,tool
-2541,Rod of Fishing Tool Unlock Location,Crossroads,tool
+2532,Witch's Staff,Crossroads,weapon
+2533,Sister Blades,Crossroads,weapon
+2534,Umbral Flames,Crossroads,weapon
+2535,Moonstone Axe,Crossroads,weapon
+2536,Argent Skull,Crossroads,weapon
+2537,Black Coat,Crossroads,weapon
+2538,Crescent Pickaxe,Crossroads,tool
+2539,Silver Spade,Crossroads,tool
+2540,Tablet of Peace,Crossroads,tool
+2541,Rod of Fishing,Crossroads,tool
 2542,Unraveling a Fateful Bond,Crossroads,incantation
 2543,Permeation of Witching-Wards,Crossroads,incantation
 2544,Fated Intervention,Crossroads,incantation
@@ -718,12 +718,12 @@ id,name,region,category
 2714,The Moonstone Axe,Crossroads,prophecy
 2715,The Argent Skull,Crossroads,prophecy
 2716,The Black Coat,Crossroads,prophecy
-2719,Staff Weapon Anubis Aspect Unlock Location,Crossroads,hidden_aspect
-2720,Daggers Weapon Morrigan Aspect Unlock Location,Crossroads,hidden_aspect
-2721,Torches Weapon Supay Aspect Unlock Location,Crossroads,hidden_aspect
-2722,Axe Weapon Nergal Aspect Unlock Location,Crossroads,hidden_aspect
-2723,Skull Weapon Hel Aspect Unlock Location,Crossroads,hidden_aspect
-2724,Coat Weapon Shiva Aspect Unlock Location,Crossroads,hidden_aspect
+2719,Anubis,Crossroads,hidden_aspect
+2720,Morrigan,Crossroads,hidden_aspect
+2721,Supay,Crossroads,hidden_aspect
+2722,Nergal,Crossroads,hidden_aspect
+2723,Hel,Crossroads,hidden_aspect
+2724,Shiva,Crossroads,hidden_aspect
 2735,Chronos Kill Reward 2,Tartarus,boss_reward
 2736,Chronos Kill Reward 3,Tartarus,boss_reward
 2737,Chronos Kill Reward 4,Tartarus,boss_reward
@@ -758,11 +758,11 @@ id,name,region,category
 2766,Axe Weapon Clear,Crossroads,weapon_clear
 2767,Skull Weapon Clear,Crossroads,weapon_clear
 2768,Coat Weapon Clear,Crossroads,weapon_clear
-2769,Frinos Familiar Unlock Location,Crossroads,familiar
-2770,Raki Familiar Unlock Location,Erebus,familiar
-2771,Toula Familiar Unlock Location,Oceanus,familiar
-2772,Hecuba Familiar Unlock Location,Fields,familiar
-2773,Gale Familiar Unlock Location,Olympus,familiar
+2769,Frinos,Crossroads,familiar
+2770,Raki,Erebus,familiar
+2771,Toula,Oceanus,familiar
+2772,Hecuba,Fields,familiar
+2773,Gale,Olympus,familiar
 2774,Clear Underworld Room 01,Erebus,room_clear
 2775,Clear Underworld Room 02,Erebus,room_clear
 2776,Clear Underworld Room 03,Erebus,room_clear
@@ -2295,21 +2295,21 @@ id,name,region,category
 4303,Surface Score Check 498,Menu,score_surface
 4304,Surface Score Check 499,Menu,score_surface
 4305,Surface Score Check 500,Menu,score_surface
-4306,Staff Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4307,Daggers Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4308,Torches Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4309,Axe Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4310,Skull Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4311,Coat Weapon Melinoe Aspect Unlock Location,Crossroads,base_aspect
-4312,Staff Weapon Circe Aspect Unlock Location,Crossroads,standard_aspect
-4313,Staff Weapon Momus Aspect Unlock Location,Crossroads,standard_aspect
-4314,Daggers Weapon Artemis Aspect Unlock Location,Crossroads,standard_aspect
-4315,Daggers Weapon Pan Aspect Unlock Location,Crossroads,standard_aspect
-4316,Torches Weapon Moros Aspect Unlock Location,Crossroads,standard_aspect
-4317,Torches Weapon Eos Aspect Unlock Location,Crossroads,standard_aspect
-4318,Axe Weapon Charon Aspect Unlock Location,Crossroads,standard_aspect
-4319,Axe Weapon Thanatos Aspect Unlock Location,Crossroads,standard_aspect
-4320,Skull Weapon Medea Aspect Unlock Location,Crossroads,standard_aspect
-4321,Skull Weapon Persephone Aspect Unlock Location,Crossroads,standard_aspect
-4322,Coat Weapon Nyx Aspect Unlock Location,Crossroads,standard_aspect
-4323,Coat Weapon Selene Aspect Unlock Location,Crossroads,standard_aspect
+4306,Staff Melinoe,Crossroads,base_aspect
+4307,Daggers Melinoe,Crossroads,base_aspect
+4308,Torches Melinoe,Crossroads,base_aspect
+4309,Axe Melinoe,Crossroads,base_aspect
+4310,Skull Melinoe,Crossroads,base_aspect
+4311,Coat Melinoe,Crossroads,base_aspect
+4312,Circe,Crossroads,standard_aspect
+4313,Momus,Crossroads,standard_aspect
+4314,Artemis,Crossroads,standard_aspect
+4315,Pan,Crossroads,standard_aspect
+4316,Moros,Crossroads,standard_aspect
+4317,Eos,Crossroads,standard_aspect
+4318,Charon,Crossroads,standard_aspect
+4319,Thanatos,Crossroads,standard_aspect
+4320,Medea,Crossroads,standard_aspect
+4321,Persephone,Crossroads,standard_aspect
+4322,Nyx,Crossroads,standard_aspect
+4323,Selene,Crossroads,standard_aspect

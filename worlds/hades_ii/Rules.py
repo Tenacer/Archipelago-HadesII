@@ -18,6 +18,16 @@ weapons = [
     "Coat Weapon",
 ]
 
+# Internal weapon token → AP item name (the real in-game weapon names).
+WEAPON_ITEM_NAMES = {
+    "Staff Weapon":   "Witch's Staff",
+    "Daggers Weapon": "Sister Blades",
+    "Torches Weapon": "Umbral Flames",
+    "Axe Weapon":     "Moonstone Axe",
+    "Skull Weapon":   "Argent Skull",
+    "Coat Weapon":    "Black Coat",
+}
+
 class HadesIILogic(LogicMixin):
     # Checks if the player has enough of a given item 
     def _has_enough_of_item(self, player: int, amount: int, item: str) -> bool:
@@ -34,7 +44,7 @@ class HadesIILogic(LogicMixin):
         if not options.weaponsanity:
             return True
         idx = weapons.index(weaponName)
-        return (options.initial_weapon == idx or self.has(f"{weaponName} Unlock", player)) # type: ignore
+        return (options.initial_weapon == idx or self.has(WEAPON_ITEM_NAMES[weaponName], player)) # type: ignore
     
     # Checks if the player has enough keepsakes for goal
     def _has_enough_keepsakes(self, player: int, amount: int) -> bool:
@@ -112,9 +122,9 @@ class HadesIILogic(LogicMixin):
         if not options.toolsanity:
             return True
         return (
-            self.has("Tablet of Peace Tool Unlock", player)  # type: ignore
-            and self.has("Crescent Pickaxe Tool Unlock", player)  # type: ignore
-            and self.has("Silver Spade Tool Unlock", player)  # type: ignore
+            self.has("Tablet of Peace", player)  # type: ignore
+            and self.has("Crescent Pickaxe", player)  # type: ignore
+            and self.has("Silver Spade", player)  # type: ignore
         )
 
     # Endgame: combined mode needs either final boss, separate mode needs both (kill counts enforced client-side).
@@ -154,27 +164,27 @@ class HadesIILogic(LogicMixin):
     # Pickaxe: 1 Psyche at the (Night's Craftwork) tool shop when toolsanity is off.
     def _has_pickaxe(self, player: int, options) -> bool:
         if options.toolsanity:
-            return self.has("Crescent Pickaxe Tool Unlock", player)  # type: ignore
+            return self.has("Crescent Pickaxe", player)  # type: ignore
         return self._has_incantation("Night's Craftwork", player, options)
 
     # Tablet of Peace: 4 Silver — vanilla purchase needs mining first.
     def _has_tablet(self, player: int, options) -> bool:
         if options.toolsanity:
-            return self.has("Tablet of Peace Tool Unlock", player)  # type: ignore
+            return self.has("Tablet of Peace", player)  # type: ignore
         return (self._has_incantation("Night's Craftwork", player, options)
                 and self._can_mine(player, options))
 
     # Silver Spade: 8 Silver — vanilla purchase needs mining first.
     def _has_spade(self, player: int, options) -> bool:
         if options.toolsanity:
-            return self.has("Silver Spade Tool Unlock", player)  # type: ignore
+            return self.has("Silver Spade", player)  # type: ignore
         return (self._has_incantation("Night's Craftwork", player, options)
                 and self._can_mine(player, options))
 
     # Rod of Fishing: 1 Bronze (Ephyra ore) — vanilla purchase needs mining + surface.
     def _has_rod(self, player: int, options) -> bool:
         if options.toolsanity:
-            return self.has("Rod of Fishing Tool Unlock", player)  # type: ignore
+            return self.has("Rod of Fishing", player)  # type: ignore
         return (self._has_incantation("Night's Craftwork", player, options)
                 and self._can_mine(player, options)
                 and self._has_surface_access(player, options))
@@ -197,14 +207,14 @@ class HadesIILogic(LogicMixin):
     # Mining: Crescent Pickaxe or Raki.
     def _can_mine(self, player: int, options) -> bool:
         return (self._has_pickaxe(player, options)
-                or self._has_gather_familiar("Raki Familiar", None, player, options))
+                or self._has_gather_familiar("Raki", None, player, options))
 
     # Digging: Silver Spade or Hecuba; shovel points only spawn once Night's Craftwork is active.
     def _can_dig(self, player: int, options) -> bool:
         if not self._has_incantation("Night's Craftwork", player, options):
             return False
         return (self._has_spade(player, options)
-                or self._has_gather_familiar("Hecuba Familiar", "Scylla", player, options))
+                or self._has_gather_familiar("Hecuba", "Scylla", player, options))
 
     # Grown plants: dig the biome seed, then grow it in the (Flourishing Soil) garden.
     def _can_grow(self, player: int, options) -> bool:
@@ -216,7 +226,7 @@ class HadesIILogic(LogicMixin):
         if not self._has_incantation("Night's Craftwork", player, options):
             return False
         return (self._has_rod(player, options)
-                or self._has_gather_familiar("Toula Familiar", "Hecate", player, options))
+                or self._has_gather_familiar("Toula", "Hecate", player, options))
 
     # Reach of a farming biome's gather points; Chaos gates open from Erebus.
     def _can_farm_biome(self, biome: str, player: int, options) -> bool:
@@ -404,13 +414,13 @@ _INCANTATION_INGREDIENTS = {
 # Weapon shop entries under weaponsanity: (location, ingredient atoms, prereq weapons).
 _WEAPON_SHOP_RULES = (
     # The mod reprices the Staff to 1 Silver when it isn't the starting weapon.
-    ("Staff Weapon Unlock Location",   (("mine", "F"),), ()),
-    ("Daggers Weapon Unlock Location", (("mine", "F"),), ()),
-    ("Torches Weapon Unlock Location", (("mine", "F"), ("boss", "Hecate")), ()),
-    ("Axe Weapon Unlock Location",     (("mine", "F"),), ()),
-    ("Skull Weapon Unlock Location",   (("mine", "H"), ("mine", "N")),
+    ("Witch's Staff",   (("mine", "F"),), ()),
+    ("Sister Blades", (("mine", "F"),), ()),
+    ("Umbral Flames", (("mine", "F"), ("boss", "Hecate")), ()),
+    ("Moonstone Axe",     (("mine", "F"),), ()),
+    ("Argent Skull",   (("mine", "H"), ("mine", "N")),
         ("Daggers Weapon", "Torches Weapon", "Axe Weapon")),
-    ("Coat Weapon Unlock Location",    (("mine", "P"), ("boss", "Hecate")),
+    ("Black Coat",    (("mine", "P"), ("boss", "Hecate")),
         ("Daggers Weapon", "Torches Weapon", "Axe Weapon", "Skull Weapon")),
 )
 
@@ -426,25 +436,25 @@ _WEAPON_VANILLA_ATOMS = {
 
 # Tool shop entries under toolsanity: (location, ingredient atoms); the whole tab needs Night's Craftwork.
 _TOOL_SHOP_RULES = (
-    ("Crescent Pickaxe Tool Unlock Location", ()),                    # 1 Psyche
-    ("Tablet of Peace Tool Unlock Location",  (("mine", "F"),)),      # 4 Silver
-    ("Silver Spade Tool Unlock Location",     (("mine", "F"),)),      # 8 Silver
-    ("Rod of Fishing Tool Unlock Location",   (("mine", "N"),)),      # 1 Bronze
+    ("Crescent Pickaxe", ()),                    # 1 Psyche
+    ("Tablet of Peace",  (("mine", "F"),)),      # 4 Silver
+    ("Silver Spade",     (("mine", "F"),)),      # 8 Silver
+    ("Rod of Fishing",   (("mine", "N"),)),      # 1 Bronze
 )
 
 # Hidden aspects: (location, item, weapon, ingredient atoms, reveal gate).
 _HIDDEN_ASPECT_DATA = (
-    ("Staff Weapon Anubis Aspect Unlock Location", "Anubis Aspect Unlock",
+    ("Anubis", "Anubis",
         "Staff Weapon", (("pick", "Q"), ("boss", "Cerberus")), "surface"),   # Circe reveals
-    ("Daggers Weapon Morrigan Aspect Unlock Location", "Morrigan Aspect Unlock",
+    ("Morrigan", "Morrigan",
         "Daggers Weapon", (("mine", "O"), ("boss", "Prometheus")), None),    # Artemis reveals
-    ("Torches Weapon Supay Aspect Unlock Location", "Supay Aspect Unlock",
+    ("Supay", "Supay",
         "Torches Weapon", (("mine", "I"),), "door"),                         # Moros reveals
-    ("Axe Weapon Nergal Aspect Unlock Location", "Nergal Aspect Unlock",
+    ("Nergal", "Nergal",
         "Axe Weapon", (("mine", "Q"), ("mine", "O")), None),                 # Charon reveals
-    ("Skull Weapon Hel Aspect Unlock Location", "Hel Aspect Unlock",
+    ("Hel", "Hel",
         "Skull Weapon", (("mine", "P"), ("grow", "Q")), "surface"),          # Medea reveals
-    ("Coat Weapon Shiva Aspect Unlock Location", "Shiva Aspect Unlock",
+    ("Shiva", "Shiva",
         "Coat Weapon", (("mine", "H"),), None),                              # Selene reveals
 )
 
@@ -456,28 +466,28 @@ _HIDDEN_ASPECT_VANILLA = {
 
 # Base aspects: (location, item, weapon). The Bones cost carries no gathering atom.
 _BASE_ASPECT_DATA = (
-    ("Staff Weapon Melinoe Aspect Unlock Location",   "Staff Melinoe Aspect Unlock",   "Staff Weapon"),
-    ("Daggers Weapon Melinoe Aspect Unlock Location", "Daggers Melinoe Aspect Unlock", "Daggers Weapon"),
-    ("Torches Weapon Melinoe Aspect Unlock Location", "Torches Melinoe Aspect Unlock", "Torches Weapon"),
-    ("Axe Weapon Melinoe Aspect Unlock Location",     "Axe Melinoe Aspect Unlock",     "Axe Weapon"),
-    ("Skull Weapon Melinoe Aspect Unlock Location",   "Skull Melinoe Aspect Unlock",   "Skull Weapon"),
-    ("Coat Weapon Melinoe Aspect Unlock Location",    "Coat Melinoe Aspect Unlock",    "Coat Weapon"),
+    ("Staff Melinoe",   "Staff Melinoe",   "Staff Weapon"),
+    ("Daggers Melinoe", "Daggers Melinoe", "Daggers Weapon"),
+    ("Torches Melinoe", "Torches Melinoe", "Torches Weapon"),
+    ("Axe Melinoe",     "Axe Melinoe",     "Axe Weapon"),
+    ("Skull Melinoe",   "Skull Melinoe",   "Skull Weapon"),
+    ("Coat Melinoe",    "Coat Melinoe",    "Coat Weapon"),
 )
 
 # Standard aspects: (location, item, weapon, ingredient atoms, needs_familiar). Costs from WeaponShopData.
 _STANDARD_ASPECT_DATA = (
-    ("Staff Weapon Circe Aspect Unlock Location",     "Circe Aspect Unlock",     "Staff Weapon",   (("grow", "G"), ("mine", "I")), True),
-    ("Staff Weapon Momus Aspect Unlock Location",     "Momus Aspect Unlock",     "Staff Weapon",   (("boss", "Scylla"), ("mine", "G")), False),
-    ("Daggers Weapon Artemis Aspect Unlock Location", "Artemis Aspect Unlock",   "Daggers Weapon", (("mine", "H"),), False),
-    ("Daggers Weapon Pan Aspect Unlock Location",     "Pan Aspect Unlock",       "Daggers Weapon", (("grow", "I"), ("boss", "Polyphemus")), False),
-    ("Torches Weapon Moros Aspect Unlock Location",   "Moros Aspect Unlock",     "Torches Weapon", (("boss", "Cerberus"), ("mine", "N")), False),
-    ("Torches Weapon Eos Aspect Unlock Location",     "Eos Aspect Unlock",       "Torches Weapon", (("boss", "Eris"), ("grow", "O")), False),
-    ("Axe Weapon Charon Aspect Unlock Location",      "Charon Aspect Unlock",    "Axe Weapon",     (("boss", "Scylla"),), False),
-    ("Axe Weapon Thanatos Aspect Unlock Location",    "Thanatos Aspect Unlock",  "Axe Weapon",     (("mine", "H"), ("grow", "F")), False),
-    ("Skull Weapon Medea Aspect Unlock Location",     "Medea Aspect Unlock",     "Skull Weapon",   (("mine", "O"), ("grow", "O")), False),
-    ("Skull Weapon Persephone Aspect Unlock Location","Persephone Aspect Unlock","Skull Weapon",   (("grow", "I"), ("grow", "N")), False),
-    ("Coat Weapon Nyx Aspect Unlock Location",        "Nyx Aspect Unlock",       "Coat Weapon",    (("mine", "Chaos"),), False),
-    ("Coat Weapon Selene Aspect Unlock Location",     "Selene Aspect Unlock",    "Coat Weapon",    (), False),
+    ("Circe",     "Circe",     "Staff Weapon",   (("grow", "G"), ("mine", "I")), True),
+    ("Momus",     "Momus",     "Staff Weapon",   (("boss", "Scylla"), ("mine", "G")), False),
+    ("Artemis", "Artemis",   "Daggers Weapon", (("mine", "H"),), False),
+    ("Pan",     "Pan",       "Daggers Weapon", (("grow", "I"), ("boss", "Polyphemus")), False),
+    ("Moros",   "Moros",     "Torches Weapon", (("boss", "Cerberus"), ("mine", "N")), False),
+    ("Eos",     "Eos",       "Torches Weapon", (("boss", "Eris"), ("grow", "O")), False),
+    ("Charon",      "Charon",    "Axe Weapon",     (("boss", "Scylla"),), False),
+    ("Thanatos",    "Thanatos",  "Axe Weapon",     (("mine", "H"), ("grow", "F")), False),
+    ("Medea",     "Medea",     "Skull Weapon",   (("mine", "O"), ("grow", "O")), False),
+    ("Persephone","Persephone","Skull Weapon",   (("grow", "I"), ("grow", "N")), False),
+    ("Nyx",        "Nyx",       "Coat Weapon",    (("mine", "Chaos"),), False),
+    ("Selene",     "Selene",    "Coat Weapon",    (), False),
 )
 
 # item → (weapon, atoms, needs_familiar) for the vanilla path of _has_standard_aspect.
@@ -657,12 +667,12 @@ def handle_hidden_aspects(world, player, options):
     if not options.hidden_aspectsanity:
         return
     hidden_aspect_rules = [
-        ("Staff Weapon Anubis Aspect Unlock Location",    "Staff Weapon"),
-        ("Daggers Weapon Morrigan Aspect Unlock Location","Daggers Weapon"),
-        ("Torches Weapon Supay Aspect Unlock Location",   "Torches Weapon"),
-        ("Axe Weapon Nergal Aspect Unlock Location",      "Axe Weapon"),
-        ("Skull Weapon Hel Aspect Unlock Location",       "Skull Weapon"),
-        ("Coat Weapon Shiva Aspect Unlock Location",      "Coat Weapon"),
+        ("Anubis",    "Staff Weapon"),
+        ("Morrigan","Daggers Weapon"),
+        ("Supay",   "Torches Weapon"),
+        ("Nergal",      "Axe Weapon"),
+        ("Hel",       "Skull Weapon"),
+        ("Shiva",      "Coat Weapon"),
     ]
     for location_name, weapon_name in hidden_aspect_rules:
         add_rule(
@@ -676,11 +686,11 @@ def handle_familiars(world, player, options):
     if not options.familiarsanity:
         return
     familiar_locations = (
-        "Frinos Familiar Unlock Location",
-        "Raki Familiar Unlock Location",
-        "Toula Familiar Unlock Location",
-        "Hecuba Familiar Unlock Location",
-        "Gale Familiar Unlock Location",
+        "Frinos",
+        "Raki",
+        "Toula",
+        "Hecuba",
+        "Gale",
     )
     for loc_name in familiar_locations:
         add_rule(
@@ -992,12 +1002,12 @@ _PROPHECY_WEAPON_RULES = (
 
 # Hidden-aspect delivery prophecies: unlocked by owning the aspect.
 _PROPHECY_ASPECT_DELIVERY_RULES = (
-    ("The Jackal's Aspect",    "Anubis Aspect Unlock"),
-    ("The Crow's Aspect",      "Morrigan Aspect Unlock"),
-    ("The Shadow's Aspect",    "Supay Aspect Unlock"),
-    ("The Warrior's Aspect",   "Nergal Aspect Unlock"),
-    ("The Grave's Aspect",     "Hel Aspect Unlock"),
-    ("The Destroyer's Aspect", "Shiva Aspect Unlock"),
+    ("The Jackal's Aspect",    "Anubis"),
+    ("The Crow's Aspect",      "Morrigan"),
+    ("The Shadow's Aspect",    "Supay"),
+    ("The Warrior's Aspect",   "Nergal"),
+    ("The Grave's Aspect",     "Hel"),
+    ("The Destroyer's Aspect", "Shiva"),
 )
 
 # Base-aspect rank-5 chain costs per initial weapon.
@@ -1092,8 +1102,8 @@ def _awakened_aspect_rule(state, player, options):
 
 # All five familiar items (promoted to progression under familiarsanity).
 _FAMILIAR_ITEMS = (
-    "Frinos Familiar", "Raki Familiar", "Toula Familiar",
-    "Hecuba Familiar", "Gale Familiar",
+    "Frinos", "Raki", "Toula",
+    "Hecuba", "Gale",
 )
 
 
