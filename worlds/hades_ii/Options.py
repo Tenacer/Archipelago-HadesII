@@ -612,7 +612,6 @@ class HadesIIOptions(PerGameCommonOptions):
     toolsanity: ToolSanity
     aspectsanity: AspectSanity
     hidden_aspectsanity: HiddenAspectSanity
-    aspect_system_unlocked: AspectSystemUnlocked
     familiarsanity: FamiliarSanity
     cauldronsanity: CauldronSanity
     lock_surface_incantations: LockSurfaceIncantations
@@ -661,6 +660,7 @@ class HadesIIOptions(PerGameCommonOptions):
     ignore_win_deaths: IgnoreWinDeaths
     cauldron_give_hints: CauldronGiveHints
     unlock_broker: UnlockBroker
+    aspect_system_unlocked: AspectSystemUnlocked
     death_link: DeathLink
     death_link_amnesty: DeathLinkAmnesty
 
@@ -677,7 +677,6 @@ hades_ii_option_groups = [
         ToolSanity,
         AspectSanity,
         HiddenAspectSanity,
-        AspectSystemUnlocked,
         FamiliarSanity,
         CauldronSanity,
         LockSurfaceIncantations,
@@ -733,6 +732,7 @@ hades_ii_option_groups = [
         IgnoreWinDeaths,
         CauldronGiveHints,
         UnlockBroker,
+        AspectSystemUnlocked,
     ])
 ]
 
