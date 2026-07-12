@@ -24,7 +24,7 @@
    (next to your Archipelago install — same place you keep other
    community apworlds).
 4. Launch Hades II from r2modman using **Start modded**. This boots the
-   game with the Lua mod loaded; running it from Steam directly will
+   game with the mod loaded; running it from Steam directly will
    start it unmodded.
 
 ## Configuring your YAML file

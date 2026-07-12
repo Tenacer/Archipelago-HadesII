@@ -60,7 +60,7 @@ SURFACE_SCORE_COUNT = len(location_table_surface_score_checks)
 
 
 def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
-    """Return (underworld_budget, surface_budget); Regions.py, HadesIIClient.py and the Lua mod MUST all agree on this split."""
+    """Return (underworld_budget, surface_budget); Regions.py, HadesIIClient.py and the game mod MUST all agree on this split."""
     surface_budget = score_rewards_amount * surface_score_ratio // 100
     underworld_budget = score_rewards_amount - surface_budget
     return underworld_budget, surface_budget
@@ -85,7 +85,7 @@ def room_region_for(bounds, depth: int) -> str:
             return region
     return bounds[-1][0]  # clamp into the final biome
 
-# Weapon tokens for room_weapon_based suffixes; MUST match WEAPON_SHORT in the Lua mod.
+# Weapon tokens for room_weapon_based suffixes; MUST match WEAPON_SHORT in the game mod.
 ROOM_WEAPON_TOKENS = ["Staff", "Daggers", "Torches", "Axe", "Skull", "Coat"]
 
 

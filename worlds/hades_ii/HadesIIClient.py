@@ -1,8 +1,7 @@
 """
 Hades II Archipelago Client
-Bridges the Hades II game mod (via JSON files in the OS user-data dir, e.g.
-~/.local/share/HadesII_AP/ on Linux or %LOCALAPPDATA%\\HadesII_AP\\ on Windows)
-with the AP server. The location can be overridden via the `hades_ii_options.ipc_directory`
+Bridges the Hades II game mod with the AP server. 
+The location can be overridden via the `hades_ii_options.ipc_directory`
 setting in host.yaml.
 """
 
@@ -231,7 +230,7 @@ class HadesIIContext(CommonContext):
             self._keepsakes_needed = slot_data.get("keepsakes_needed", 0)
             self._fatesanity = slot_data.get("fatesanity") == 1
             self._fates_needed = slot_data.get("fates_needed", 0)
-            # Score split budgets must match Locations.score_check_split and the Lua mod.
+            # Score split budgets must match Locations.score_check_split and the game mod.
             self._score_split = slot_data.get("score_split_mode") == 1
             self._underworld_budget, self._surface_budget = score_check_split(
                 slot_data.get("score_rewards_amount", 150),
@@ -290,7 +289,7 @@ class HadesIIContext(CommonContext):
     # ── Settings (slot data → game mod) ──────────────────────────────────────
 
     def _write_settings(self, slot_data: dict):
-        """Write the AP slot data so the Lua mod can read its configuration."""
+        """Write the AP slot data so the game mod can read its configuration."""
         data = dict(slot_data)
         data["world_id"] = self._world_id
         path = self.ipc_dir / "ap_settings.json"
@@ -331,7 +330,7 @@ class HadesIIContext(CommonContext):
     # ── DeathLink ────────────────────────────────────────────────────────────
 
     def _handle_incoming_deathlink(self, args: dict):
-        """Append a deathlink flag to the world inbox so the Lua mod can kill Melinoë."""
+        """Append a deathlink flag to the world inbox so the game can kill Melinoë."""
         inbox_path = self._ipc_file("ap_in.json")
         try:
             with open(inbox_path) as f:
@@ -454,7 +453,7 @@ class HadesIIContext(CommonContext):
         await self._process_deathlink(data)
 
     async def _process_score_checks(self, data: dict):
-        """Convert the Lua mod's score-check counters into AP LocationChecks, per route pool in separate mode."""
+        """Convert the game mod's score-check counters into AP LocationChecks, per route pool in separate mode."""
         if self._score_split:
             await self._send_score_range(
                 data.get("checks_sent_underworld", 0),
