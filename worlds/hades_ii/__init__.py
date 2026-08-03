@@ -1,4 +1,4 @@
-from typing import ClassVar, Dict, List
+from typing import ClassVar, Dict
 import settings
 from Options import OptionError
 from worlds.AutoWorld import World
@@ -7,7 +7,7 @@ from . import web_world
 from .Options import HadesIIOptions
 from .Locations import give_all_locations_table, location_name_groups
 from .Regions import create_regions
-from .Items import item_table, item_name_groups, create_items, Hades_II_Item
+from .Items import item_table, item_name_groups, create_items, Hades_II_Item, VOW_POINT_COSTS
 from .Rules import set_rules
 
 
@@ -19,27 +19,6 @@ class HadesIISettings(settings.Group):
         Windows, ~/Library/Application Support/HadesII_AP/ on macOS)."""
 
     ipc_directory: IpcDirectory = IpcDirectory("")
-
-# Shrine point costs per rank for each vow (index 0 = cost of rank 1, etc.)
-_VOW_POINT_COSTS: Dict[str, List[int]] = {
-    "EnemyDamageShrineUpgrade":     [1, 2, 2],
-    "EnemyHealthShrineUpgrade":     [1, 1, 1],
-    "EnemyShieldShrineUpgrade":     [1, 1],
-    "EnemySpeedShrineUpgrade":      [3, 3],
-    "EnemyCountShrineUpgrade":      [1, 1, 1],
-    "NextBiomeEnemyShrineUpgrade":  [1, 2],
-    "EnemyRespawnShrineUpgrade":    [1, 1],
-    "EnemyEliteShrineUpgrade":      [2, 3],
-    "HealingReductionShrineUpgrade":[1, 1, 2],
-    "ShopPricesShrineUpgrade":      [1, 1],
-    "MinibossCountShrineUpgrade":   [2],
-    "BoonSkipShrineUpgrade":        [3],
-    "BiomeSpeedShrineUpgrade":      [1, 2, 3],
-    "LimitGraspShrineUpgrade":      [1, 1, 1, 2],
-    "BoonManaReserveShrineUpgrade": [1, 1],
-    "BanUnpickedBoonsShrineUpgrade":[2],
-    "BossDifficultyShrineUpgrade":  [2, 3, 3, 4],
-}
 
 
 def _launch_client(*args):
@@ -75,17 +54,17 @@ class HadesIIWorld(World):
 
     def _compute_vow_ranks(self, total_points: int) -> Dict[str, int]:
         """Randomly distribute total_points shrine points across vows using self.random."""
-        ranks: Dict[str, int] = {name: 0 for name in _VOW_POINT_COSTS}
+        ranks: Dict[str, int] = {name: 0 for name in VOW_POINT_COSTS}
         remaining = total_points
         while remaining > 0:
             affordable = [
-                name for name, costs in _VOW_POINT_COSTS.items()
+                name for name, costs in VOW_POINT_COSTS.items()
                 if ranks[name] < len(costs) and costs[ranks[name]] <= remaining
             ]
             if not affordable:
                 break
             chosen = self.random.choice(affordable)
-            remaining -= _VOW_POINT_COSTS[chosen][ranks[chosen]]
+            remaining -= VOW_POINT_COSTS[chosen][ranks[chosen]]
             ranks[chosen] += 1
         return {name: rank for name, rank in ranks.items() if rank > 0}
 

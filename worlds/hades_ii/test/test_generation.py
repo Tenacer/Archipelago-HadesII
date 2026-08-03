@@ -3,22 +3,27 @@ from .bases import HadesIITestBase
 from ..Options import hades_ii_option_presets
 
 
-def _assert_score_checks_block_progression(test_case) -> None:
-    """Score checks must reject progression items via their per-location item rule."""
+def _assert_score_checks_take_progression(test_case) -> None:
+    """Score checks accept progression except for the protected tail (deepest 1/8 of each route)."""
+    from ..Locations import score_check_placement
+
     fake_progression = Item("test", ItemClassification.progression, None, test_case.player)
     fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
-    score_locs = [
-        loc for loc in test_case.multiworld.get_locations(test_case.player)
-        if loc.name.startswith(("Score Check ", "Underworld Score Check ", "Surface Score Check "))
-    ]
-    test_case.assertGreater(len(score_locs), 0, "no score checks found")
-    for loc in score_locs:
+    placement = list(score_check_placement(test_case.multiworld.worlds[test_case.player].options))
+    test_case.assertGreater(len(placement), 0, "no score checks found")
+
+    tail_seen = False
+    for name, region, is_tail, _loc_id in placement:
+        loc = test_case.multiworld.get_location(name, test_case.player)
         test_case.assertNotEqual(loc.progress_type, LocationProgressType.EXCLUDED,
-            f"{loc.name} must not be EXCLUDED — rely on item rule instead")
-        test_case.assertFalse(loc.item_rule(fake_progression),
-            f"{loc.name} should reject progression items")
-        test_case.assertTrue(loc.item_rule(fake_filler),
-            f"{loc.name} should accept filler items")
+            f"{name} must not be EXCLUDED — rely on item rules instead")
+        test_case.assertEqual(loc.parent_region.name, region,
+            f"{name} should be banded into {region}")
+        test_case.assertTrue(loc.item_rule(fake_filler), f"{name} should accept filler items")
+        test_case.assertEqual(loc.item_rule(fake_progression), not is_tail,
+            f"{name} progression acceptance should match its band (tail={is_tail})")
+        tail_seen = tail_seen or is_tail
+    test_case.assertTrue(tail_seen, "no protected tail checks found")
 
 
 _WEAPON_CLEAR_NAMES = (
@@ -33,21 +38,18 @@ class TestDefaultGeneration(HadesIITestBase):
     default sanities, normal fear."""
     options = {}
 
-    def test_score_checks_block_progression(self) -> None:
-        _assert_score_checks_block_progression(self)
+    def test_score_checks_take_progression(self) -> None:
+        _assert_score_checks_take_progression(self)
 
-    def test_weapon_clears_present_and_filler_only(self) -> None:
-        # Weaponsanity is on by default: the 6 per-weapon "<W> Clear" checks
-        # exist, are gated (have an access rule), and reject progression items.
+    def test_weapon_clears_present_and_gated(self) -> None:
+        # Weaponsanity is on by default: the 6 per-weapon "<W> Clear" checks exist
+        # and are gated by an access rule, so they can hold any item.
         fake_progression = Item("test", ItemClassification.progression, None, self.player)
-        fake_filler = Item("test", ItemClassification.filler, None, self.player)
         for name in _WEAPON_CLEAR_NAMES:
             loc = self.multiworld.get_location(name, self.player)
             self.assertIsNotNone(loc.access_rule, f"{name} must have an access rule")
-            self.assertFalse(loc.item_rule(fake_progression),
-                f"{name} should reject progression items")
-            self.assertTrue(loc.item_rule(fake_filler),
-                f"{name} should accept filler items")
+            self.assertTrue(loc.item_rule(fake_progression),
+                f"{name} should accept progression items")
 
     def test_boss_rewards_present_by_default(self) -> None:
         # True Ending is the default goal: per-kill reward locations exist up to
@@ -191,8 +193,8 @@ class TestTrueEndingAllSanities(HadesIITestBase):
         "fatesanity": 1,
     }
 
-    def test_score_checks_block_progression(self) -> None:
-        _assert_score_checks_block_progression(self)
+    def test_score_checks_take_progression(self) -> None:
+        _assert_score_checks_take_progression(self)
 
 
 class TestAllSanitiesOff(HadesIITestBase):
@@ -415,6 +417,60 @@ class TestVanillaFear(HadesIITestBase):
         self.assertEqual(len(vow_items), 0, "Vanilla fear should add no vow items")
 
 
+class TestReverseFearCaps(HadesIITestBase):
+    """reverse_fear gates each boss on how much fear is still active, so vows come
+    off progressively instead of arriving in one late batch."""
+    options = {"fear_system": 1, "initial_fear_level": 32}
+
+    def _initial_points(self) -> int:
+        from ..Items import VOW_POINT_COSTS
+        return sum(sum(VOW_POINT_COSTS[shrine][:rank])
+                   for shrine, rank in self.world.vow_ranks.items())
+
+    def test_vow_items_are_progression(self) -> None:
+        vow_items = [item for item in self.multiworld.itempool
+                     if item.player == self.player and "Vow of" in item.name]
+        self.assertGreater(len(vow_items), 0, "reverse_fear should add vow items")
+        for item in vow_items:
+            self.assertTrue(item.advancement, f"{item.name} must be progression for the fear caps")
+
+    def test_fear_points_drop_as_vows_arrive(self) -> None:
+        from BaseClasses import CollectionState
+        state = CollectionState(self.multiworld)
+        self.assertEqual(state._fear_points_left(self.player, self.world.options),
+                         self._initial_points())
+        for item in self.multiworld.itempool:
+            if item.player == self.player and "Vow of" in item.name:
+                state.collect(item, prevent_sweep=True)
+        self.assertEqual(state._fear_points_left(self.player, self.world.options), 0,
+                         "collecting every vow must clear all fear")
+
+    def test_bosses_gated_on_fear(self) -> None:
+        # With no vows the player sits at full fear, so no boss is expected to fall.
+        from BaseClasses import CollectionState
+        state = CollectionState(self.multiworld)
+        for name in ("Hecate Victory", "Chronos Victory", "Typhon Victory"):
+            self.assertFalse(self.multiworld.get_location(name, self.player).access_rule(state),
+                f"{name} should be gated at full fear")
+
+    def test_final_bosses_need_most_vows(self) -> None:
+        # The final tier caps fear at 15% of the start, so nearly every vow is on the path.
+        from ..Rules import _FEAR_TIERS
+        self.assertEqual(_FEAR_TIERS[-1][1], 0.15)
+        cap = int(self._initial_points() * 0.15)
+        self.assertLess(cap, self._initial_points() // 4)
+
+
+class TestVanillaFearHasNoCaps(HadesIITestBase):
+    """Outside reverse_fear the fear level never changes, so the caps must not apply."""
+    options = {"fear_system": 3}
+
+    def test_fear_points_always_zero(self) -> None:
+        from BaseClasses import CollectionState
+        state = CollectionState(self.multiworld)
+        self.assertEqual(state._fear_points_left(self.player, self.world.options), 0)
+
+
 class TestFatesanityWithGoal(HadesIITestBase):
     options = {"fatesanity": 1, "fates_needed": 10}
 
@@ -499,8 +555,8 @@ class TestScoreRewards72(HadesIITestBase):
         ]
         self.assertEqual(len(score_locs), 72)
 
-    def test_score_checks_block_progression(self) -> None:
-        _assert_score_checks_block_progression(self)
+    def test_score_checks_take_progression(self) -> None:
+        _assert_score_checks_take_progression(self)
 
 
 class TestScoreRewardsMax(HadesIITestBase):
@@ -513,8 +569,8 @@ class TestScoreRewardsMax(HadesIITestBase):
         ]
         self.assertEqual(len(score_locs), 150)
 
-    def test_score_checks_block_progression(self) -> None:
-        _assert_score_checks_block_progression(self)
+    def test_score_checks_take_progression(self) -> None:
+        _assert_score_checks_take_progression(self)
 
 
 _WEAPON_UNLOCK_LOCATIONS = [
@@ -683,8 +739,9 @@ class TestIncantationChainsAreProgression(HadesIITestBase):
 
 
 class TestScoreSplitSeparate(HadesIITestBase):
-    """Separate score split (default): underworld score checks live in Erebus
-    (reachable from start) and surface ones in Ephyra (gated by surface access).
+    """Separate score split (default): each route's budget is banded across that
+    route's four biomes — underworld starting in Erebus (reachable from start),
+    surface starting in Ephyra (gated by surface access).
     lock_surface_incantations on so the surface gate has teeth."""
     options = {
         "score_split_mode": "separate",
@@ -698,19 +755,23 @@ class TestScoreSplitSeparate(HadesIITestBase):
         under, surf = score_check_split(100, 40)
         self.assertEqual((under, surf), (60, 40))
 
-    def test_underworld_checks_in_erebus(self) -> None:
-        # The underworld budget (60) of route-named checks is placed in Erebus.
-        loc = self.multiworld.get_location("Underworld Score Check 1", self.player)
-        self.assertEqual(loc.parent_region.name, "Erebus")
-        loc = self.multiworld.get_location("Underworld Score Check 60", self.player)
-        self.assertEqual(loc.parent_region.name, "Erebus")
+    def test_underworld_checks_banded(self) -> None:
+        # 60 underworld checks band 1/8-2/8-2/8-3/8 across the Chronos route.
+        for name, region in (("Underworld Score Check 1", "Erebus"),
+                             ("Underworld Score Check 20", "Oceanus"),
+                             ("Underworld Score Check 35", "Fields"),
+                             ("Underworld Score Check 60", "Tartarus")):
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertEqual(loc.parent_region.name, region)
 
-    def test_surface_checks_in_ephyra(self) -> None:
-        # The surface budget (40) of route-named checks is placed in Ephyra.
-        loc = self.multiworld.get_location("Surface Score Check 1", self.player)
-        self.assertEqual(loc.parent_region.name, "Ephyra")
-        loc = self.multiworld.get_location("Surface Score Check 40", self.player)
-        self.assertEqual(loc.parent_region.name, "Ephyra")
+    def test_surface_checks_banded(self) -> None:
+        # 40 surface checks band the same way across the Typhon route.
+        for name, region in (("Surface Score Check 1", "Ephyra"),
+                             ("Surface Score Check 15", "Thessaly"),
+                             ("Surface Score Check 25", "Olympus"),
+                             ("Surface Score Check 40", "Summit")):
+            loc = self.multiworld.get_location(name, self.player)
+            self.assertEqual(loc.parent_region.name, region)
 
     def test_surface_checks_need_surface_access(self) -> None:
         # With no items collected the surface unlock incantations are missing,
@@ -720,27 +781,30 @@ class TestScoreSplitSeparate(HadesIITestBase):
 
 
 class TestScoreSplitCombined(HadesIITestBase):
-    """Combined score split: all checks live in Menu and are reachable from the
-    start regardless of surface access."""
+    """Combined score split: one pool banded down the underworld chain, which can
+    earn the whole budget on its own, so no check ever needs surface access."""
     options = {
         "score_split_mode": "combined",
         "score_rewards_amount": 100,
         "lock_surface_incantations": 1,
     }
 
-    def test_all_checks_in_menu(self) -> None:
-        for name in ("Score Check 1", "Score Check 100"):
+    def test_all_checks_banded_underworld(self) -> None:
+        for name, region in (("Score Check 1", "Erebus"), ("Score Check 30", "Oceanus"),
+                             ("Score Check 55", "Fields"), ("Score Check 100", "Tartarus")):
             loc = self.multiworld.get_location(name, self.player)
-            self.assertEqual(loc.parent_region.name, "Menu")
+            self.assertEqual(loc.parent_region.name, region)
 
-    def test_all_checks_reachable_from_start(self) -> None:
+    def test_first_band_reachable_from_start(self) -> None:
+        # The Erebus band needs nothing; the deepest band sits behind the boss chain, not surface access.
         self.assertTrue(self.can_reach_location("Score Check 1"))
-        self.assertTrue(self.can_reach_location("Score Check 100"))
+        self.assertFalse(self.can_reach_location("Score Check 100"))
 
 
 # ── Room-based location systems ───────────────────────────────────────────────
 
-def _assert_room_checks_block_progression(test_case) -> None:
+def _assert_room_checks_take_progression(test_case) -> None:
+    # Room checks already carry real logic via their per-depth biome region, so they take any item.
     fake_progression = Item("test", ItemClassification.progression, None, test_case.player)
     fake_filler = Item("test", ItemClassification.filler, None, test_case.player)
     room_locs = [
@@ -749,8 +813,8 @@ def _assert_room_checks_block_progression(test_case) -> None:
     ]
     test_case.assertGreater(len(room_locs), 0, "no room checks found")
     for loc in room_locs:
-        test_case.assertFalse(loc.item_rule(fake_progression),
-            f"{loc.name} should reject progression items")
+        test_case.assertTrue(loc.item_rule(fake_progression),
+            f"{loc.name} should accept progression items")
         test_case.assertTrue(loc.item_rule(fake_filler),
             f"{loc.name} should accept filler items")
 
@@ -800,8 +864,8 @@ class TestRoomBased(HadesIITestBase):
     def test_surface_rooms_need_surface_access(self) -> None:
         self.assertFalse(self.can_reach_location("Clear Surface Room 01"))
 
-    def test_room_checks_block_progression(self) -> None:
-        _assert_room_checks_block_progression(self)
+    def test_room_checks_take_progression(self) -> None:
+        _assert_room_checks_take_progression(self)
 
 
 class TestRoomWeaponBased(HadesIITestBase):
@@ -820,8 +884,8 @@ class TestRoomWeaponBased(HadesIITestBase):
         for name in ("Clear Underworld Room 01 Staff", "Clear Surface Room 01 Coat"):
             self.assertIsNotNone(self.multiworld.get_location(name, self.player))
 
-    def test_room_checks_block_progression(self) -> None:
-        _assert_room_checks_block_progression(self)
+    def test_room_checks_take_progression(self) -> None:
+        _assert_room_checks_take_progression(self)
 
 
 # ── Ingredient logic ──────────────────────────────────────────────────────────

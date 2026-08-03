@@ -30,8 +30,13 @@ shuffled into the Archipelago item pool, each behind its own option:
   fires an AP check; the resource reward is delivered by AP instead.
 
 Rooms also count toward a **score system**: every cleared room earns
-points, and reaching a score milestone fires a filler-item check
-(configurable with `score_rewards_amount`). By default the score is
+points, and reaching a score milestone fires an AP check (configurable
+with `score_rewards_amount`). Score checks hold ordinary randomised
+items, progression included — each route's checks are spread across that
+route's four biomes in logic, so later checks sit behind deeper
+progress. The deepest eighth of each route is the exception: those are
+the longest grind, so they only ever hold non-progression items. By
+default the score is
 **split per route** (`score_split_mode`): the underworld route (Erebus →
 Tartarus, the Chronos path) and the surface route (Ephyra → Summit, the
 Typhon path) each accumulate their own score and can only earn their own

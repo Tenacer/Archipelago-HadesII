@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
-from .Items import item_table_fears, item_table_keepsakes, item_table_prophecies
-from .Locations import initial_aspect_item
+from .Items import item_table_keepsakes, item_table_prophecies, VOW_POINT_COSTS, VOW_ITEM_FOR_SHRINE
+from .Locations import initial_aspect_item, score_check_placement
 from worlds.AutoWorld import LogicMixin
 from worlds.generic.Rules import add_rule, add_item_rule
 
@@ -32,6 +32,17 @@ class HadesIILogic(LogicMixin):
     # Checks if the player has enough of a given item 
     def _has_enough_of_item(self, player: int, amount: int, item: str) -> bool:
         return self.count(item, player) >= amount  # type: ignore
+
+    # Shrine points still active in reverse_fear; each vow item received clears that vow's highest remaining rank.
+    def _fear_points_left(self, player: int, options) -> int:
+        if options.fear_system.value != 1:
+            return 0
+        vow_ranks = self.multiworld.worlds[player].vow_ranks  # type: ignore
+        total = 0
+        for shrine, rank in vow_ranks.items():
+            received = self.count(VOW_ITEM_FOR_SHRINE[shrine], player)  # type: ignore
+            total += sum(VOW_POINT_COSTS[shrine][:max(0, rank - received)])
+        return total
     
     # Generation-time approximation: owning N weapons + endgame reach proves N distinct clears are possible; the real count is enforced client-side.
     def _has_enough_weapons(self, player: int, options, amount: int) -> bool:
@@ -590,16 +601,41 @@ def handle_ingredients(world, player: int, options) -> None:
             ))
 
 
-def _restrict_score_check_progression(world, player: int, options) -> None:
-    """Block progression items from score/room checks while letting useful + filler fill them uniformly."""
-    score_prefixes = ("Score Check ", "Underworld Score Check ", "Surface Score Check ", "Clear ")
-    for loc in world.get_locations(player):
-        if loc.name.startswith(score_prefixes):
-            add_item_rule(loc, lambda item: not item.advancement)
+def _restrict_score_tail_progression(world, player: int, options) -> None:
+    """Keep progression out of the deepest 1/8 of each route's score checks — that tail is a long grind."""
+    for name, _region, is_tail, _loc_id in score_check_placement(options):
+        if is_tail:
+            add_item_rule(world.get_location(name, player), lambda item: not item.advancement)
+
+
+# Boss victories per route → the most fear (as a share of the starting level) the player may still carry.
+_FEAR_TIERS = [
+    (("Hecate Victory",   "Polyphemus Victory"), 0.80),
+    (("Scylla Victory",   "Eris Victory"),       0.55),
+    (("Cerberus Victory", "Prometheus Victory"), 0.35),
+    (("Chronos Victory",  "Typhon Victory"),     0.15),
+]
+
+
+def handle_fear(world, player: int, options) -> None:
+    """reverse_fear: cap the fear still active at each boss so vows come off progressively instead of all at the end."""
+    if options.fear_system.value != 1:
+        return
+    vow_ranks = world.worlds[player].vow_ranks
+    initial = sum(sum(VOW_POINT_COSTS[shrine][:rank]) for shrine, rank in vow_ranks.items())
+    if initial == 0:
+        return
+    for location_names, share in _FEAR_TIERS:
+        cap = int(initial * share)
+        for name in location_names:
+            add_rule(
+                world.get_location(name, player),
+                lambda state, c=cap: state._fear_points_left(player, options) <= c,  # type: ignore
+            )
 
 
 def _set_weapon_clear_rules(world, player: int, options) -> None:
-    """Weapon Clear checks are trackable filler; the weapon-clears goal itself is enforced client-side."""
+    """Weapon Clear checks need the weapon plus endgame reach; the goal count itself is enforced client-side."""
     if not options.weaponsanity:
         return
     for weapon in weapons:
@@ -612,13 +648,13 @@ def _set_weapon_clear_rules(world, player: int, options) -> None:
             state._has_weapon(w, player, options)
             and state._can_reach_endgame(player, options)
         ))
-        add_item_rule(loc, lambda item: not item.advancement)
 
 
 def set_rules(world, player: int, options) -> None:
     handle_area_logic(world, player, options)
-    _restrict_score_check_progression(world, player, options)
+    _restrict_score_tail_progression(world, player, options)
     _set_weapon_clear_rules(world, player, options)
+    handle_fear(world, player, options)
     world.completion_condition[player] = lambda state: state._can_get_victory(player, options)
 
     # One unified handler per sanity.

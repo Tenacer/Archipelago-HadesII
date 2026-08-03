@@ -59,6 +59,8 @@ class ScoreRewardsAmount(Range):
     Each room in Hades gives "its depth" in score when completed. The points needed between
     consecutive checks start small, rise gently to a steady mid-game plateau, then climb again
     toward the final checks — so the early game unlocks quickly and the last checks are the grind.
+    In logic each route's checks are banded across that route's four biomes, so later checks
+    require deeper progress; the deepest eighth never holds progression items.
     """
     display_name = "Score Rewards Amount"
     range_start = 72
@@ -315,7 +317,10 @@ class FearSystem(Choice):
     """
     Choose either reverse_fear (1), minimal_fear (2) or vanilla_fear (3) for the game.
     In reverse_fear you start with randomly distributed Fear vows that are locked on until
-    you receive the corresponding vow items from the AP world.
+    you receive the corresponding vow items from the AP world. Logic caps how much Fear can
+    still be active at each boss (80% / 55% / 35% of the starting level for the first three
+    bosses of a route, 15% at Chronos and Typhon), so vows come off progressively and the
+    final fights are never expected at high Fear.
     In minimal_fear the game starts with randomly distributed vows that act as a permanent
     floor — the shrine is hidden and levels never change.
     vanilla_fear leaves all vow control to the player (shrine works normally).

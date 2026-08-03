@@ -2,10 +2,7 @@ from BaseClasses import Region, Entrance
 from .Locations import (
     HadesIILocation,
     SURFACE_LOCK_LOCATIONS,
-    location_table_score_checks,
-    location_table_underworld_score_checks,
-    location_table_surface_score_checks,
-    score_check_split,
+    score_check_placement,
     location_room_clears_by_region,
     location_room_weapon_clears_by_region,
     location_table_boss_rewards,
@@ -64,21 +61,9 @@ def _add_location(region: Region, name: str, address):
 def create_regions(player, multiworld, location_database, options):
     regions = {name: Region(name, player, multiworld) for name in _region_connections}
 
-    # Score checks: combined mode lives in Menu; separate mode places each route's budget in Erebus/Ephyra so fill respects surface access.
-    if options.location_system == "score_based":
-        n = options.score_rewards_amount.value
-        if options.score_split_mode == 1:  # separate
-            underworld_budget, surface_budget = score_check_split(n, options.surface_score_ratio.value)
-            for i in range(1, underworld_budget + 1):
-                name = f"Underworld Score Check {i}"
-                _add_location(regions["Erebus"], name, location_table_underworld_score_checks[name])
-            for i in range(1, surface_budget + 1):
-                name = f"Surface Score Check {i}"
-                _add_location(regions["Ephyra"], name, location_table_surface_score_checks[name])
-        else:  # combined
-            for i in range(1, n + 1):
-                name = f"Score Check {i}"
-                _add_location(regions["Menu"], name, location_table_score_checks[name])
+    # Score checks: banded across each route's biomes so fill reads the score ladder as real depth progression.
+    for name, region_name, _is_tail, loc_id in score_check_placement(options):
+        _add_location(regions[region_name], name, loc_id)
 
     # Room-based systems: each depth's check goes in the biome region owning its run depth.
     room_region_tables = None

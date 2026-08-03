@@ -66,6 +66,27 @@ PROGRESSION_PROPHECY_ITEMS = frozenset({
     "The Unseen Sentinel Reward",        # QuestUnlockAllWeaponAspects → Bearing Dark Gifts
 })
 
+# Shrine point costs per rank for each vow (index 0 = cost of rank 1, etc.)
+VOW_POINT_COSTS: Dict[str, List[int]] = {
+    "EnemyDamageShrineUpgrade":     [1, 2, 2],
+    "EnemyHealthShrineUpgrade":     [1, 1, 1],
+    "EnemyShieldShrineUpgrade":     [1, 1],
+    "EnemySpeedShrineUpgrade":      [3, 3],
+    "EnemyCountShrineUpgrade":      [1, 1, 1],
+    "NextBiomeEnemyShrineUpgrade":  [1, 2],
+    "EnemyRespawnShrineUpgrade":    [1, 1],
+    "EnemyEliteShrineUpgrade":      [2, 3],
+    "HealingReductionShrineUpgrade":[1, 1, 2],
+    "ShopPricesShrineUpgrade":      [1, 1],
+    "MinibossCountShrineUpgrade":   [2],
+    "BoonSkipShrineUpgrade":        [3],
+    "BiomeSpeedShrineUpgrade":      [1, 2, 3],
+    "LimitGraspShrineUpgrade":      [1, 1, 1, 2],
+    "BoonManaReserveShrineUpgrade": [1, 1],
+    "BanUnpickedBoonsShrineUpgrade":[2],
+    "BossDifficultyShrineUpgrade":  [2, 3, 3, 4],
+}
+
 # (base item name, shrine_upgrade_name); vow items only enter the pool in reverse_fear mode.
 _VOW_OPTIONS = [
     ("Vow of Pain",    "EnemyDamageShrineUpgrade"),
@@ -86,6 +107,9 @@ _VOW_OPTIONS = [
     ("Vow of Denial",  "BanUnpickedBoonsShrineUpgrade"),
     ("Vow of Rivals",  "BossDifficultyShrineUpgrade"),
 ]
+
+# shrine_upgrade_name → AP item name, for the fear rules in Rules.py.
+VOW_ITEM_FOR_SHRINE = {shrine: name for name, shrine in _VOW_OPTIONS}
 
 
 class ItemData(NamedTuple):
@@ -167,11 +191,14 @@ def create_items(self) -> None:
     pool: List[Item] = []
 
     # Fear vows — only in reverse_fear; amounts from the randomly distributed vow_ranks.
+    # Progression so the fear caps in Rules.py can count them (state.has ignores `useful`).
     if self.options.fear_system.value == 1:
         vow_ranks = getattr(self, "vow_ranks", {})
         for base, shrine_name in _VOW_OPTIONS:
             for _ in range(vow_ranks.get(shrine_name, 0)):
-                pool.append(self.create_item(base))
+                item = self.create_item(base)
+                item.classification = ItemClassification.progression
+                pool.append(item)
 
     # Keepsakes: 30 with checks plus 3 receive-only post-ending ones; promoted to progression when the goal counts them.
     if self.options.keepsakesanity:

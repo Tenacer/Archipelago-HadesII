@@ -66,6 +66,26 @@ def score_check_split(score_rewards_amount: int, surface_score_ratio: int):
     return underworld_budget, surface_budget
 
 
+def score_check_bands(budget: int, regions):
+    """Split an ordered score budget into [(region, first, last)] plus the 1-based start of the protected tail.
+
+    Shares are 1/8, 2/8, 2/8, 3/8 across a route's biomes (the last 1/8 being the tail),
+    mirroring Polycosmos. Banding is deliberately over-strict — score is farmable in the
+    first biome — which only ever pushes items later, never earlier.
+    """
+    if budget <= 0:
+        return [], 1
+    eighth = budget // 8
+    counts = [budget - 7 * eighth, 2 * eighth, 2 * eighth, 3 * eighth]
+    bands, index = [], 1
+    for region, count in zip(regions, counts):
+        if count <= 0:
+            continue
+        bands.append((region, index, index + count - 1))
+        index += count
+    return bands, budget - eighth + 1
+
+
 # -- Room-based location systems (room_based / room_weapon_based) --------------
 # Per-route biome depth bounds as ordered (region, last_run_depth) pairs; each room check lives in the biome region owning its depth.
 # TODO(confirm): boundaries are estimates — update from the mod's logged depths, then regenerate the room rows (scripts/gen_room_locations.py).
@@ -74,8 +94,38 @@ SURFACE_BIOME_BOUNDS    = [("Ephyra", 11), ("Thessaly", 19), ("Olympus", 29), ("
 
 UNDERWORLD_ROOM_MAX = UNDERWORLD_BIOME_BOUNDS[-1][1]
 SURFACE_ROOM_MAX    = SURFACE_BIOME_BOUNDS[-1][1]
+
 # Run depth where Tartarus begins; the Chronos-kill auto-grant covers from here to the underworld max.
 UNDERWORLD_AUTOGRANT_FROM = UNDERWORLD_BIOME_BOUNDS[-2][1] + 1
+
+# Biome order per route, reused to band score checks by depth.
+UNDERWORLD_REGIONS = [region for region, _ in UNDERWORLD_BIOME_BOUNDS]
+SURFACE_REGIONS    = [region for region, _ in SURFACE_BIOME_BOUNDS]
+
+
+def score_check_placement(options):
+    """Yield (name, region, is_tail, id) for every enabled score check — the single source of truth for Regions.py and Rules.py."""
+    if options.location_system != "score_based":
+        return
+    if options.score_split_mode == 1:  # separate
+        underworld_budget, surface_budget = score_check_split(
+            options.score_rewards_amount.value, options.surface_score_ratio.value)
+        pools = [
+            ("Underworld Score Check", underworld_budget, UNDERWORLD_REGIONS,
+             location_table_underworld_score_checks),
+            ("Surface Score Check", surface_budget, SURFACE_REGIONS,
+             location_table_surface_score_checks),
+        ]
+    else:  # combined — banded down the underworld chain, which can earn the whole pool on its own
+        pools = [("Score Check", options.score_rewards_amount.value, UNDERWORLD_REGIONS,
+                  location_table_score_checks)]
+
+    for prefix, budget, regions, table in pools:
+        bands, tail_start = score_check_bands(budget, regions)
+        for region, first, last in bands:
+            for i in range(first, last + 1):
+                name = f"{prefix} {i}"
+                yield name, region, i >= tail_start, table[name]
 
 
 def room_region_for(bounds, depth: int) -> str:
@@ -173,19 +223,8 @@ def setup_location_table_with_settings(options) -> dict:
 
     # Score checks: one combined pool, or the two route-named pools split by budget.
     if options.location_system == "score_based":
-        if options.score_split_mode == 1:  # separate
-            underworld_budget, surface_budget = score_check_split(
-                options.score_rewards_amount.value, options.surface_score_ratio.value)
-            for i in range(1, underworld_budget + 1):
-                name = f"Underworld Score Check {i}"
-                total[name] = location_table_underworld_score_checks[name]
-            for i in range(1, surface_budget + 1):
-                name = f"Surface Score Check {i}"
-                total[name] = location_table_surface_score_checks[name]
-        else:  # combined
-            for i in range(1, options.score_rewards_amount.value + 1):
-                name = f"Score Check {i}"
-                total[name] = location_table_score_checks[name]
+        for name, _region, _is_tail, loc_id in score_check_placement(options):
+            total[name] = loc_id
 
     # Room-based systems: per-route depth checks.
     elif options.location_system == "room_based":
